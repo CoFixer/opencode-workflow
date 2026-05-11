@@ -1,0 +1,125 @@
+{
+  "version": "1.0",
+  "stack": "base",
+  "agents": {
+    "playwright-qa-agent": {
+      "file": "testing/playwright-qa-agent.md",
+      "tier": "medium",
+      "domain": "qa",
+      "roles": ["tester", "verifier"],
+      "description": "Execute user stories via Playwright with PASS/FAIL reports"
+    },
+    "doc-updater": {
+      "file": "documentation/doc-updater.md",
+      "tier": "medium",
+      "domain": "documentation",
+      "roles": ["documenter"],
+      "description": "Analyze session and propose documentation updates"
+    },
+    "automation-scout": {
+      "file": "analysis/automation-scout.md",
+      "tier": "low",
+      "domain": "meta",
+      "roles": ["analyzer"],
+      "description": "Detect repetitive patterns and suggest automations"
+    },
+    "learning-extractor": {
+      "file": "analysis/learning-extractor.md",
+      "tier": "low",
+      "domain": "meta",
+      "roles": ["analyzer"],
+      "description": "Extract learnings from session in TIL format"
+    },
+    "followup-suggester": {
+      "file": "analysis/followup-suggester.md",
+      "tier": "low",
+      "domain": "meta",
+      "roles": ["analyzer"],
+      "description": "Identify incomplete work and prioritize follow-ups"
+    },
+    "duplicate-checker": {
+      "file": "analysis/duplicate-checker.md",
+      "tier": "low",
+      "domain": "meta",
+      "roles": ["validator"],
+      "description": "Check proposals for duplicates against existing docs"
+    },
+    "backend-developer": {
+      "file": "development/backend-developer.md",
+      "tier": "high",
+      "domain": "backend",
+      "roles": ["developer"],
+      "description": "NestJS backend development specialist"
+    },
+    "frontend-developer": {
+      "file": "development/frontend-developer.md",
+      "tier": "high",
+      "domain": "frontend",
+      "roles": ["developer"],
+      "description": "React frontend development specialist"
+    },
+    "mobile-developer": {
+      "file": "development/mobile-developer.md",
+      "tier": "high",
+      "domain": "mobile",
+      "roles": ["developer"],
+      "description": "React Native mobile development specialist"
+    },
+    "api-integration-agent": {
+      "file": "development/api-integration-agent.md",
+      "tier": "medium",
+      "domain": "backend",
+      "roles": ["integrator"],
+      "description": "API integration between frontend and backend"
+    },
+    "database-designer": {
+      "file": "development/database-designer.md",
+      "tier": "medium",
+      "domain": "backend",
+      "roles": ["designer"],
+      "description": "Database schema design and optimization"
+    },
+    "fullstack-agent": {
+      "file": "development/fullstack-agent.md",
+      "tier": "high",
+      "domain": "fullstack",
+      "roles": ["developer", "coordinator"],
+      "description": "Full-stack feature implementation coordinator"
+    },
+    "gap-finder": {
+      "file": "quality/gap-finder.md",
+      "tier": "medium",
+      "domain": "qa",
+      "roles": ["analyzer"],
+      "description": "Find implementation gaps across the full stack"
+    },
+    "gap-fixer": {
+      "file": "quality/gap-fixer.md",
+      "tier": "medium",
+      "domain": "qa",
+      "roles": ["fixer"],
+      "description": "Fix gaps found by gap analysis"
+    },
+    "quality-lead": {
+      "file": "quality/quality-lead.md",
+      "tier": "medium",
+      "domain": "qa",
+      "roles": ["lead"],
+      "description": "Quality oversight and standards enforcement"
+    },
+    "reviewer": {
+      "file": "quality/reviewer.md",
+      "tier": "medium",
+      "domain": "qa",
+      "roles": ["reviewer"],
+      "description": "General code and documentation reviewer"
+    },
+    "project-coordinator": {
+      "file": "orchestration/project-coordinator.md",
+      "tier": "high",
+      "domain": "orchestration",
+      "roles": ["coordinator"],
+      "description": "Multi-agent orchestration and project planning"
+    }
+  }
+}

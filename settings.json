@@ -1,0 +1,46 @@
+{
+    "framework": "opencode",
+    "version": "1.0",
+    "permissions": {
+        "allow": [
+            "Edit:*",
+            "Write:*",
+            "MultiEdit:*",
+            "Bash:*"
+        ],
+        "defaultMode": "acceptEdits"
+    },
+    "hooks": {
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "$PROJECT_DIR/.opencode/hooks/skill-activation-prompt.sh"
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "$PROJECT_DIR/.opencode/hooks/auto-reflect.sh"
+                    },
+                    {
+                        "type": "command",
+                        "command": "$PROJECT_DIR/.opencode/hooks/status-auto-updater.sh"
+                    }
+                ]
+            }
+        ]
+    },
+    "project": {
+        "sharedHub": ".project/",
+        "docsPath": ".project/docs/",
+        "memoryPath": ".project/memory/",
+        "statusPath": ".project/status/",
+        "prdPath": ".project/prd/"
+    }
+}
