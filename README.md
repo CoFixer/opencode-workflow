@@ -12,9 +12,10 @@ A project-specific workflow system for OpenCode agents, modeled after `.claude`,
 ```
 .opencode/
 ├── README.md                    # This file
-├── settings.json                # Workspace settings
-├── skill-rules.json             # Skill activation rules
+├── settings.json                # Workspace settings (reference only)
+├── skill-rules.json             # Skill activation rules (reference only)
 ├── prompts/                     # Reusable prompt templates (60+)
+├── commands/                    # OpenCode custom commands (Ctrl+K)
 │   ├── new-project.md
 │   ├── init-workspace.md
 │   ├── init-harness.md
@@ -80,24 +81,46 @@ A project-specific workflow system for OpenCode agents, modeled after `.claude`,
 ## How It Works
 
 ### Skills
-Skills are loaded by OpenCode and invoked with `/skill:<name>`:
+
+OpenCode auto-discovers `SKILL.md` files under `.opencode/skills/` (and other framework skill dirs). These skills are exposed via the built-in **`skill`** tool.
+
+**To invoke a skill, type in chat:**
+- `/skill:<name>` — e.g. `/skill:commit`
+- `/<name>` — shorthand, e.g. `/commit`
+
+The AI will automatically call the `skill` tool and load the skill instructions.
 
 | Skill | Command | Purpose |
 |-------|---------|---------|
-| `commit` | `/skill:commit` | Git commit & PR workflow |
-| `create-dev-pr` | `/skill:create-dev-pr` | Create PR to dev branch |
-| `find-gaps` | `/skill:find-gaps` | Find implementation gaps |
-| `fix-gaps` | `/skill:fix-gaps` | Fix identified gaps |
-| `generate-docs` | `/skill:generate-docs` | Generate API & knowledge docs |
-| `generate-ouroboros` | `/skill:generate-ouroboros` | Validate PRD specs |
-| `review-tickets` | `/skill:review-tickets` | Review Notion tickets |
-| `run-fullstack` | `/skill:run-fullstack` | Full-stack dev pipeline |
-| `reflect` | `/skill:reflect` | Session reflection |
-| `generate-prd` | `/skill:generate-prd` | Generate PRD from input |
-| `generate-ppt` | `/skill:generate-ppt` | Generate HTML presentations |
-| `generate-proposal` | `/skill:generate-proposal` | Generate client proposals |
-| `generate-invoice` | `/skill:generate-invoice` | Generate invoices |
-| `run-playwright` | `/skill:run-playwright` | Run Playwright E2E tests |
+| `commit` | `/commit` or `/skill:commit` | Git commit & PR workflow |
+| `create-dev-pr` | `/create-dev-pr` | Create PR to dev branch |
+| `find-gaps` | `/find-gaps` | Find implementation gaps |
+| `fix-gaps` | `/fix-gaps` | Fix identified gaps |
+| `generate-docs` | `/generate-docs` | Generate API & knowledge docs |
+| `generate-ouroboros` | `/generate-ouroboros` | Validate PRD specs |
+| `review-tickets` | `/review-tickets` | Review Notion tickets |
+| `run-fullstack` | `/run-fullstack` | Full-stack dev pipeline |
+| `reflect` | `/reflect` | Session reflection |
+| `generate-prd` | `/generate-prd` | Generate PRD from input |
+| `generate-ppt` | `/generate-ppt` | Generate HTML presentations |
+| `generate-proposal` | `/generate-proposal` | Generate client proposals |
+| `generate-invoice` | `/generate-invoice` | Generate invoices |
+| `run-playwright` | `/run-playwright` | Run Playwright E2E tests |
+
+### Custom Commands (Ctrl+K)
+
+Project commands are also available via the **Command Dialog** (`Ctrl+K`):
+
+- `project:commit`
+- `project:find-gaps`
+- `project:fix-gaps`
+- `project:generate-docs`
+- `project:run-fullstack`
+- `project:reflect`
+- `project:review-tickets`
+- `project:run-playwright`
+
+Commands live in `.opencode/commands/*.md`. Each file becomes a command whose content is sent as a prompt.
 
 ### Agents
 Agents are specialized roles for complex tasks. Register them in `agents/agent-manifest.json`:
@@ -170,8 +193,14 @@ Use the fullstack prompt
    description: What this skill does and when to use it
    ---
    ```
-3. Register in `skill-rules.json`
-4. Invoke with `/skill:skill-name`
+3. OpenCode will auto-discover the skill on next restart
+4. Invoke with `/skill:skill-name` or `/<skill-name>`
+
+## Creating New Commands
+
+1. Create file: `commands/{command-name}.md`
+2. Write the prompt text that should be sent to the AI
+3. Invoke via `Ctrl+K` → select `project:{command-name}`
 
 ## Creating New Agents
 

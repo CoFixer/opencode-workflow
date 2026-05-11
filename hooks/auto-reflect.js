@@ -7,10 +7,10 @@
  */
 
 const { readFileSync, writeFileSync, existsSync, mkdirSync, appendFileSync } = require('fs');
-const { join } = require('path');
+const { join, dirname } = require('path');
 const { execSync } = require('child_process');
 
-const PROJECT_DIR = process.env.PROJECT_DIR || process.cwd();
+const PROJECT_DIR = dirname(dirname(__dirname));
 const MEMORY_DIR = join(PROJECT_DIR, '.project', 'memory');
 const LEARNINGS_FILE = join(MEMORY_DIR, 'LEARNINGS.md');
 

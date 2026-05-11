@@ -50,7 +50,7 @@ function getProjectRoot(filePath) {
     dir = parent;
   }
   const match = filePath.match(/(.+?)\/(?:backend|frontend)/);
-  return match ? match[1] : process.cwd();
+  return match ? match[1] : dirname(dirname(__dirname));
 }
 
 function main() {

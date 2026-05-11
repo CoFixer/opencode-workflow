@@ -40,13 +40,14 @@
             "./base/docs/guides"
         ]
     },
+    "_hooksNote": "OpenCode does not execute hooks from settings.json. Skill auto-activation is handled via OpenCode.md project context + the skill tool. Hooks here are kept for reference only.",
     "hooks": {
         "UserPromptSubmit": [
             {
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "node $PROJECT_DIR/.opencode/hooks/skill-activation-prompt.js"
+                        "command": "node .opencode/hooks/skill-activation-prompt.js"
                     }
                 ]
             }
@@ -56,11 +57,11 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "node $PROJECT_DIR/.opencode/hooks/auto-reflect.js"
+                        "command": "node .opencode/hooks/auto-reflect.js"
                     },
                     {
                         "type": "command",
-                        "command": "node $PROJECT_DIR/.opencode/hooks/status-auto-updater.js"
+                        "command": "node .opencode/hooks/status-auto-updater.js"
                     }
                 ]
             }

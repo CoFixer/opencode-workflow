@@ -11,8 +11,8 @@
 const { readFileSync, existsSync, readdirSync, statSync } = require('fs');
 const { join, dirname } = require('path');
 
-const PROJECT_DIR = process.env.PROJECT_DIR || process.cwd();
-const OPENCODE_DIR = join(PROJECT_DIR, '.opencode');
+const OPENCODE_DIR = dirname(__dirname);
+const PROJECT_DIR = dirname(OPENCODE_DIR);
 const RULES_FILE = join(OPENCODE_DIR, 'skill-rules.json');
 
 /**
