@@ -1,4 +1,4 @@
-# {PROJECT_NAME} - Claude Context
+# {PROJECT_NAME} - OpenCode Context
 
 ## Quick Stack Reference
 
@@ -191,9 +191,9 @@ Project memory files are generated from templates during `/new-project`:
 
 | Template | Source | Destination |
 |----------|--------|-------------|
-| `DECISIONS.template.md` | `.opencode/templates/claude-project/memory/` | `.project/memory/DECISIONS.md` |
-| `LEARNINGS.template.md` | `.opencode/templates/claude-project/memory/` | `.project/memory/LEARNINGS.md` |
-| `PREFERENCES.template.md` | `.opencode/templates/claude-project/memory/` | `.project/memory/PREFERENCES.md` |
+| `DECISIONS.template.md` | `.opencode/base/templates/project/memory/` | `.project/memory/DECISIONS.md` |
+| `LEARNINGS.template.md` | `.opencode/base/templates/project/memory/` | `.project/memory/LEARNINGS.md` |
+| `PREFERENCES.template.md` | `.opencode/base/templates/project/memory/` | `.project/memory/PREFERENCES.md` |
 
 ---
 

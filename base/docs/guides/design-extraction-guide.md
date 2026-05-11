@@ -26,7 +26,7 @@ if [ -d ".project/resources/HTML" ]; then
     echo "Processing $HTML_FILE_COUNT HTML files for design extraction..."
 
     # Copy template
-    cp .pi/templates/claude-project/docs/PROJECT_DESIGN_GUIDELINES.template.md \
+    cp .opencode/base/templates/project/docs/PROJECT_DESIGN_GUIDELINES.template.md \
        .project/docs/PROJECT_DESIGN_GUIDELINES.md
 
     # Replace basic placeholders

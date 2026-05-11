@@ -1,73 +1,35 @@
-# Frontend Development Guides
+# React Guides
 
-This directory contains guides for React frontend development.
+Reference documentation for React/TypeScript development patterns.
 
-## Available Guides
+These are **not executable skills** - they are educational materials consulted during development.
 
-| Guide | Purpose |
-|-------|---------|
-| api-integration.md | Connecting to backend APIs |
-| best-practices.md | General React best practices |
-| component-patterns.md | Reusable component patterns |
-| data-fetching.md | TanStack Query patterns |
-| loading-and-error-states.md | UI state handling |
-| performance.md | Optimization techniques |
-| routing-guide.md | React Router patterns |
-| styling-guide.md | TailwindCSS conventions |
-| tanstack-query.md | Query caching and invalidation |
-| typescript-standards.md | TypeScript conventions |
+## Contents
 
-## Quick Reference
+| Guide | Description |
+|-------|-------------|
+| [best-practices.md](best-practices.md) | React component and coding standards |
+| [component-patterns.md](component-patterns.md) | Component structure and organization patterns |
+| [common-patterns.md](common-patterns.md) | Reusable code patterns (forms, auth, etc.) |
+| [styling-guide.md](styling-guide.md) | Tailwind CSS and styling conventions |
+| [data-fetching.md](data-fetching.md) | API integration and data fetching patterns |
+| [api-integration.md](api-integration.md) | Screen-to-API endpoint mapping |
+| [loading-and-error-states.md](loading-and-error-states.md) | Handling async state in components |
+| [routing-guide.md](routing-guide.md) | React Router configuration |
+| [tanstack-query.md](tanstack-query.md) | TanStack Query patterns |
+| [performance.md](performance.md) | Performance optimization tips |
+| [file-organization.md](file-organization.md) | Directory structure conventions |
+| [typescript-standards.md](typescript-standards.md) | TypeScript best practices |
+| [browser-testing.md](browser-testing.md) | Manual testing checklist |
 
-### Creating a New Page
+## When to Use
 
-```tsx
-// app/pages/my-feature/MyFeaturePage.tsx
-import { useQuery } from '@tanstack/react-query';
-import { myFeatureService } from '@/services/my-feature.service';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { ErrorAlert } from '@/components/ui/error-alert';
+These guides are consulted when you need:
+- Pattern reference during implementation
+- Best practices for a specific topic
+- Code examples to follow
+- Understanding of project conventions
 
-export function MyFeaturePage() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['my-feature'],
-    queryFn: () => myFeatureService.getAll(),
-  });
+## Looking for Executable Skills?
 
-  if (isLoading) return <LoadingSpinner />;
-  if (isError) return <ErrorAlert message="Failed to load data" />;
-  if (!data?.length) return <EmptyState message="No items found" />;
-
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold">My Feature</h1>
-      {/* ... */}
-    </div>
-  );
-}
-```
-
-### Standard Component Structure
-
-```
-app/
-├── pages/
-│   └── my-feature/
-│       └── MyFeaturePage.tsx
-├── components/
-│   ├── ui/              # shadcn components
-│   └── my-feature/      # feature components
-├── hooks/
-│   └── useMyFeature.ts
-├── services/
-│   └── my-feature.service.ts
-├── types/
-│   └── my-feature.types.ts
-└── routes/
-    └── AppRoutes.tsx
-```
-
-## Related
-
-- **Agents:** [frontend-developer](../../agents/development/frontend-developer.md)
-- **Skills:** [run-fullstack](../../skills/dev/run-fullstack/SKILL.md)
+For actionable workflows (e.g., "generate tests", "create PR"), see [../skills/](../skills/).
