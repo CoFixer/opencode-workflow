@@ -1,0 +1,251 @@
+{
+  "version": "2.0",
+  "agents": {
+    "development": {
+      "backend-developer": {
+        "name": "Backend Developer",
+        "description": "NestJS backend specialist for API design, TypeORM, and business logic",
+        "role": "backend_developer",
+        "stack": "nestjs",
+        "file": "development/backend-developer.md",
+        "tags": ["backend", "nestjs", "api", "typeorm"]
+      },
+      "frontend-developer": {
+        "name": "Frontend Developer",
+        "description": "React frontend specialist for UI components, routing, and state management",
+        "role": "frontend_developer",
+        "stack": "react",
+        "file": "development/frontend-developer.md",
+        "tags": ["frontend", "react", "ui", "tailwind"]
+      },
+      "mobile-developer": {
+        "name": "Mobile Developer",
+        "description": "React Native mobile specialist for iOS and Android development",
+        "role": "mobile_developer",
+        "stack": "react-native",
+        "file": "development/mobile-developer.md",
+        "tags": ["mobile", "react-native", "ios", "android"]
+      },
+      "api-integration-agent": {
+        "name": "API Integration Agent",
+        "description": "Integrates frontend with backend APIs and validates contracts",
+        "role": "fullstack_developer",
+        "stack": "mixed",
+        "file": "development/api-integration-agent.md",
+        "tags": ["api", "integration", "fullstack", "contracts"]
+      },
+      "database-designer": {
+        "name": "Database Designer",
+        "description": "Designs database schemas, migrations, and query optimization",
+        "role": "backend_developer",
+        "stack": "postgresql",
+        "file": "development/database-designer.md",
+        "tags": ["database", "typeorm", "schema", "migrations"]
+      },
+      "nestjs-specialist": {
+        "name": "NestJS Specialist",
+        "description": "Advanced NestJS patterns, microservices, CQRS, and performance optimization",
+        "role": "backend_developer",
+        "stack": "nestjs",
+        "file": "development/nestjs-specialist.md",
+        "tags": ["backend", "nestjs", "advanced", "microservices"]
+      },
+      "ticket-fixer": {
+        "name": "Ticket Fixer",
+        "description": "Full-stack ticket resolution agent coordinating across teams",
+        "role": "fullstack_developer",
+        "stack": "mixed",
+        "file": "development/ticket-fixer.md",
+        "tags": ["fullstack", "tickets", "coordination", "bugs"]
+      },
+      "backend-agent": {
+        "name": "Backend Agent",
+        "description": "Specialized NestJS backend developer agent for complex features",
+        "role": "backend_developer",
+        "stack": "nestjs",
+        "file": "development/backend-agent.md",
+        "tags": ["backend", "nestjs", "specialist"]
+      },
+      "frontend-agent": {
+        "name": "Frontend Agent",
+        "description": "Specialized React frontend developer agent for complex UI features",
+        "role": "frontend_developer",
+        "stack": "react",
+        "file": "development/frontend-agent.md",
+        "tags": ["frontend", "react", "specialist"]
+      },
+      "fullstack-agent": {
+        "name": "Fullstack Agent",
+        "description": "Full-stack feature developer coordinating backend and frontend",
+        "role": "fullstack_developer",
+        "stack": "mixed",
+        "file": "development/fullstack-agent.md",
+        "tags": ["fullstack", "coordination", "feature"]
+      }
+    },
+    "analysis": {
+      "code-architecture-reviewer": {
+        "name": "Code Architecture Reviewer",
+        "description": "Reviews architecture decisions and structural patterns",
+        "role": "architect",
+        "file": "analysis/code-architecture-reviewer.md",
+        "tags": ["architecture", "review", "patterns"]
+      },
+      "gap-finder": {
+        "name": "Gap Finder",
+        "description": "Finds implementation gaps between design and code",
+        "role": "qa_engineer",
+        "file": "analysis/gap-finder.md",
+        "tags": ["gap", "analysis", "qa", "compliance"]
+      },
+      "gap-fixer": {
+        "name": "Gap Fixer",
+        "description": "Fixes implementation gaps found by gap-finder",
+        "role": "developer",
+        "file": "analysis/gap-fixer.md",
+        "tags": ["gap", "fix", "implementation"]
+      },
+      "duplicate-checker": {
+        "name": "Duplicate Checker",
+        "description": "Checks for duplicate code and DRY violations",
+        "role": "developer",
+        "file": "analysis/duplicate-checker.md",
+        "tags": ["duplicate", "refactor", "dry"]
+      },
+      "code-reviewer": {
+        "name": "Code Reviewer",
+        "description": "Code review specialist for quality and best practices",
+        "role": "code_reviewer",
+        "file": "analysis/code-reviewer.md",
+        "tags": ["review", "code", "quality"]
+      },
+      "gap-analyzer": {
+        "name": "Gap Analyzer",
+        "description": "Systematic gap analysis specialist",
+        "role": "gap_analyzer",
+        "file": "analysis/gap-analyzer.md",
+        "tags": ["gap", "analysis", "specialist"]
+      },
+      "automation-scout": {
+        "name": "Automation Scout",
+        "description": "Detects repetitive patterns and suggests automations",
+        "role": "analyst",
+        "file": "analysis/automation-scout.md",
+        "tags": ["automation", "patterns", "analysis"]
+      },
+      "code-refactor-master": {
+        "name": "Code Refactor Master",
+        "description": "Advanced refactoring patterns and execution",
+        "role": "specialist",
+        "file": "analysis/code-refactor-master.md",
+        "tags": ["refactor", "patterns", "advanced"]
+      },
+      "followup-suggester": {
+        "name": "Followup Suggester",
+        "description": "Identifies incomplete work and prioritizes follow-ups",
+        "role": "analyst",
+        "file": "analysis/followup-suggester.md",
+        "tags": ["followup", "planning", "analysis"]
+      },
+      "learning-extractor": {
+        "name": "Learning Extractor",
+        "description": "Extracts learnings from sessions in TIL format",
+        "role": "analyst",
+        "file": "analysis/learning-extractor.md",
+        "tags": ["learning", "documentation", "analysis"]
+      },
+      "plan-reviewer": {
+        "name": "Plan Reviewer",
+        "description": "Reviews implementation plans for feasibility and risks",
+        "role": "reviewer",
+        "file": "analysis/plan-reviewer.md",
+        "tags": ["plan", "review", "risks"]
+      }
+    },
+    "quality": {
+      "quality-lead": {
+        "name": "Quality Lead",
+        "description": "Oversees code quality, standards, and best practices",
+        "role": "qa_lead",
+        "file": "quality/quality-lead.md",
+        "tags": ["quality", "review", "standards"]
+      },
+      "auto-error-resolver": {
+        "name": "Auto Error Resolver",
+        "description": "Automatically fixes common TypeScript and build errors",
+        "role": "developer",
+        "file": "quality/auto-error-resolver.md",
+        "tags": ["error", "fix", "automation", "typescript"]
+      },
+      "agent-monitor": {
+        "name": "Agent Monitor",
+        "description": "Monitors agent orchestration and reports on workflows",
+        "role": "analyst",
+        "file": "quality/agent-monitor.md",
+        "tags": ["monitoring", "agents", "reporting"]
+      },
+      "refactorer": {
+        "name": "Refactorer",
+        "description": "Plans and executes refactoring strategies",
+        "role": "developer",
+        "file": "quality/refactorer.md",
+        "tags": ["refactor", "strategy", "execution"]
+      },
+      "reviewer": {
+        "name": "Reviewer",
+        "description": "General code and plan reviewer",
+        "role": "code_reviewer",
+        "file": "quality/reviewer.md",
+        "tags": ["review", "code", "plan"]
+      }
+    },
+    "documentation": {
+      "documentation-architect": {
+        "name": "Documentation Architect",
+        "description": "Maintains project documentation structure and architecture",
+        "role": "technical_writer",
+        "file": "documentation/documentation-architect.md",
+        "tags": ["docs", "documentation", "architecture"]
+      },
+      "doc-updater": {
+        "name": "Doc Updater",
+        "description": "Updates docs after code changes and syncs references",
+        "role": "technical_writer",
+        "file": "documentation/doc-updater.md",
+        "tags": ["docs", "update", "sync"]
+      },
+      "prd-converter": {
+        "name": "PRD Converter",
+        "description": "Converts PRDs into implementation-ready specifications",
+        "role": "technical_writer",
+        "file": "documentation/prd-converter.md",
+        "tags": ["prd", "conversion", "specs"]
+      },
+      "web-research-specialist": {
+        "name": "Web Research Specialist",
+        "description": "Conducts online technical research and gathers resources",
+        "role": "researcher",
+        "file": "documentation/web-research-specialist.md",
+        "tags": ["research", "web", "technical"]
+      }
+    },
+    "orchestration": {
+      "project-coordinator": {
+        "name": "Project Coordinator",
+        "description": "Orchestrates multi-agent workflows and coordinates teams",
+        "role": "project_manager",
+        "file": "orchestration/project-coordinator.md",
+        "tags": ["orchestration", "coordination", "planning"]
+      }
+    },
+    "testing": {
+      "playwright-qa-agent": {
+        "name": "Playwright QA Agent",
+        "description": "Executes E2E tests via Playwright with PASS/FAIL reports",
+        "role": "tester",
+        "file": "testing/playwright-qa-agent.md",
+        "tags": ["testing", "playwright", "e2e", "qa"]
+      }
+    }
+  }
+}

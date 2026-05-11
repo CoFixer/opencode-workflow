@@ -1,0 +1,50 @@
+{
+  "version": "1.0",
+  "name": "storepilot-opencode",
+  "description": "OpenCode workspace settings for StorePilot",
+  "workspace": {
+    "root": "../../",
+    "packages": [
+      "backend",
+      "frontend",
+      "dashboard",
+      "storepilot-plugin"
+    ]
+  },
+  "skills": {
+    "enabled": true,
+    "rulesFile": "../skill-rules.json",
+    "autoActivate": true
+  },
+  "agents": {
+    "enabled": true,
+    "registryFile": "../agents/agent-manifest.json",
+    "defaultAgent": "project-coordinator"
+  },
+  "prompts": {
+    "directory": "../prompts",
+    "defaultPrompt": "feature-spec"
+  },
+  "guides": {
+    "directories": [
+      "../guides",
+      "../backend/guides",
+      "../frontend/guides",
+      "../mobile/guides",
+      "../base/guides"
+    ]
+  },
+  "docs": {
+    "directories": [
+      "../base/docs",
+      "../base/docs/checklists",
+      "../base/docs/guides"
+    ]
+  },
+  "preferences": {
+    "codeStyle": "minimal-changes",
+    "testBeforeCommit": true,
+    "followExistingPatterns": true,
+    "documentationOnChange": true
+  }
+}

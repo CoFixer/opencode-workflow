@@ -10,13 +10,43 @@
         ],
         "defaultMode": "acceptEdits"
     },
+    "skills": {
+        "enabled": true,
+        "rulesFile": "./skill-rules.json",
+        "autoActivate": true
+    },
+    "agents": {
+        "enabled": true,
+        "registryFile": "./agents/agent-manifest.json",
+        "defaultAgent": "project-coordinator"
+    },
+    "prompts": {
+        "directory": "./prompts",
+        "defaultPrompt": "feature-spec"
+    },
+    "guides": {
+        "directories": [
+            "./guides",
+            "./backend/guides",
+            "./frontend/guides",
+            "./mobile/guides",
+            "./base/guides"
+        ]
+    },
+    "docs": {
+        "directories": [
+            "./base/docs",
+            "./base/docs/checklists",
+            "./base/docs/guides"
+        ]
+    },
     "hooks": {
         "UserPromptSubmit": [
             {
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "$PROJECT_DIR/.opencode/hooks/skill-activation-prompt.sh"
+                        "command": "node $PROJECT_DIR/.opencode/hooks/skill-activation-prompt.js"
                     }
                 ]
             }
@@ -26,11 +56,11 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "$PROJECT_DIR/.opencode/hooks/auto-reflect.sh"
+                        "command": "node $PROJECT_DIR/.opencode/hooks/auto-reflect.js"
                     },
                     {
                         "type": "command",
-                        "command": "$PROJECT_DIR/.opencode/hooks/status-auto-updater.sh"
+                        "command": "node $PROJECT_DIR/.opencode/hooks/status-auto-updater.js"
                     }
                 ]
             }
@@ -42,5 +72,11 @@
         "memoryPath": ".project/memory/",
         "statusPath": ".project/status/",
         "prdPath": ".project/prd/"
+    },
+    "preferences": {
+        "codeStyle": "minimal-changes",
+        "testBeforeCommit": true,
+        "followExistingPatterns": true,
+        "documentationOnChange": true
     }
 }

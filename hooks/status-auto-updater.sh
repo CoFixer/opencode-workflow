@@ -1,17 +1,6 @@
 #!/bin/bash
-# Status auto-updater hook - triggers at session stop
-# Updates status files with progress markers
+# Status Auto-Updater Hook Wrapper
+# Calls the Node.js implementation for status file updates
 
-PROJECT_DIR="${PROJECT_DIR:-.}"
-STATUS_DIR="$PROJECT_DIR/.project/status"
-
-# Only run if .project exists
-if [ ! -d "$STATUS_DIR" ]; then
-  exit 0
-fi
-
-# Update temp status with session end time
-TEMP_DIR="$STATUS_DIR/temp"
-mkdir -p "$TEMP_DIR"
-
-echo "{ \"lastSessionEnd\": \"$(date -Iseconds)\" }" > "$TEMP_DIR/session-tracker.json"
+cd "$PROJECT_DIR/.opencode/hooks" || exit 0
+node status-auto-updater.js
