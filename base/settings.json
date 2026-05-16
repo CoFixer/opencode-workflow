@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "name": "storepilot-opencode",
-  "description": "OpenCode workspace settings for StorePilot",
+  "name": "storepilot",
+  "description": "Project workspace settings for StorePilot",
   "workspace": {
     "root": "../../",
     "packages": [
@@ -13,16 +13,25 @@
   },
   "skills": {
     "enabled": true,
-    "rulesFile": "../skill-rules.json",
+    "rulesFile": "../skills/skill-rules.json",
     "autoActivate": true
   },
   "agents": {
     "enabled": true,
-    "registryFile": "../agents/agent-manifest.json",
+    "registryFile": "../agents/agent-registry.json",
     "defaultAgent": "project-coordinator"
   },
   "prompts": {
-    "directory": "../prompts",
+    "directories": [
+      "../prompts",
+      "../prompts/dev",
+      "../prompts/git",
+      "../prompts/project",
+      "../prompts/design",
+      "../prompts/qa",
+      "../prompts/agent",
+      "../prompts/utils"
+    ],
     "defaultPrompt": "feature-spec"
   },
   "guides": {
@@ -40,6 +49,16 @@
       "../base/docs/checklists",
       "../base/docs/guides"
     ]
+  },
+  "schemas": {
+    "directory": "../base/schemas",
+    "files": [
+      "../base/schemas/pipeline.json",
+      "../base/schemas/phase-result.json"
+    ]
+  },
+  "scripts": {
+    "dispatcher": "../scripts/dispatcher.js"
   },
   "preferences": {
     "codeStyle": "minimal-changes",

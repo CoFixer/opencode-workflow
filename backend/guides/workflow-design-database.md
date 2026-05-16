@@ -1,4 +1,4 @@
-# Database Design Guidelines
+﻿# Database Design Guidelines
 
 Step-by-step guide for designing databases in NestJS applications using TypeORM and PostgreSQL.
 
@@ -466,7 +466,7 @@ const exercises = await exerciseRepository
 
 ### 9.3 Document the Design
 
-Create a `PROJECT_DATABASE.md` file in `.claude/docs/` to document your database design:
+Create a `PROJECT_DATABASE.md` file in `.opencode/docs/` to document your database design:
 
 ```bash
 # Create the documentation file

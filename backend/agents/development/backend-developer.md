@@ -1,4 +1,4 @@
----
+﻿---
 name: backend-developer
 description: Use this agent for end-to-end backend development from PRD analysis to API implementation. This agent handles reviewing PRD files to identify new/updated features, updating project documentation, designing database schemas, creating/updating APIs following NestJS three-layer architecture, and ensuring Swagger documentation and E2E tests are complete.
 
@@ -36,7 +36,7 @@ You are an expert backend developer specializing in NestJS applications. Your ro
 ## Core Responsibilities
 
 1. **PRD Review**: Locate and analyze PRD files in `.project/prd/` to identify new or updated features
-2. **Documentation Updates**: Update `CLAUDE.md` and `.project/docs/` files
+2. **Documentation Updates**: Update `opencode.md` and `.project/docs/` files
 3. **Database Design**: Design entities, create TypeORM migrations for new features
 4. **API Creation**: Implement new controllers, services (in providers/), repositories, and entities
 5. **API Updates**: Modify existing APIs to match updated requirements
@@ -56,7 +56,7 @@ You are an expert backend developer specializing in NestJS applications. Your ro
    - Note any new data entities, fields, or relationships mentioned
 
 2. **Compare with Current State**
-   - Read `CLAUDE.md` for current feature documentation and architecture patterns
+   - Read `opencode.md` for current feature documentation and architecture patterns
    - Check `.project/docs/` for additional project documentation
    - Identify gaps between PRD and current implementation
 
@@ -67,7 +67,7 @@ You are an expert backend developer specializing in NestJS applications. Your ro
 
 ### Phase 2: Documentation Update
 
-1. **Update CLAUDE.md**
+1. **Update opencode.md**
    - Add new features to relevant sections
    - Update architecture patterns if changed
    - Update User Types if roles changed
@@ -427,27 +427,27 @@ npm run test:e2e -- --grep "Feature"
 - `backend/src/modules/items/` - Item module with categories
 
 ### Documentation
-- `CLAUDE.md` - Main project documentation (architecture, tech stack, patterns)
+- `opencode.md` - Main project documentation (architecture, tech stack, patterns)
 - `.project/prd/` - PRD files directory (search for latest PDF/MD)
 - `.project/docs/` - Additional project documentation
 
 ### NestJS Guides (Consult for Patterns)
-- `.claude/nestjs/guides/BEST-PRACTICES.md` - **CRITICAL: Coding standards, conventions**
-- `.claude/nestjs/guides/BASE-CONTROLLER-GUIDE.md` - Three-layer architecture details
-- `.claude/nestjs/guides/DATABASE-PATTERNS-GUIDE.md` - TypeORM patterns
-- `.claude/nestjs/guides/SERVICES-AND-REPOSITORIES-GUIDE.md` - Service/Repository patterns
-- `.claude/nestjs/guides/ROUTING-AND-CONTROLLERS-GUIDE.md` - Controller patterns
-- `.claude/nestjs/guides/VALIDATION-GUIDE.md` - DTO validation patterns
-- `.claude/nestjs/guides/MIDDLEWARE-GUIDE.md` - Guards, interceptors, pipes
-- `.claude/nestjs/guides/ERROR-HANDLING-GUIDE.md` - Error handling patterns
-- `.claude/nestjs/guides/AUTHENTICATION-GUIDE.md` - JWT authentication patterns
+- `.opencode/nestjs/guides/BEST-PRACTICES.md` - **CRITICAL: Coding standards, conventions**
+- `.opencode/nestjs/guides/BASE-CONTROLLER-GUIDE.md` - Three-layer architecture details
+- `.opencode/nestjs/guides/DATABASE-PATTERNS-GUIDE.md` - TypeORM patterns
+- `.opencode/nestjs/guides/SERVICES-AND-REPOSITORIES-GUIDE.md` - Service/Repository patterns
+- `.opencode/nestjs/guides/ROUTING-AND-CONTROLLERS-GUIDE.md` - Controller patterns
+- `.opencode/nestjs/guides/VALIDATION-GUIDE.md` - DTO validation patterns
+- `.opencode/nestjs/guides/MIDDLEWARE-GUIDE.md` - Guards, interceptors, pipes
+- `.opencode/nestjs/guides/ERROR-HANDLING-GUIDE.md` - Error handling patterns
+- `.opencode/nestjs/guides/AUTHENTICATION-GUIDE.md` - JWT authentication patterns
 
 ### Workflows (Follow Step-by-Step)
-- `.claude/nestjs/guides/workflow-convert-prd-to-knowledge.md` - PRD conversion guide
-- `.claude/nestjs/guides/workflow-design-database.md` - Database design process
-- `.claude/nestjs/guides/workflow-generate-api-docs.md` - API documentation
-- `.claude/nestjs/guides/workflow-generate-e2e-tests.md` - E2E test generation
-- `.claude/nestjs/guides/workflow-implement-redis-caching.md` - Redis caching patterns
+- `.opencode/nestjs/guides/workflow-convert-prd-to-knowledge.md` - PRD conversion guide
+- `.opencode/nestjs/guides/workflow-design-database.md` - Database design process
+- `.opencode/nestjs/guides/workflow-generate-api-docs.md` - API documentation
+- `.opencode/nestjs/guides/workflow-generate-e2e-tests.md` - E2E test generation
+- `.opencode/nestjs/guides/workflow-implement-redis-caching.md` - Redis caching patterns
 
 ### Testing Infrastructure
 - `backend/test/e2e/` - E2E test examples
@@ -487,7 +487,7 @@ After completing each phase, provide:
 
 ## Best Practices
 
-**CRITICAL: Before implementing any code, review `.claude/nestjs/guides/BEST-PRACTICES.md` for mandatory project rules and conventions.**
+**CRITICAL: Before implementing any code, review `.opencode/nestjs/guides/BEST-PRACTICES.md` for mandatory project rules and conventions.**
 
 1. **Always read the PRD first** - Don't assume requirements
 2. **Update documentation before coding** - Keep docs in sync

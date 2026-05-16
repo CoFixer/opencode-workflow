@@ -1,4 +1,4 @@
-# Backend Patterns for Kimi
+# Backend Patterns for OpenCode
 
 Quick reference for NestJS backend development in StorePilot.
 

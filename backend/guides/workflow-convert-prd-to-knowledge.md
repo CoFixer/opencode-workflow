@@ -1,4 +1,4 @@
-# PRD to PROJECT_KNOWLEDGE Converter
+﻿# PRD to PROJECT_KNOWLEDGE Converter
 
 Convert a Product Requirements Document (PRD) PDF into structured `.project/docs/PROJECT_KNOWLEDGE.md` documentation.
 
@@ -21,7 +21,7 @@ This skill is iteration-aware:
 
 ## Purpose
 
-This resource guides the transformation of `prd.pdf` (located in the project root) into structured PROJECT_KNOWLEDGE.md documentation, providing Claude with product context for development tasks.
+This resource guides the transformation of `prd.pdf` (located in the project root) into structured PROJECT_KNOWLEDGE.md documentation, providing OpenCode with product context for development tasks.
 
 ---
 
@@ -45,7 +45,7 @@ This resource guides the transformation of `prd.pdf` (located in the project roo
 
 ### Step 1: Read the PRD
 
-Use Claude's Read tool to read the PDF:
+Use OpenCode's Read tool to read the PDF:
 
 ```
 Read ./prd.pdf

@@ -1,4 +1,4 @@
-# API Integration Guide
+﻿# API Integration Guide
 
 This guide maps frontend screens to their required backend API endpoints. Use this when implementing data fetching for any screen.
 
@@ -382,7 +382,7 @@ gh pr create --base dev --title "feat: [Feature] API integration" --body "$(cat 
 - [ ] Confirmed data displays correctly
 
 ---
-Generated with [Claude Code](https://claude.com/claude-code)
+Generated with [OpenCode](https://OpenCode.com/OpenCode-code)
 EOF
 )"
 ```

@@ -1,4 +1,4 @@
----
+﻿---
 name: frontend-error-fixer
 description: Use this agent when you encounter frontend errors, whether they appear during the build process (TypeScript, bundling, linting errors) or at runtime in the browser console (JavaScript errors, React errors, network issues). This agent specializes in diagnosing and fixing frontend issues with precision.\n\nExamples:\n- <example>\n  Context: User encounters an error in their React application\n  user: "I'm getting a 'Cannot read property of undefined' error in my React component"\n  assistant: "I'll use the frontend-error-fixer agent to diagnose and fix this runtime error"\n  <commentary>\n  Since the user is reporting a browser console error, use the frontend-error-fixer agent to investigate and resolve the issue.\n  </commentary>\n</example>\n- <example>\n  Context: Build process is failing\n  user: "My build is failing with a TypeScript error about missing types"\n  assistant: "Let me use the frontend-error-fixer agent to resolve this build error"\n  <commentary>\n  The user has a build-time error, so the frontend-error-fixer agent should be used to fix the TypeScript issue.\n  </commentary>\n</example>\n- <example>\n  Context: User notices errors in browser console while testing\n  user: "I just implemented a new feature and I'm seeing some errors in the console when I click the submit button"\n  assistant: "I'll launch the frontend-error-fixer agent to investigate these console errors using the browser tools"\n  <commentary>\n  Runtime errors are appearing during user interaction, so the frontend-error-fixer agent should investigate using browser tools MCP.\n  </commentary>\n</example>
 color: green
@@ -86,16 +86,16 @@ Remember: You are a precision instrument for error resolution. Every change you 
 When diagnosing errors, consult these guides:
 
 ### TypeScript & Code Quality
-- `.claude/react/guides/typescript-standards.md` - TypeScript error patterns and best practices
-- `.claude/react/guides/best-practices.md` - React coding standards
+- `.opencode/react/guides/typescript-standards.md` - TypeScript error patterns and best practices
+- `.opencode/react/guides/best-practices.md` - React coding standards
 
 ### React & Components
-- `.claude/react/guides/component-patterns.md` - React component issues and structure
-- `.claude/react/guides/loading-and-error-states.md` - Async/loading issues
+- `.opencode/react/guides/component-patterns.md` - React component issues and structure
+- `.opencode/react/guides/loading-and-error-states.md` - Async/loading issues
 
 ### Data & API
-- `.claude/react/guides/data-fetching.md` - API/fetch errors
-- `.claude/react/guides/tanstack-query.md` - TanStack Query errors and patterns
+- `.opencode/react/guides/data-fetching.md` - API/fetch errors
+- `.opencode/react/guides/tanstack-query.md` - TanStack Query errors and patterns
 
 ### Styling
-- `.claude/react/guides/styling-guide.md` - CSS/Tailwind issues
+- `.opencode/react/guides/styling-guide.md` - CSS/Tailwind issues

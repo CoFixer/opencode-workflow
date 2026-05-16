@@ -1,6 +1,6 @@
-# .kimi Workflow Guide
+# .opencode Workflow Guide
 
-How to use the `.kimi` workflow system effectively.
+How to use the `.opencode` workflow system effectively.
 
 ## Quick Reference
 
@@ -69,7 +69,7 @@ Agents are specialized roles for complex tasks:
 4. **Reference guides**
    - Backend patterns → `.pi/backend/guides/`
    - Project specs → `.project/docs/`
-   - Kimi workflows → `.opencode/guides/`
+    - OpenCode workflows → `.opencode/guides/`
 
 ## Adding New Skills
 

@@ -1,4 +1,4 @@
-# NestJS Backend Development Guide
+﻿# NestJS Backend Development Guide
 
 > This guide is loaded by the `backend-developer` agent when working with NestJS projects.
 > Contains detailed NestJS-specific patterns, rules, and implementation workflows.
@@ -460,7 +460,7 @@ If refactoring causes issues:
 4. Test with known-working scenario
 
 **Backup Location**:
-- `d:\MY-PROJECTS\AIWorkflowProjects\PT\dummy-project\.claude\agents\backend-developer.md.backup`
+- `d:\MY-PROJECTS\AIWorkflowProjects\PT\dummy-project\.OpenCode\agents\backend-developer.md.backup`
 
 ---
 

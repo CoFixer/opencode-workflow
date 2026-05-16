@@ -1,4 +1,4 @@
-# Best Practices
+﻿# Best Practices
 
 Generic, framework-agnostic coding standards and framework resource guide for all projects using the `.pi/` configuration system.
 
@@ -147,7 +147,7 @@ Controllers (HTTP only) -> Services (business logic) -> Repositories (data acces
 ```
 <type>(<scope>): <description>
 
-Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: OpenCode <noreply@anthropic.com>
 ```
 Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`, `perf`
 
@@ -185,23 +185,23 @@ To identify the project's tech stack:
 
 ### Available Modules
 
-Install via `/setup-claude` (interactive) or `/migrate-submodules` (flags).
+Install via `/setup-OpenCode` (interactive) or `/migrate-submodules` (flags).
 
 #### Development Frameworks
 
 | Module | Path | Repository | Content |
 |--------|------|-----------|---------|
-| **NestJS** | `.pi/nestjs/` | [claude-nestjs](https://github.com/CoFixer/claude-nestjs) | Controllers, Services, DTOs, TypeORM, Swagger, Socket.IO |
-| **React** | `.pi/react/` | [claude-react](https://github.com/CoFixer/claude-react) | React 19, TailwindCSS, shadcn/ui, React Router, Playwright |
-| **React Native** | `.pi/react-native/` | [claude-react-native](https://github.com/CoFixer/claude-react-native) | NativeWind, React Navigation, Detox, Native Modules |
+| **NestJS** | `.pi/nestjs/` | [OpenCode-nestjs](https://github.com/CoFixer/opencode-nestjs) | Controllers, Services, DTOs, TypeORM, Swagger, Socket.IO |
+| **React** | `.pi/react/` | [OpenCode-react](https://github.com/CoFixer/opencode-react) | React 19, TailwindCSS, shadcn/ui, React Router, Playwright |
+| **React Native** | `.pi/react-native/` | [OpenCode-react-native](https://github.com/CoFixer/opencode-react-native) | NativeWind, React Navigation, Detox, Native Modules |
 
 #### Department Modules
 
 | Module | Path | Repository | Content |
 |--------|------|-----------|---------|
-| **Marketing** | `.pi/marketing/` | [claude-marketing](https://github.com/CoFixer/claude-marketing) | CRO, copywriting, SEO, analytics |
-| **Operations** | `.pi/operations/` | [claude-operations](https://github.com/CoFixer/claude-operations) | Process automation, workflows, documentation |
-| **Content** | `.pi/content/` | [claude-content](https://github.com/CoFixer/claude-content) | Content strategy, blog posts, video scripts |
+| **Marketing** | `.pi/marketing/` | [OpenCode-marketing](https://github.com/CoFixer/opencode-marketing) | CRO, copywriting, SEO, analytics |
+| **Operations** | `.pi/operations/` | [OpenCode-operations](https://github.com/CoFixer/opencode-operations) | Process automation, workflows, documentation |
+| **Content** | `.pi/content/` | [OpenCode-content](https://github.com/CoFixer/opencode-content) | Content strategy, blog posts, video scripts |
 
 ### Resource Structure
 
@@ -249,7 +249,7 @@ Each framework submodule follows a consistent structure:
 If the framework paths above don't exist:
 1. Use the **cross-cutting practices** in this document as your baseline
 2. Check `.pi/docs/guides/` for extracted framework guides (available without submodules)
-3. Run **`/setup-claude`** to interactively add framework submodules
+3. Run **`/setup-OpenCode`** to interactively add framework submodules
 
 ---
 
@@ -261,5 +261,5 @@ If the framework paths above don't exist:
 | Commit Workflow | `.pi/docs/COMMIT_WORKFLOW_GUIDE.md` | Git branching, commit format, PR process |
 | E2E Testing | `.pi/docs/E2E_TESTING.md` | Playwright Page Object Model, test fixtures |
 | Troubleshooting | `.pi/docs/TROUBLESHOOTING.md` | Common issues and solutions |
-| Setup Command | `/setup-claude` | Add framework submodules interactively |
+| Setup Command | `/setup-OpenCode` | Add framework submodules interactively |
 | Submodule Check | `/submodule-check` | Validate submodule health and sync |

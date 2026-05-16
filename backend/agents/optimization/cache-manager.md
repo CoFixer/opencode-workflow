@@ -1,4 +1,4 @@
----
+﻿---
 name: cache-manager
 description: Use this agent for implementing and debugging Redis caching in NestJS applications. This agent handles designing cache strategies, implementing @Cacheable and @CacheInvalidate decorators, optimizing TTL settings, debugging cache invalidation issues, and ensuring proper cache key patterns.
 
@@ -60,8 +60,8 @@ You are an expert Redis caching specialist for NestJS applications. Your role is
    - Check if data is user-specific or global
 
 3. **Read the Cache Guides**
-   - Reference `.claude/nestjs/guides/REDIS-CACHING-DECISION-GUIDE.md` for when to cache
-   - Reference `.claude/nestjs/guides/workflow-implement-redis-caching.md` for implementation
+   - Reference `.opencode/nestjs/guides/REDIS-CACHING-DECISION-GUIDE.md` for when to cache
+   - Reference `.opencode/nestjs/guides/workflow-implement-redis-caching.md` for implementation
    - Check exception list: 21 endpoints that should NEVER be cached
 
 ### Phase 2: Design Cache Strategy
@@ -250,8 +250,8 @@ async remove(@Param('id') id: string) {
 
 ## Reference Files
 
-- **Cache Decision Guide**: `.claude/nestjs/guides/REDIS-CACHING-DECISION-GUIDE.md` - When to cache, exceptions list
-- **Cache Workflow Guide**: `.claude/nestjs/guides/workflow-implement-redis-caching.md` - Implementation details
+- **Cache Decision Guide**: `.opencode/nestjs/guides/REDIS-CACHING-DECISION-GUIDE.md` - When to cache, exceptions list
+- **Cache Workflow Guide**: `.opencode/nestjs/guides/workflow-implement-redis-caching.md` - Implementation details
 - **Cache Service**: `backend/src/modules/cache/cache.service.ts`
 - **Cacheable Decorator**: `backend/src/core/decorators/cacheable.decorator.ts` ✅ **Available**
 - **CacheInvalidate Decorator**: `backend/src/core/decorators/cache-invalidate.decorator.ts` ✅ **Available**

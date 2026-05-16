@@ -1,4 +1,4 @@
-# E2E Test Generator Guide
+﻿# E2E Test Generator Guide
 
 Complete guide to generating end-to-end tests for NestJS controllers and API endpoints.
 
@@ -25,7 +25,7 @@ This guide activates automatically when:
 - You ask to "generate tests" or "create e2e tests"
 - You finish implementing an API endpoint
 
-**Manual invocation:** Ask Claude to "generate e2e tests for [module/controller]"
+**Manual invocation:** Ask OpenCode to "generate e2e tests for [module/controller]"
 
 ---
 

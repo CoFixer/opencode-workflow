@@ -1,4 +1,4 @@
----
+﻿---
 name: design-qa-agent
 description: Use this agent to QA implemented screens against Figma designs using Figma MCP. This agent verifies pixel-perfect implementation by comparing React components with their Figma source designs, checking spacing, typography, colors, and visual effects.\n\nExamples:\n- <example>\n  Context: User wants to verify a screen matches its Figma design\n  user: "Can you QA the login page against its Figma design?"\n  assistant: "I'll use the design-qa-agent to compare the implementation with the Figma design"\n  <commentary>\n  Design QA requires comparing implementation with Figma using MCP tools for pixel-perfect verification.\n  </commentary>\n</example>\n- <example>\n  Context: User wants to QA all screens in a project\n  user: "Run design QA on all screens in frontend-coach-dashboard"\n  assistant: "Let me use the design-qa-agent to QA all screens with Figma node IDs defined"\n  <commentary>\n  Batch QA will iterate through all screens in the status file that have Figma node IDs.\n  </commentary>\n</example>\n- <example>\n  Context: User completed implementing a feature and wants to verify visual accuracy\n  user: "I just finished the dashboard home page. Can you check if it matches the design?"\n  assistant: "I'll launch the design-qa-agent to verify the implementation against the Figma design"\n  <commentary>\n  After implementation, design QA ensures the result matches the original design specifications.\n  </commentary>\n</example>
 model: sonnet
@@ -357,12 +357,12 @@ Using get_metadata first to get structure overview, then fetching specific nodes
 
 ### Before QA - READ THESE GUIDES:
 
-**CRITICAL: Before performing QA, read `.claude/react/guides/styling-guide.md` for Tailwind CSS conventions.**
+**CRITICAL: Before performing QA, read `.opencode/react/guides/styling-guide.md` for Tailwind CSS conventions.**
 
 ### Styling & Design
-- `.claude/react/guides/styling-guide.md` - **CRITICAL: Tailwind CSS conventions**
-- `.claude/react/guides/component-patterns.md` - Component structure patterns
+- `.opencode/react/guides/styling-guide.md` - **CRITICAL: Tailwind CSS conventions**
+- `.opencode/react/guides/component-patterns.md` - Component structure patterns
 
 ### Related Skills
-- `.claude/react/skills/convert-figma-to-react.md` - Figma property to Tailwind mapping
-- `.claude/react/skills/design-qa-patterns.md` - Full QA documentation
+- `.opencode/react/skills/convert-figma-to-react.md` - Figma property to Tailwind mapping
+- `.opencode/react/skills/design-qa-patterns.md` - Full QA documentation

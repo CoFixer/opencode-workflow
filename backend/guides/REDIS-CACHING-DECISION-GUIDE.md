@@ -1,4 +1,4 @@
-# Redis Caching Decision Guide
+﻿# Redis Caching Decision Guide
 
 **Complete decision guide for implementing Redis caching in Coffee Club backend.**
 
@@ -550,7 +550,7 @@ Before implementing caching on a GET endpoint:
 
 **Related Files:**
 - [workflow-implement-redis-caching.md](workflow-implement-redis-caching.md) - Implementation workflow
-- [CLAUDE.md](../../../CLAUDE.md) - Project documentation
+- [opencode.md](../../../opencode.md) - Project documentation
 - [backend/src/core/decorators/](../../../backend/src/core/decorators/) - Decorator implementations
 - [backend/src/core/constants/cache-ttl.constants.ts](../../../backend/src/core/constants/cache-ttl.constants.ts) - TTL constants
 

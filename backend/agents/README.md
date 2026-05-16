@@ -1,4 +1,4 @@
-# NestJS Agents
+﻿# NestJS Agents
 
 Specialized autonomous agents for NestJS development, testing, debugging, and optimization.
 
@@ -49,7 +49,7 @@ Agents are organized by function:
 
 **Workflow Phases:**
 1. PRD Analysis
-2. Documentation Update (CLAUDE.md)
+2. Documentation Update (opencode.md)
 3. Database Design (entities + migrations)
 4. API Development (three-layer architecture)
 5. Testing & Swagger Documentation
@@ -218,7 +218,7 @@ All NestJS agents in Coffee Club follow these conventions:
 - **[Workflows](../guides/workflow-*.md)** - Step-by-step workflow guides (5 workflows)
 - **[Skills](../skills/README.md)** - NestJS skills for code generation
 - **[Examples](../examples/README.md)** - Complete working code examples
-- **[CLAUDE.md](../../../CLAUDE.md)** - Main project documentation
+- **[opencode.md](../../../opencode.md)** - Main project documentation
 
 ---
 

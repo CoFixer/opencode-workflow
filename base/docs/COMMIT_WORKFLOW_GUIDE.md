@@ -1,12 +1,12 @@
-# Claude Commit Workflow Guide
+﻿# OpenCode Commit Workflow Guide
 
-This guide explains how to use Claude to commit code and create pull requests.
+This guide explains how to use OpenCode to commit code and create pull requests.
 
 ---
 
 ## Quick Start
 
-Simply tell Claude:
+Simply tell OpenCode:
 
 ```
 /commit
@@ -18,7 +18,7 @@ or
 Please commit my changes
 ```
 
-Claude will commit to your **current branch** and create a PR to `dev`.
+OpenCode will commit to your **current branch** and create a PR to `dev`.
 
 ---
 
@@ -28,15 +28,15 @@ Claude will commit to your **current branch** and create a PR to `dev`.
 
 1. **You make code changes** in any project folder
 2. **Ensure you're on your personal branch** (e.g., `siam`, `john`)
-3. **Run `/commit`** or ask Claude to commit
-4. **Claude validates your branch** - must not be `main` or `dev`
-5. **Claude commits and pushes** to your current branch
-6. **Claude creates a PR** targeting `dev`
+3. **Run `/commit`** or ask OpenCode to commit
+4. **OpenCode validates your branch** - must not be `main` or `dev`
+5. **OpenCode commits and pushes** to your current branch
+6. **OpenCode creates a PR** targeting `dev`
 7. **You receive a PR URL** to review and share
 
 ### Key Principle
 
-**Use current branch** - Claude does NOT create new branches. It commits to whatever branch you're currently on.
+**Use current branch** - OpenCode does NOT create new branches. It commits to whatever branch you're currently on.
 
 ---
 
@@ -53,7 +53,7 @@ Claude will commit to your **current branch** and create a PR to `dev`.
 - `dev` - Cannot commit directly
 - Detached HEAD - Must checkout a branch first
 
-If you're on a protected branch, Claude will ask you to create a personal branch.
+If you're on a protected branch, OpenCode will ask you to create a personal branch.
 
 ---
 
@@ -114,7 +114,7 @@ Type:
 
 ### 4. Review the Results
 
-Claude will show you:
+OpenCode will show you:
 ```
 ✓ Workflow Complete
 
@@ -125,8 +125,8 @@ https://github.com/org/repo/pull/42
   - Files: 8
 
 Submodule PRs (if any):
-1. https://github.com/org/claude-base/pull/15 (base)
-2. https://github.com/org/project-claude/pull/8 (.claude)
+1. https://github.com/org/OpenCode-base/pull/15 (base)
+2. https://github.com/org/project-OpenCode/pull/8 (.OpenCode)
 ```
 
 ### 5. Share PR Link
@@ -147,10 +147,10 @@ project/                    (Parent repo)
 │   └── react/              (Nested submodule)
 ```
 
-### What Claude Does Automatically
+### What OpenCode does Automatically
 
 1. **Detects submodule changes** - If you modified files in `.pi/base/` or other submodules
-2. **Commits deepest first** - Starts with nested submodules, then `.claude`, then parent
+2. **Commits deepest first** - Starts with nested submodules, then `.OpenCode`, then parent
 3. **Uses current branch in each** - Each submodule commits to its own current branch
 4. **Creates PRs for each level** - Every repo gets a PR targeting `dev`
 
@@ -161,11 +161,11 @@ If you edited files in `.pi/base/`:
 ```
 PRs Created:
 
-1. https://github.com/org/claude-base/pull/15
+1. https://github.com/org/OpenCode-base/pull/15
    - Branch: siam (in base submodule)
 
-2. https://github.com/org/project-claude/pull/8
-   - Branch: siam (in .claude submodule)
+2. https://github.com/org/project-OpenCode/pull/8
+   - Branch: siam (in .OpenCode submodule)
 
 3. https://github.com/org/project/pull/42
    - Branch: siam (in parent repo)
@@ -198,7 +198,7 @@ This will:
 
 ### What NOT to Commit
 
-Claude automatically excludes:
+OpenCode automatically excludes:
 - `.env` files (secrets)
 - `credentials.json` (sensitive data)
 - `node_modules/` (dependencies)
@@ -247,14 +247,14 @@ Make sure you:
 
 ## Commit Message Format
 
-Claude generates commit messages following this format:
+OpenCode generates commit messages following this format:
 
 ```
 <type>(<scope>): <description>
 
 <optional body>
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+Co-Authored-By: OpenCode Opus 4.5 <noreply@anthropic.com>
 ```
 
 ### Types
@@ -304,10 +304,10 @@ A: Yes! Add it after `/commit`: `/commit your message here`
 A: Your branch remains. You can continue working on it or delete it.
 
 **Q: Do I need to handle submodules manually?**
-A: No. Claude detects and handles all submodule changes automatically.
+A: No. OpenCode detects and handles all submodule changes automatically.
 
 **Q: What if I'm on `dev` and want to commit?**
-A: Claude will ask you to create a personal branch first.
+A: OpenCode will ask you to create a personal branch first.
 
 ---
 

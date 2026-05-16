@@ -1,4 +1,4 @@
-# Fullstack Pipeline Status - {PROJECT_NAME}
+﻿# Fullstack Pipeline Status - {PROJECT_NAME}
 
 ## Progress
 
@@ -32,7 +32,7 @@
 
 | Dimension | Key | Stored Value | Captured At |
 |-----------|-----|-------------|-------------|
-| .claude submodule | claude_submodule_hash | - | never |
+| .opencode submodule | opencode_submodule_hash | - | never |
 | .project/docs | docs_composite_hash | - | never |
 | .project/memory | memory_composite_hash | - | never |
 | Contract: API | contract_api_hash | - | never |
@@ -84,5 +84,5 @@ The `$BACKEND`, `$FRONTEND`, and `$STACK` variables are resolved from the `tech_
 
 | Category | Options | Submodule URL |
 |----------|---------|---------------|
-| Backend | nestjs | github.com/CoFixer/claude-{backend} |
-| Frontend | react, react-native | github.com/CoFixer/claude-{frontend} |
+| Backend | nestjs | github.com/CoFixer/opencode-{backend} |
+| Frontend | react, react-native | github.com/CoFixer/opencode-{frontend} |

@@ -1,4 +1,4 @@
-# .claude System Audit Report
+﻿# .OpenCode System Audit Report
 
 Generated: {TIMESTAMP}
 Scope: {SCOPE} | Tier: {TIER} | Mode: {MODE}

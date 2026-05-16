@@ -1,4 +1,4 @@
-# Organize Types - React Native
+﻿# Organize Types - React Native
 
 Analyze and maintain TypeScript type organization in React Native mobile codebase.
 
@@ -317,7 +317,7 @@ export interface SelectOption {
 import type { SelectOption } from '~/types/ui';
 ```
 
-## Instructions for Claude
+## Instructions for OpenCode
 
 When this skill is invoked:
 

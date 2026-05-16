@@ -1,4 +1,4 @@
-# Fullstack Orchestrator: Architecture Evolution & Lessons Learned
+﻿# Fullstack Orchestrator: Architecture Evolution & Lessons Learned
 
 This document archives the iterative design process of the `/fullstack` command, capturing failed approaches, lessons learned, and successful decisions. It serves as institutional memory for future architectural decisions.
 
@@ -69,7 +69,7 @@ The status file pattern from Ralph already solved state tracking. Building our o
 
 | Problem | Impact |
 |---------|--------|
-| **Parallelism is impossible** | Claude is single-threaded |
+| **Parallelism is impossible** | OpenCode is single-threaded |
 | Ralph overhead for simple tasks | Unnecessary complexity |
 | 9 phases that must run sequentially | Wrong tool for the job |
 
@@ -261,7 +261,7 @@ Referenced from existing tiers:
 ### Use Skill Chain (phases)
 
 - 9 sequential phases with dependencies
-- Single Claude invocation per phase
+- Single OpenCode invocation per phase
 - Status file for tracking/resume
 
 ### Use Ralph (items)

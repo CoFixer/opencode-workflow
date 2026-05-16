@@ -1,4 +1,4 @@
----
+﻿---
 skill_name: organize-types
 applies_to_local_project_only: true
 auto_trigger_regex: [organize types, typescript types, type organization, refactor types, centralize types, barrel exports]
@@ -186,7 +186,7 @@ export interface Tab {
 // Used by tab-switcher.tsx AND other components
 ```
 
-## Instructions for Claude
+## Instructions for OpenCode
 
 When this skill is invoked:
 

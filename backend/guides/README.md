@@ -1,4 +1,4 @@
-# NestJS Guides & Workflows
+﻿# NestJS Guides & Workflows
 
 Comprehensive guides and step-by-step workflows for NestJS/TypeORM development in Coffee Club.
 
@@ -178,7 +178,7 @@ async getOrderStats(startDate: Date, endDate: Date) {
 
 ## Related Documentation
 
-- [CLAUDE.md](../../../CLAUDE.md) - Full project documentation
+- [opencode.md](../../../opencode.md) - Full project documentation
 - [Backend Modules](../../../backend/src/modules/) - Source code
 - [Best Practices](BEST-PRACTICES.md) - NestJS coding standards
 

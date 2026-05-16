@@ -1,4 +1,4 @@
----
+﻿---
 name: module-scaffolder
 description: Automatically scaffold complete NestJS modules following three-layer architecture. Generates entity, repository, service, controller, DTOs, and module configuration. Use when you need to create a new CRUD module like "generate module for Product" or "scaffold User module with authentication".
 model: sonnet
@@ -195,17 +195,17 @@ Next steps:
 ## Key Reference Files
 
 **Skills to leverage:**
-- `.claude/nestjs/skills/crud-module-generator/SKILL.md` - CRUD generation patterns
-- `.claude/nestjs/skills/response-dto-factory/SKILL.md` - Response DTO patterns
-- `.claude/nestjs/skills/swagger-doc-generator/SKILL.md` - Swagger patterns
+- `.opencode/nestjs/skills/crud-module-generator/SKILL.md` - CRUD generation patterns
+- `.opencode/nestjs/skills/response-dto-factory/SKILL.md` - Response DTO patterns
+- `.opencode/nestjs/skills/swagger-doc-generator/SKILL.md` - Swagger patterns
 
 **Examples to reference:**
-- `.claude/nestjs/examples/crud-module/` - Complete Product CRUD example
+- `.opencode/nestjs/examples/crud-module/` - Complete Product CRUD example
 - `backend/src/modules/orders/` - Real-world complex module with relationships
 - `backend/src/modules/categories/` - Simple module example
 
 **Project documentation:**
-- `CLAUDE.md` - Full project documentation with NestJS patterns
+- `opencode.md` - Full project documentation with NestJS patterns
 - `backend/README.md` - Backend-specific setup and conventions
 
 ## Best Practices (NEVER violate)

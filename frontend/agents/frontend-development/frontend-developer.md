@@ -1,4 +1,4 @@
----
+﻿---
 name: frontend-developer
 description: Use this agent for frontend development tasks including analyzing project documentation, mapping APIs to pages, updating API integration docs, and creating Playwright E2E tests. This agent reads PROJECT_KNOWLEDGE, PROJECT_API, and PROJECT_API_INTEGRATION to understand the system, then implements frontend features with proper testing.\n\nExamples:\n- <example>\n  Context: User wants to integrate backend APIs into a frontend page\n  user: "Integrate the exercise APIs into the patient exercise page"\n  assistant: "I'll use the frontend-developer agent to analyze the APIs and implement the integration"\n  <commentary>\n  API integration requires reading PROJECT_API docs and updating PROJECT_API_INTEGRATION with implementation details.\n  </commentary>\n  </example>\n- <example>\n  Context: User wants to update API integration documentation\n  user: "Update the API integration docs to show which endpoints the coach dashboard uses"\n  assistant: "Let me use the frontend-developer agent to analyze and update PROJECT_API_INTEGRATION.md"\n  <commentary>\n  Documentation updates require analyzing existing pages and mapping them to their required API endpoints.\n  </commentary>\n  </example>\n- <example>\n  Context: User wants E2E tests for a completed feature\n  user: "Create Playwright tests for the patient signup flow"\n  assistant: "I'll use the frontend-developer agent to create E2E tests following the Page Object Model pattern"\n  <commentary>\n  E2E tests should use the existing Playwright infrastructure with Page Objects, fixtures, and utilities.\n  </commentary>\n  </example>
 model: opus
@@ -232,7 +232,7 @@ You are an expert frontend developer specializing in React/TypeScript applicatio
   - `api-mocking.ts` - API mocking utilities
 
 ### Frontend Development Skill
-- `.claude/skills/frontend-dev-guidelines/` - Comprehensive frontend patterns
+- `.opencode/skills/frontend-dev-guidelines/` - Comprehensive frontend patterns
   - Invoke with: `Skill(skill: "frontend-dev-guidelines")`
 
 ---
@@ -437,27 +437,27 @@ npm run typecheck             # TypeScript type checking
 
 ### Before Any Implementation - READ THESE GUIDES:
 
-**CRITICAL: Before implementing any code, read `.claude/react/guides/best-practices.md` for mandatory project rules.**
+**CRITICAL: Before implementing any code, read `.opencode/react/guides/best-practices.md` for mandatory project rules.**
 
 ### Architecture & Patterns
-- `.claude/react/guides/best-practices.md` - **CRITICAL: Coding standards**
-- `.claude/react/guides/component-patterns.md` - Component structure patterns
-- `.claude/react/guides/file-organization.md` - Directory structure
+- `.opencode/react/guides/best-practices.md` - **CRITICAL: Coding standards**
+- `.opencode/react/guides/component-patterns.md` - Component structure patterns
+- `.opencode/react/guides/file-organization.md` - Directory structure
 
 ### Data & API
-- `.claude/react/guides/data-fetching.md` - API patterns
-- `.claude/react/guides/tanstack-query.md` - Query patterns
-- `.claude/react/guides/api-integration.md` - Screen-to-API mapping
+- `.opencode/react/guides/data-fetching.md` - API patterns
+- `.opencode/react/guides/tanstack-query.md` - Query patterns
+- `.opencode/react/guides/api-integration.md` - Screen-to-API mapping
 
 ### UI & Styling
-- `.claude/react/guides/styling-guide.md` - Tailwind CSS conventions
-- `.claude/react/guides/loading-and-error-states.md` - Async state handling
+- `.opencode/react/guides/styling-guide.md` - Tailwind CSS conventions
+- `.opencode/react/guides/loading-and-error-states.md` - Async state handling
 
 ### Quality & Standards
-- `.claude/react/guides/typescript-standards.md` - TypeScript rules
-- `.claude/react/guides/performance.md` - Optimization techniques
+- `.opencode/react/guides/typescript-standards.md` - TypeScript rules
+- `.opencode/react/guides/performance.md` - Optimization techniques
 
 ### Authentication
-- `.claude/react/guides/authentication-architecture.md` - Auth flow details
-- `.claude/react/guides/authentication.md` - Auth implementation patterns
-- `.claude/react/guides/auth-guards.md` - Route protection
+- `.opencode/react/guides/authentication-architecture.md` - Auth flow details
+- `.opencode/react/guides/authentication.md` - Auth implementation patterns
+- `.opencode/react/guides/auth-guards.md` - Route protection

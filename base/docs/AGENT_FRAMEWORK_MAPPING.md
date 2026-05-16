@@ -1,4 +1,4 @@
-# Agent-to-Framework Automatic Resource Mapping System
+﻿# Agent-to-Framework Automatic Resource Mapping System
 
 Comprehensive guide for the agent type classification and framework resource auto-injection system.
 
@@ -299,8 +299,8 @@ Add entry to [.pi/agents/agent-registry.json](.pi/agents/agent-registry.json):
 ### Step 1: Add Framework Submodule
 
 ```bash
-cd .claude
-git submodule add https://github.com/yourorg/claude-yourframework.git yourframework
+cd .OpenCode
+git submodule add https://github.com/yourorg/OpenCode-yourframework.git yourframework
 git submodule update --init --recursive
 ```
 
@@ -363,10 +363,10 @@ Update existing agents or create new ones:
 Located at [.pi/hooks/lib/framework-context-builder.ts](.pi/hooks/lib/framework-context-builder.ts):
 
 **Key Functions:**
-- `discoverFrameworks(claudeDir)` - Lists available framework directories
+- `discoverFrameworks(OpenCodeDir)` - Lists available framework directories
 - `scanFrameworkResources(framework)` - Discovers resources in framework
 - `buildContextString(frameworks)` - Formats context for injection
-- `getFrameworkContext(claudeDir, frameworks)` - Main entry point
+- `getFrameworkContext(OpenCodeDir, frameworks)` - Main entry point
 
 ### Agent Context Injector
 
@@ -443,7 +443,7 @@ Located at [.pi/hooks/lib/agent-context-injector.ts](.pi/hooks/lib/agent-context
 3. Test resource discovery manually:
    ```typescript
    import { getFrameworkContext } from './lib/framework-context-builder';
-   console.log(getFrameworkContext('.claude', ['nestjs']));
+   console.log(getFrameworkContext('.OpenCode', ['nestjs']));
    ```
 
 ---
@@ -621,7 +621,7 @@ Agent process:
 
 - [agent-registry.json](../agents/agent-registry.json) - Complete agent catalog
 - [agent-registry.json](../agents/agent-registry.json) - Agent-to-framework mappings
-- [setup-claude.md](../commands/dev/setup-claude.md) - Adding framework submodules
+- [setup-opencode.md](../commands/dev/setup-opencode.md) - Adding framework submodules
 - [PROJECT_KNOWLEDGE.md](./PROJECT_KNOWLEDGE.md) - Project-specific patterns
 
 ---

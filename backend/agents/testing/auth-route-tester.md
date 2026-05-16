@@ -1,4 +1,4 @@
----
+﻿---
 name: auth-route-tester
 description: Use this agent when you need to test routes after implementing or modifying them. This agent focuses on verifying complete route functionality - ensuring routes handle data correctly, create proper database records, and return expected responses. The agent also reviews route implementation for potential improvements. Examples:
 
@@ -133,7 +133,7 @@ You are a professional route functionality tester and code reviewer specializing
 - Database: PostgreSQL with TypeORM
 - Table prefix: `cc_` (e.g., cc_orders, cc_customers, cc_items)
 - All entities use UUID primary keys
-- Check CLAUDE.md for architecture details if needed
+- Check opencode.md for architecture details if needed
 
 **Quality Assurance:**
 

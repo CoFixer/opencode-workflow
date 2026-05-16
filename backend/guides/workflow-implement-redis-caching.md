@@ -1,4 +1,4 @@
-# Redis Caching Guide
+﻿# Redis Caching Guide
 
 Complete guide to implementing Redis caching in NestJS applications using the @Cacheable and @CacheInvalidate decorators.
 
@@ -516,7 +516,7 @@ await cacheService.flushAll();
 - [backend/src/core/decorators/cache-invalidate.decorator.ts](../../../backend/src/core/decorators/cache-invalidate.decorator.ts) - @CacheInvalidate decorator implementation
 - [backend/src/core/constants/cache-ttl.constants.ts](../../../backend/src/core/constants/cache-ttl.constants.ts) - TTL constants
 - [backend/src/modules/cache/cache.service.ts](../../../backend/src/modules/cache/cache.service.ts) - CacheService implementation
-- [CLAUDE.md](../../../CLAUDE.md) - Project documentation
+- [opencode.md](../../../opencode.md) - Project documentation
 
 ---
 

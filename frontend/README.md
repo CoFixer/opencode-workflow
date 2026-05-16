@@ -1,6 +1,6 @@
-# Claude React
+﻿# OpenCode React
 
-Claude Code configuration for React frontend development. This is a framework-specific submodule designed to be used alongside `claude-base` (shared/generic config).
+OpenCode configuration for React frontend development. This is a framework-specific submodule designed to be used alongside `OpenCode-base` (shared/generic config).
 
 ## Contents
 
@@ -38,13 +38,13 @@ Working code examples in `examples/` directory.
 Add as a git submodule to your project:
 
 ```bash
-git submodule add https://github.com/CoFixer/claude-react.git .claude/react
+git submodule add https://github.com/CoFixer/opencode-react.git .opencode/react
 ```
 
 ### Project Structure
 
 ```
-.claude/
+.opencode/
 ├── base/      # Generic/shared config (git submodule)
 ├── nestjs/    # NestJS-specific config (git submodule) - optional
 ├── react/     # This repo (git submodule)
@@ -53,5 +53,5 @@ git submodule add https://github.com/CoFixer/claude-react.git .claude/react
 
 ## Related Repos
 
-- [claude-base](https://github.com/CoFixer/claude-base) - Shared/generic Claude Code config
-- [claude-nestjs](https://github.com/CoFixer/claude-nestjs) - NestJS-specific Claude Code config
+- [OpenCode-base](https://github.com/CoFixer/opencode-base) - Shared/generic OpenCode config
+- [OpenCode-nestjs](https://github.com/CoFixer/opencode-nestjs) - NestJS-specific OpenCode config

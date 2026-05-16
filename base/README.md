@@ -1,22 +1,18 @@
-# OpenCode Base
+---
+name: base-workspace
+description: Base workspace for .opencode system configuration.
+---
 
-Framework documentation, guides, and workspace configuration for the OpenCode agent workflow.
+# .opencode/base
+
+Base configuration for the `.opencode` workflow system.
 
 ## Contents
 
-- `settings.json` — Workspace configuration (skills, agents, prompts, guides, docs)
-- `docs/` — Framework documentation and checklists
-- `guides/` — Setup guides (Google OAuth, PM2, etc.)
+- `settings.json` — Workspace-level configuration (model preferences, tool configs)
 
-## Workspace Config
+## Related
 
-The `settings.json` file wires up:
-- **Skills**: `../skill-rules.json` (auto-activate on trigger)
-- **Agents**: `../agents/agent-manifest.json`
-- **Prompts**: `../prompts/` directory
-- **Guides**: Backend, frontend, mobile, and base guides
-- **Docs**: Framework docs and checklists
-
-## Integration
-
-All paths are relative to the `.opencode/` root. The shared project hub is at `.project/`.
+- Shared agents live in `.opencode/agents/` (not in this directory)
+- Skills live in `.opencode/skills/`
+- Prompts live in `.opencode/prompts/`

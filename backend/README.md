@@ -1,6 +1,6 @@
-# claude-nestjs
+﻿# OpenCode-nestjs
 
-NestJS-specific configuration for Claude Code.
+NestJS-specific configuration for OpenCode.
 
 ## Contents
 
@@ -9,15 +9,15 @@ NestJS-specific configuration for Claude Code.
 
 ## Usage
 
-This submodule is designed to be used with [claude-base](https://github.com/CoFixer/claude-base) for shared commands, hooks, and skills.
+This submodule is designed to be used with [OpenCode-base](https://github.com/CoFixer/opencode-base) for shared commands, hooks, and skills.
 
 ### Project Structure
 ```
-.claude/
-├── base/          # Shared commands, hooks, skills (claude-base)
+.opencode/
+├── base/          # Shared commands, hooks, skills (OpenCode-base)
 ├── nestjs/        # NestJS-specific guides (this repo)
-├── react/         # React-specific guides (claude-react)
-└── react-native/  # React Native-specific guides (claude-react-native)
+├── react/         # React-specific guides (OpenCode-react)
+└── react-native/  # React Native-specific guides (OpenCode-react-native)
 ```
 
 ## Guide Catalog
@@ -113,7 +113,7 @@ This submodule provides guides for:
 
 ---
 
-**Part of the Claude Code ecosystem**
-- [claude-base](https://github.com/CoFixer/claude-base) - Shared configuration
-- [claude-react](https://github.com/CoFixer/claude-react) - React guides
-- [claude-react-native](https://github.com/CoFixer/claude-react-native) - React Native guides
+**Part of the OpenCode ecosystem**
+- [OpenCode-base](https://github.com/CoFixer/opencode-base) - Shared configuration
+- [OpenCode-react](https://github.com/CoFixer/opencode-react) - React guides
+- [OpenCode-react-native](https://github.com/CoFixer/opencode-react-native) - React Native guides

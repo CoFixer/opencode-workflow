@@ -1,6 +1,6 @@
-# React/Next.js Skills Directory
+﻿# React/Next.js Skills Directory
 
-Comprehensive skill library for React/Next.js frontend development following Anthropic's best practices for Claude Code.
+Comprehensive skill library for React/Next.js frontend development following Anthropic's best practices for OpenCode.
 
 ---
 
@@ -243,7 +243,7 @@ Each skill follows Anthropic's best practices:
 
 ## 🔍 How Skills Are Triggered
 
-Skills are automatically suggested by Claude based on:
+Skills are automatically suggested by OpenCode based on:
 
 1. **Keywords**: Explicit mentions in your prompt
 2. **Intent Patterns**: Action phrases (e.g., "convert figma", "fix bug", "generate test")

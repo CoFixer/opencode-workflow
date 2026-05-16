@@ -1,4 +1,4 @@
-# Figma to React Native Conversion Guide
+﻿# Figma to React Native Conversion Guide
 
 Convert Figma designs to **pixel-perfect** React Native components using Figma MCP server, with full integration into the project's NativeWind (Tailwind CSS for RN), React Native Paper, and TypeScript patterns.
 
@@ -1051,7 +1051,7 @@ const shadowStyle = Platform.select({
 
 | Issue | Solution |
 |-------|----------|
-| MCP not responding | Check `claude mcp list` - ensure figma server is connected |
+| MCP not responding | Check `OpenCode mcp list` - ensure figma server is connected |
 | No design context | Ensure you have the correct Figma URL with node-id |
 | Response too large | Use `get_metadata` first, then fetch specific nodes |
 | Node not found | Verify node ID format (use colon `:` for MCP, hyphen `-` in URLs) |

@@ -1,9 +1,9 @@
-#!/bin/bash
+﻿#!/bin/bash
 # ============================================================
 # autopilot.sh — Persistent team mode with auto-resume
 # ============================================================
 #
-# Wraps Claude Code in a tmux session. Detects rate-limit exits,
+# Wraps OpenCode in a tmux session. Detects rate-limit exits,
 # waits with exponential backoff, and auto-resumes the team loop.
 #
 # Usage:
@@ -13,16 +13,16 @@
 #   ./autopilot.sh --prd .project/prd/my-feature.md
 #   ./autopilot.sh --prd ./prd.md --split-dev
 #
-# Requirements: tmux, claude CLI
-# Monitor:     tmux attach -t claude-autopilot
-# Stop:        tmux send-keys -t claude-autopilot C-c
+# Requirements: tmux, OpenCode CLI
+# Monitor:     tmux attach -t OpenCode-autopilot
+# Stop:        tmux send-keys -t OpenCode-autopilot C-c
 # ============================================================
 
 set -euo pipefail
 
 # --- Configuration ---
-SESSION_NAME="claude-autopilot"
-LOG_FILE="/tmp/claude-autopilot.log"
+SESSION_NAME="OpenCode-autopilot"
+LOG_FILE="/tmp/OpenCode-autopilot.log"
 WAIT_SECONDS=60
 MAX_WAIT=300
 MAX_RETRIES=50
@@ -44,8 +44,8 @@ if ! command -v tmux &>/dev/null; then
     exit 1
 fi
 
-if ! command -v claude &>/dev/null; then
-    echo -e "${RED}Error: claude CLI is required but not installed.${NC}"
+if ! command -v OpenCode &>/dev/null; then
+    echo -e "${RED}Error: OpenCode CLI is required but not installed.${NC}"
     exit 1
 fi
 
@@ -68,9 +68,9 @@ run_loop() {
     while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         log "${GREEN}--- Run #$((RETRY_COUNT + 1)) ---${NC}"
 
-        # Run claude with team command
+        # Run OpenCode with team command
         set +e
-        claude -p "team: start --autopilot $TEAM_ARGS" 2>&1 | tee -a "$LOG_FILE"
+        OpenCode -p "team: start --autopilot $TEAM_ARGS" 2>&1 | tee -a "$LOG_FILE"
         EXIT_CODE=$?
         set -e
 

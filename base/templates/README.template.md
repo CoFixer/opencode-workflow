@@ -1,4 +1,4 @@
-# {PROJECT_NAME}
+﻿# {PROJECT_NAME}
 
 > [Project description extracted from PROJECT_KNOWLEDGE.md]
 
@@ -38,7 +38,7 @@
 [if react-native]
 ├── mobile/               # React Native mobile app
 [endif]
-├── .opencode/              # Claude configuration & skills
+├── .opencode/              # OpenCode configuration & skills
 ├── .project/      # Project documentation
 └── docker-compose.yml    # Service orchestration
 ```
@@ -112,7 +112,7 @@ npm run migration:run
 
 ## Documentation
 
-- **Quick Reference**: See [CLAUDE.md](CLAUDE.md) for Claude context
+- **Quick Reference**: See [opencode.md](opencode.md) for OpenCode context
 - **Full Documentation**: See `.project/docs/`
   - [PROJECT_KNOWLEDGE.md](.project/docs/PROJECT_KNOWLEDGE.md) - Architecture
   - [PROJECT_API.md](.project/docs/PROJECT_API.md) - API specs
@@ -178,14 +178,14 @@ docker-compose -f docker-compose.prod.yml up -d
 4. After review, merge to `dev`
 5. `dev` → `main` for production releases
 
-## Claude Code Configuration
+## OpenCode Configuration
 
-This project uses [Claude Code](https://claude.ai) for AI-assisted development with a structured configuration system.
+This project uses [OpenCode](https://OpenCode.ai) for AI-assisted development with a structured configuration system.
 
 ### Configuration Structure
 
 ```
-.opencode/                    # How Claude works (shared via submodules)
+.opencode/                    # How OpenCode works (shared via submodules)
 ├── agents/                 # Agent definitions (specialized AI roles)
 ├── commands/               # Slash commands (/commit, /fullstack, etc.)
 ├── hooks/                  # Automation hooks (pre/post execution)
@@ -194,7 +194,7 @@ This project uses [Claude Code](https://claude.ai) for AI-assisted development w
 ├── templates/              # Project templates
 └── settings.json           # Configuration
 
-.project/            # What Claude knows (project-specific)
+.project/            # What OpenCode knows (project-specific)
 ├── docs/                   # Technical documentation
 ├── memory/                 # Project memory (decisions, learnings, preferences)
 ├── prd/                    # Product requirements
@@ -203,7 +203,7 @@ This project uses [Claude Code](https://claude.ai) for AI-assisted development w
 
 ### Memory System
 
-Claude maintains persistent context across sessions at three levels:
+OpenCode maintains persistent context across sessions at three levels:
 
 | Level | Location | Purpose |
 |-------|----------|---------|

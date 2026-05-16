@@ -1,4 +1,4 @@
-# Frontend Patterns for Kimi
+# Frontend Patterns for OpenCode
 
 Quick reference for React frontend/dashboard development in StorePilot.
 

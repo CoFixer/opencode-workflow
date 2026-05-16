@@ -1,4 +1,4 @@
-# Claude Code secrets (keep .gitkeep)
+# OpenCode secrets (keep .gitkeep)
 .project/secrets/*
 !.project/secrets/.gitkeep
 

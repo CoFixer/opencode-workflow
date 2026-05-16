@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 
 /**
@@ -21,8 +21,8 @@ function resolvePorts(projectRoot) {
     return { backend: base, frontend: base + 1, dashboardBasePort: base + 2 };
   }
 
-  // Priority 2: port-map.json from .claude submodule
-  const portMapPath = path.join(projectRoot, '.claude', 'base', 'port-map.json');
+  // Priority 2: port-map.json from .OpenCode submodule
+  const portMapPath = path.join(projectRoot, '.OpenCode', 'base', 'port-map.json');
   if (fs.existsSync(portMapPath)) {
     const portMap = JSON.parse(fs.readFileSync(portMapPath, 'utf8'));
     const base = portMap.projects[projectName];

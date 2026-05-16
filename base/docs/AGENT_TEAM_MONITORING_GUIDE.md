@@ -1,6 +1,6 @@
-# Agent & Team Monitoring Guide
+﻿# Agent & Team Monitoring Guide
 
-How to monitor individual agents and agent teams while they work in Claude Code.
+How to monitor individual agents and agent teams while they work in OpenCode.
 
 ---
 
@@ -57,7 +57,7 @@ How to monitor individual agents and agent teams while they work in Claude Code.
 
 ### Running Agents in Background
 
-Ask Claude to run something in the background:
+Ask OpenCode to run something in the background:
 ```
 Run the test suite in the background and report only failing tests
 ```
@@ -100,7 +100,7 @@ Resumed agents retain their full conversation history and pick up exactly where 
 
 ## Monitoring Agent Teams
 
-Agent teams have a **lead** (your main session) and multiple **teammates** (separate Claude instances).
+Agent teams have a **lead** (your main session) and multiple **teammates** (separate OpenCode instances).
 
 ### Display Modes
 
@@ -124,7 +124,7 @@ Set in `settings.json`:
 
 Or use CLI flag:
 ```bash
-claude --teammate-mode tmux
+OpenCode --teammate-mode tmux
 ```
 
 ### Interacting with Teammates
@@ -308,7 +308,7 @@ exit 0
 Share a task list across sessions with an environment variable:
 
 ```bash
-CLAUDE_CODE_TASK_LIST_ID=my-project claude
+CLAUDE_CODE_TASK_LIST_ID=my-project OpenCode
 ```
 
 This uses `~/.pi/tasks/my-project/` for all sessions, letting you pick up where you left off.
