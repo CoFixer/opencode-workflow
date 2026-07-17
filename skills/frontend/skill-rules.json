@@ -6,7 +6,7 @@
       "type": "domain",
       "enforcement": "suggest",
       "priority": "high",
-      "file": "../agents/frontend-development/frontend-developer.md",
+      "file": "../agents/development/frontend-developer.md",
       "promptTriggers": {
         "keywords": ["frontend", "react", "component", "page", "api integration", "playwright", "e2e test", "typescript", "tailwind", "redux", "router"],
         "intentPatterns": [

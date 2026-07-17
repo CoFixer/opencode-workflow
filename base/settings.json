@@ -52,13 +52,10 @@
   },
   "schemas": {
     "directory": "../base/schemas",
-    "files": [
-      "../base/schemas/pipeline.json",
-      "../base/schemas/phase-result.json"
-    ]
+    "files": []
   },
   "scripts": {
-    "dispatcher": "../scripts/dispatcher.js"
+    "dispatcher": ""
   },
   "preferences": {
     "codeStyle": "minimal-changes",

@@ -100,6 +100,11 @@
       "name": "e2e-test-generator",
       "trigger": "/skill:e2e-test-generator",
       "description": "Generate end-to-end tests for NestJS controllers and APIs"
+    },
+    {
+      "name": "develop-skills",
+      "trigger": "/skill:develop-skills",
+      "description": "Creating and managing OpenCode skills, hooks, and skill-rules configuration"
     }
   ]
 }
