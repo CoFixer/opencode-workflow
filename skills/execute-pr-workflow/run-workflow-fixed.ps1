@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Execute PR Workflow - Automated CI/CD pipeline for feature/bug fixes.
 
@@ -667,3 +667,4 @@ catch {
     Write-Host "`nStack Trace:`n$($_.ScriptStackTrace)" -ForegroundColor Gray
     exit 1
 }
+

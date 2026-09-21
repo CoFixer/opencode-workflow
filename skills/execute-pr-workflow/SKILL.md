@@ -209,12 +209,16 @@ gh pr merge $prNumber --squash --delete-branch
 
 ### 10) First commit: create dev -> main PR
 
-Check if `dev` has commits not in `main`:
+Only create the release PR if `main` is empty (no commits yet). Once `main` has been initialized, never auto-merge `dev` to `main`.
 
 ```powershell
-$devCommits = git log main..dev --oneline
-if ($devCommits.Count -gt 0) {
-    # This is effectively a first/new release
+git rev-parse --verify main 2>$null | Out-Null
+$mainExists = $LASTEXITCODE -eq 0
+$mainCommitCount = if ($mainExists) { git rev-list --count main 2>$null } else { 0 }
+$isFirstCommit = (-not $mainExists) -or ([int]$mainCommitCount -eq 0)
+
+if ($isFirstCommit) {
+    # This is the first commit — create release PR
     $releaseBranch = "release/dev-to-main-$timestamp"
     git checkout dev
     git pull origin dev
