@@ -11,8 +11,8 @@ This skill automates the **full PR lifecycle** from changes to merged code:
 2. Runs build and type checks for affected packages
 3. Commits and pushes to an appropriate branch
 4. Creates a PR to the `dev` branch
-5. Waits for CI/QA tests to pass
-6. Auto-merges the PR to `dev`
+5. Waits for CI checks with a **bounded timeout** (detects jobs that never get a runner)
+6. Auto-merges the PR to `dev` — blocking only when the base branch actually requires the check
 7. **First commit detection:** If `dev` has changes not in `main`, also creates a PR `dev -> main` and merges it
 
 ## Hard rules
@@ -22,6 +22,15 @@ This skill automates the **full PR lifecycle** from changes to merged code:
 - Do not proceed if PR creation fails
 - Never stage secrets (for example `.env*`, credentials files)
 - Always create a new branch; never commit directly to `dev` or `main`
+- **Never wait indefinitely on CI.** Use a bounded wait (default 8 min) and bail
+  out early when a queued job is never picked up by a runner.
+- **Advisory checks must not block a merge.** Only block on a failing/stuck check
+  when the base branch enforces it as a required status check.
+- **Keep skill scripts ASCII-only.** PowerShell 5.1 reads BOM-less UTF-8 files as
+  ANSI, turning glyphs like `✓` into "smart quotes" that break parsing. Use
+  `[OK]`, `[x]`, `->` instead of `✓`, `✗`, `→`.
+- `run-workflow.ps1` is the **single source of truth**; `run-workflow-fixed.ps1`
+  is a thin wrapper that delegates to it so the two can never drift.
 
 ## Workflow (PowerShell commands)
 
@@ -176,36 +185,82 @@ $prUrl = gh pr create --base dev --head $branchName --title $title --body $body
 if ([string]::IsNullOrWhiteSpace($prUrl)) { throw "PR creation failed." }
 ```
 
-### 9) Wait for QA tests and merge to dev
+### 9) Wait for CI checks and merge to dev (bounded, incident-aware)
+
+Do **not** poll blindly for 30 minutes. A queued job that never gets a runner is a
+platform problem (GitHub Actions incident / runner capacity), not a code problem.
+Detect it early and move on.
 
 ```powershell
-# Wait for checks to complete (poll every 10 seconds, max 30 minutes)
 $prNumber = gh pr view $branchName --json number --jq '.number'
-$waited = 0
-$maxWait = 30 * 60  # 30 minutes in seconds
 
-while ($waited -lt $maxWait) {
+$maxWaitSeconds              = 8 * 60   # overall budget for the whole wait
+$runnerAcquireTimeoutSeconds = 120      # give up if nothing is picked up in 2 min
+
+$waited = 0
+$sawProgress = $false
+$ciStatus = "TimedOut"
+
+while ($waited -lt $maxWaitSeconds) {
     Start-Sleep -Seconds 10
     $waited += 10
 
-    $checks = gh pr checks $prNumber --json state --jq '.[].state' 2>$null
-    if ($checks) {
-        $checkStates = $checks -split "`n" | Where-Object { $_ }
+    $json = gh pr checks $prNumber --json name,state,startedAt 2>$null
+    if (-not $json) { $ciStatus = "NoChecks"; break }
 
-        if ($checkStates | Where-Object { $_ -eq "FAILURE" }) {
-            throw "QA tests failed on PR #$prNumber"
-        }
+    $checks = @($json | ConvertFrom-Json)
+    $states = @($checks | ForEach-Object { ([string]$_.state).ToUpper() })
 
-        if (($checkStates | Where-Object { $_ -ne "SUCCESS" -and $_ -ne "SKIPPED" }).Count -eq 0) {
-            Write-Host "All QA tests passed!"
-            break
-        }
+    if ($states -contains "FAILURE" -or $states -contains "ERROR" -or $states -contains "CANCELLED") {
+        $ciStatus = "Failed"; break
+    }
+
+    $pending = @($states | Where-Object { $_ -in @("PENDING","QUEUED","IN_PROGRESS","EXPECTED","REQUESTED","WAITING","STALE") })
+    if ($pending.Count -eq 0) { $ciStatus = "Passed"; break }
+
+    # Has any job actually been picked up by a runner yet?
+    $running = @($checks | Where-Object { ([string]$_.state).ToUpper() -eq "IN_PROGRESS" -or $_.startedAt })
+    if ($running.Count -gt 0) { $sawProgress = $true }
+
+    # Nothing ever started -> GitHub-hosted runner capacity / Actions incident.
+    if (-not $sawProgress -and $waited -ge $runnerAcquireTimeoutSeconds) {
+        $ciStatus = "Stuck"; break
     }
 }
 
-# Merge PR
+# Decide whether CI can block the merge: only if 'dev' enforces required checks.
+$checksRequired = $false
+$repo = gh repo view --json nameWithOwner --jq '.nameWithOwner'
+$protection = gh api "repos/$repo/branches/dev/protection" 2>$null
+if ($protection) {
+    $contexts = @(($protection | ConvertFrom-Json).required_status_checks.contexts)
+    $checksRequired = $contexts.Count -gt 0
+}
+
+switch ($ciStatus) {
+    "Passed"   { }
+    "Failed"   { throw "CI failed on PR #$prNumber. Fix before merging." }
+    "NoChecks" { Write-Host "No CI checks configured; proceeding." }
+    default {
+        if ($checksRequired) {
+            throw "CI did not complete ($ciStatus) and 'dev' requires it. PR left open: $prUrl"
+        }
+        Write-Host "CI did not complete ($ciStatus); checks are advisory on 'dev'. Merging."
+    }
+}
+
+# Merge PR (verify success; do not silently ignore a failed merge)
 gh pr merge $prNumber --squash --delete-branch
+if ($LASTEXITCODE -ne 0) { gh pr merge $prNumber --squash }
+if ($LASTEXITCODE -ne 0) { throw "Failed to merge PR #$prNumber." }
 ```
+
+**CI outcomes:** `Passed`, `Failed`, `NoChecks`, `Stuck` (no runner picked up the
+job), `TimedOut`. `Stuck` / `TimedOut` only block the merge when the base branch
+enforces required status checks; otherwise the merge proceeds after the short
+wait. A one-time GitHub Actions health check
+(`https://www.githubstatus.com/api/v2/components.json`) is also performed and a
+warning is printed when Actions is degraded.
 
 ### 10) First commit: create dev -> main PR
 
@@ -239,9 +294,9 @@ This PR merges all changes from dev to main.
 
     $releasePrUrl = gh pr create --base main --head $releaseBranch --title $releaseTitle --body $releaseBody
 
-    # Wait for QA on release PR
+    # Wait using the same bounded/incident-aware logic as Section 9, against base 'main'.
+    # Only block the release merge when 'main' enforces required status checks.
     $releasePrNumber = gh pr view $releaseBranch --json number --jq '.number'
-    # ... (same polling logic as above) ...
 
     # Merge release PR
     gh pr merge $releasePrNumber --squash --delete-branch
@@ -267,7 +322,10 @@ Return:
 - branch name created
 - commit SHA + subject
 - PR URL (dev PR)
-- QA test status (PASSED / FAILED)
+- CI status: `PASSED` / `FAILED` / `NO CHECKS` / `STUCK (no runner)` / `TIMED OUT`
 - merge status (MERGED / NOT MERGED)
 - If first commit: release PR URL and merge status
 - any failure reason
+- when CI was `STUCK`/`TIMED OUT` and the check was advisory: state clearly that
+  the merge proceeded on locally-passing build/type checks while GitHub Actions
+  was degraded

@@ -22,7 +22,12 @@ param(
     [switch]$SkipTests,
     [switch]$DryRun,
     [string]$CustomBranchName,
-    [string]$CommitMessage
+    [string]$CommitMessage,
+    # Maximum time to wait for CI checks before giving up (minutes).
+    [int]$MaxWaitMinutes = 8,
+    # If no runner picks up a queued job within this many seconds, treat CI as
+    # stuck (e.g. a GitHub Actions incident) instead of waiting the full budget.
+    [int]$RunnerAcquireTimeoutSeconds = 120
 )
 
 $ErrorActionPreference = "Stop"
@@ -44,17 +49,17 @@ function Write-Step {
 
 function Write-Success {
     param([string]$Message)
-    Write-Host "  ✓ $Message" -ForegroundColor $Colors.Success
+    Write-Host "  [OK] $Message" -ForegroundColor $Colors.Success
 }
 
 function Write-Error {
     param([string]$Message)
-    Write-Host "  ✗ $Message" -ForegroundColor $Colors.Error
+    Write-Host "  [x] $Message" -ForegroundColor $Colors.Error
 }
 
 function Write-Info {
     param([string]$Message)
-    Write-Host "  → $Message" -ForegroundColor $Colors.Info
+    Write-Host "  -> $Message" -ForegroundColor $Colors.Info
 }
 
 function Invoke-Command {
@@ -263,77 +268,150 @@ function Invoke-TypeCheck {
     }
 }
 
+# CI states that mean "still working" and CI states that mean "broken".
+$script:PendingCheckStates = @("PENDING", "QUEUED", "IN_PROGRESS", "EXPECTED", "REQUESTED", "WAITING", "STALE")
+$script:FailedCheckStates = @("FAILURE", "ERROR", "CANCELLED", "TIMED_OUT", "STARTUP_FAILURE", "ACTION_REQUIRED")
+
+<#
+.SYNOPSIS
+    Returns $true when GitHub Actions is reporting anything other than
+    operational (e.g. an incident delaying runner assignment).
+#>
+function Test-GitHubActionsDegraded {
+    try {
+        $resp = Invoke-RestMethod -Uri "https://www.githubstatus.com/api/v2/components.json" -TimeoutSec 10 -ErrorAction Stop
+        $actions = $resp.components | Where-Object { $_.name -eq "Actions" } | Select-Object -First 1
+        if ($actions -and ([string]$actions.status) -ne "operational") { return $true }
+    }
+    catch {
+        # Status endpoint unreachable - assume healthy and continue.
+    }
+    return $false
+}
+
+<#
+.SYNOPSIS
+    Returns $true when the base branch enforces the CI check as a required
+    status check. On repos without branch protection this returns $false, so
+    advisory checks never block a merge.
+#>
+function Test-ChecksRequired {
+    param([string]$BaseBranch = "dev")
+
+    try {
+        $repo = gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>$null
+        if (-not $repo) { return $false }
+        $protection = gh api "repos/$repo/branches/$BaseBranch/protection" 2>$null
+        if (-not $protection) { return $false }
+        $obj = $protection | ConvertFrom-Json
+        $contexts = @($obj.required_status_checks.contexts)
+        return ($contexts.Count -gt 0)
+    }
+    catch {
+        return $false
+    }
+}
+
+<#
+.SYNOPSIS
+    Waits for CI checks on a PR with bounded, self-terminating logic.
+
+.DESCRIPTION
+    Returns one of: Passed, Failed, NoChecks, Stuck, TimedOut.
+    - Failed   : a check reported a terminal failure.
+    - Stuck    : no runner ever picked up the job within the acquisition budget
+                 (typical of a GitHub Actions incident) - returns quickly instead
+                 of burning the whole wait budget.
+    - NoChecks : the PR has no checks configured.
+    - TimedOut : checks were running but did not finish in time.
+#>
 function Invoke-QATests {
     param(
         [string]$Branch,
         [string]$BaseBranch = "dev",
-        [int]$MaxWaitMinutes = 30
+        [int]$MaxWaitMinutes = 8,
+        [int]$RunnerAcquireTimeoutSeconds = 120
     )
 
-    Write-Step "Waiting for CI/QA Tests on PR: $Branch -> $BaseBranch"
+    Write-Step "Waiting for CI checks: $Branch -> $BaseBranch"
 
-    # Check if GitHub CLI is available
     if (-not (Test-CommandExists "gh")) {
-        Write-Warning "GitHub CLI (gh) not found. Skipping automated QA check. Please verify tests manually."
-        return $true
+        Write-Warning "GitHub CLI (gh) not found. Skipping automated CI check."
+        return "NoChecks"
     }
 
-    # Get PR number
+    # Locate the PR (short, bounded retry).
     $prNumber = $null
-    $attempts = 0
-    $maxAttempts = 10
-
-    while (-not $prNumber -and $attempts -lt $maxAttempts) {
-        Start-Sleep -Seconds 3
-        $attempts++
-
-        try {
-            $prList = gh pr list --head $Branch --base $BaseBranch --json number --jq '.[0].number' 2>$null
-            if ($prList) {
-                $prNumber = $prList.Trim()
-            }
-        }
-        catch { }
+    for ($i = 0; $i -lt 10 -and -not $prNumber; $i++) {
+        Start-Sleep -Seconds 2
+        $prList = gh pr list --head $Branch --base $BaseBranch --json number --jq '.[0].number' 2>$null
+        if ($prList) { $prNumber = $prList.Trim() }
     }
-
     if (-not $prNumber) {
-        Write-Warning "Could not find PR number. Skipping automated QA check."
-        return $true
+        Write-Warning "Could not find an open PR for $Branch -> $BaseBranch."
+        return "NoChecks"
     }
 
-    Write-Info "Found PR #$prNumber, waiting for checks..."
+    # One-time platform health check so we can react intelligently to an incident.
+    if (Test-GitHubActionsDegraded) {
+        Write-Warning "GitHub Actions is reporting degraded performance (see https://www.githubstatus.com). Runner assignment may stall."
+    }
 
-    # Wait for checks to complete
     $waited = 0
+    $sawProgress = $false
+    $emptyPolls = 0
+
     while ($waited -lt ($MaxWaitMinutes * 60)) {
         Start-Sleep -Seconds 10
         $waited += 10
 
-        try {
-            $checks = gh pr checks $prNumber --json state --jq '.[].state' 2>$null
-            if ($checks) {
-                $checkStates = $checks -split "`n" | Where-Object { $_ }
-
-                if ($checkStates | Where-Object { $_ -eq "FAILURE" }) {
-                    Write-Error "QA tests failed on PR #$prNumber"
-                    return $false
-                }
-
-                if (($checkStates | Where-Object { $_ -ne "SUCCESS" -and $_ -ne "SKIPPED" }).Count -eq 0) {
-                    Write-Success "All QA tests passed on PR #$prNumber"
-                    return $true
-                }
+        $json = gh pr checks $prNumber --json name,state,startedAt 2>$null
+        if (-not $json) {
+            $emptyPolls++
+            if ($emptyPolls -ge 3) {
+                Write-Info "No CI checks are configured for PR #$prNumber."
+                return "NoChecks"
             }
+            continue
         }
-        catch { }
+
+        $checks = @($json | ConvertFrom-Json)
+        if ($checks.Count -eq 0) { return "NoChecks" }
+
+        $states = @($checks | ForEach-Object { ([string]$_.state).ToUpper() })
+
+        $failed = @($states | Where-Object { $script:FailedCheckStates -contains $_ })
+        if ($failed.Count -gt 0) {
+            Write-Error "CI failed on PR #$prNumber ($($failed -join ', '))."
+            return "Failed"
+        }
+
+        $pending = @($states | Where-Object { $script:PendingCheckStates -contains $_ })
+        if ($pending.Count -eq 0) {
+            Write-Success "All CI checks passed on PR #$prNumber."
+            return "Passed"
+        }
+
+        # Has any job actually been picked up by a runner yet?
+        $running = @($checks | Where-Object {
+            ([string]$_.state).ToUpper() -eq "IN_PROGRESS" -or
+            ($_.startedAt -and ([string]$_.state).ToUpper() -notin @("QUEUED", "PENDING", "EXPECTED", "REQUESTED", "WAITING"))
+        })
+        if ($running.Count -gt 0) { $sawProgress = $true }
+
+        # Nothing ever started and we've exhausted the runner-acquisition budget.
+        if (-not $sawProgress -and $waited -ge $RunnerAcquireTimeoutSeconds) {
+            Write-Warning "No runner picked up the CI job within ${RunnerAcquireTimeoutSeconds}s (still queued). This is a GitHub-hosted runner capacity/incident issue, not a code failure."
+            return "Stuck"
+        }
 
         if ($waited % 60 -eq 0) {
-            Write-Info "Waiting for checks... ($($waited / 60) minutes elapsed)"
+            Write-Info "Still waiting for CI... ($([int]($waited / 60)) min elapsed)"
         }
     }
 
-    Write-Warning "Timed out waiting for checks after $MaxWaitMinutes minutes"
-    return $true
+    Write-Warning "Timed out waiting for CI after $MaxWaitMinutes minutes."
+    return "TimedOut"
 }
 
 function New-PullRequest {
@@ -406,7 +484,14 @@ function Merge-PullRequest {
 
     # Direct merge
     gh pr merge $prNumber --squash --delete-branch 2>$null
-    Write-Success "Merged PR #$prNumber and deleted branch"
+    if ($LASTEXITCODE -ne 0) {
+        # Retry without deleting the branch (some repos protect the head branch).
+        gh pr merge $prNumber --squash 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to merge PR #$prNumber (exit $LASTEXITCODE). The PR may require a completed, passing CI check."
+        }
+    }
+    Write-Success "Merged PR #$prNumber"
     return $true
 }
 
@@ -431,11 +516,11 @@ function Test-IsFirstCommit {
 
 try {
     Write-Host @"
-╔═══════════════════════════════════════════════════════════════╗
-║              Execute PR Workflow Automation                   ║
-║                                                               ║
-║  Automated CI/CD: Build → Type Check → PR → QA → Merge        ║
-╚═══════════════════════════════════════════════════════════════╝
++===============================================================+
+|              Execute PR Workflow Automation                   |
+|                                                               |
+|  Automated CI/CD: Build -> Type Check -> PR -> CI -> Merge    |
++===============================================================+
 "@ -ForegroundColor $Colors.Step
 
     # Pre-flight checks
@@ -504,7 +589,7 @@ try {
         Write-Host "  - Commit: $CommitMessage"
         Write-Host "  - Push to origin"
         Write-Host "  - Create PR to dev"
-        Write-Host "  - Wait for QA tests"
+        Write-Host "  - Wait for CI checks (bounded; sticky queue aware)"
         Write-Host "  - Merge to dev"
         if (Test-IsFirstCommit) {
             Write-Host "  - Create PR dev -> main"
@@ -576,14 +661,27 @@ $($changedFiles | ForEach-Object { "- $_" } | Out-String)
 
     $prUrl = New-PullRequest -Branch $branchName -BaseBranch "dev" -Title $prTitle -Body $prBody
 
-    # Step 6: Wait for QA tests
+    # Step 6: Wait for CI checks (bounded; detects stuck/unassigned runners)
+    $ciStatus = "Skipped"
     if (-not $SkipTests) {
-        $qaPassed = Invoke-QATests -Branch $branchName -BaseBranch "dev"
-        if (-not $qaPassed) {
-            throw "QA tests failed. Please fix issues and retry."
-        }
+        $ciStatus = Invoke-QATests -Branch $branchName -BaseBranch "dev" -MaxWaitMinutes $MaxWaitMinutes -RunnerAcquireTimeoutSeconds $RunnerAcquireTimeoutSeconds
     } else {
-        Write-Info "Skipping QA test wait (--SkipTests)"
+        Write-Info "Skipping CI wait (--SkipTests)"
+    }
+
+    $checksRequired = Test-ChecksRequired -BaseBranch "dev"
+    switch ($ciStatus) {
+        "Passed"   { }
+        "NoChecks" { Write-Info "No CI checks found for this PR; proceeding to merge." }
+        "Skipped"  { }
+        "Failed"   { throw "CI checks failed on the PR. Fix the issues before merging." }
+        default {
+            # Stuck or TimedOut: only block when the base branch enforces the check.
+            if ($checksRequired) {
+                throw "CI did not complete ($ciStatus) and 'dev' requires these checks. PR left open at $($prUrl). Re-run once GitHub Actions recovers."
+            }
+            Write-Warning "CI did not complete ($ciStatus), but checks are not required on 'dev' and local build/type checks passed. Proceeding to merge."
+        }
     }
 
     # Step 7: Merge to dev
@@ -605,7 +703,7 @@ $($changedFiles | ForEach-Object { "- $_" } | Out-String)
 
         $releasePrTitle = "release: merge dev to main"
         $releasePrBody = @"
-## Release PR: dev → main
+## Release PR: dev -> main
 
 This PR merges all changes from dev to main.
 
@@ -620,11 +718,17 @@ $($changedFiles | ForEach-Object { "- $_" } | Out-String)
 
         $releasePrUrl = New-PullRequest -Branch $devToMainBranch -BaseBranch "main" -Title $releasePrTitle -Body $releasePrBody
 
-        # Wait for QA on dev->main PR
+        # Wait for CI on the release PR (bounded, same stuck detection).
         if (-not $SkipTests) {
-            $releaseQaPassed = Invoke-QATests -Branch $devToMainBranch -BaseBranch "main" -MaxWaitMinutes 30
-            if (-not $releaseQaPassed) {
-                throw "QA tests failed on release PR. Please fix issues and retry."
+            $releaseCiStatus = Invoke-QATests -Branch $devToMainBranch -BaseBranch "main" -MaxWaitMinutes $MaxWaitMinutes -RunnerAcquireTimeoutSeconds $RunnerAcquireTimeoutSeconds
+            if ($releaseCiStatus -eq "Failed") {
+                throw "CI checks failed on the release PR. Fix the issues before merging."
+            }
+            if (($releaseCiStatus -eq "Stuck" -or $releaseCiStatus -eq "TimedOut") -and (Test-ChecksRequired -BaseBranch "main")) {
+                throw "Release PR checks are required on 'main' but did not complete ($releaseCiStatus). PR left open at $($releasePrUrl)."
+            }
+            if ($releaseCiStatus -eq "Stuck" -or $releaseCiStatus -eq "TimedOut") {
+                Write-Warning "Release CI did not complete ($releaseCiStatus); checks are not required on 'main'. Proceeding to merge."
             }
         }
 
@@ -645,9 +749,9 @@ $($changedFiles | ForEach-Object { "- $_" } | Out-String)
     # Summary
     Write-Host @"
 
-╔═══════════════════════════════════════════════════════════════╗
-║                    Workflow Complete! ✓                        ║
-╚═══════════════════════════════════════════════════════════════╝
++===============================================================+
+|                    Workflow Complete! [OK]                        |
++===============================================================+
 
   Branch:       $branchName
   Commit:       $CommitMessage
@@ -657,7 +761,7 @@ $($changedFiles | ForEach-Object { "- $_" } | Out-String)
 
     if ($isFirstCommit) {
         Write-Host "  Release PR:   $releasePrUrl" -ForegroundColor $Colors.Success
-        Write-Host "  Merged:       dev → main" -ForegroundColor $Colors.Success
+        Write-Host "  Merged:       dev -> main" -ForegroundColor $Colors.Success
     }
 
     Write-Host "`nAll changes have been successfully integrated!`n" -ForegroundColor $Colors.Success
