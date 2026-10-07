@@ -358,6 +358,39 @@ export function EditMeetingForm({ meetingId }: { meetingId: number }) {
 }
 ```
 
+### Toast notifications (avoid duplicate toasts)
+
+The dashboard installs a global TanStack Query `MutationCache` that shows a
+generic success/error toast for every mutation (`"Saved successfully"` on
+success, the server message on error). A `src/lib/notify.ts` guard records
+page-level toasts and suppresses that generic fallback when a page already
+showed its own toast, so the two never stack.
+
+Two patterns are valid — pick one per mutation, never both:
+
+1. **Let the global cache handle it (preferred).** Set a message via `meta`
+   and do not call `toast` in the component:
+
+   ```typescript
+   // queries/useMeetings.ts
+   export function useCreateMeeting() {
+     return useMutation({
+       mutationFn: (data: MeetingCreateRequest) => meetingService.create(data),
+       meta: { successMessage: 'Meeting created!' },
+       onSuccess: () => qc.invalidateQueries({ queryKey: ['meetings'] }),
+     });
+   }
+   ```
+
+2. **Handle it in the component.** Call `toast.success`/`toast.error`
+   yourself. Add `meta: { hideToast: true }` only if you also want to silence
+   the global error toast, or rely on the dedup guard which will skip the
+   generic toast automatically.
+
+Do **not** set `meta.successMessage` and also call `toast.success` for the same
+mutation; that is what caused the duplicate "Contact details saved" +
+"Saved successfully" toasts.
+
 ## File Organization
 
 ### Query Hooks Directory
