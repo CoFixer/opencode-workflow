@@ -110,6 +110,21 @@
       "name": "execute-pr-workflow",
       "trigger": "/skill:execute-pr-workflow",
       "description": "Runs build/type checks, pushes to a feature/bug branch, creates a PR to dev, runs QA tests, and merges. If first commit, also creates PR from dev to main and merges."
+    },
+    {
+      "name": "execute-staging-pr-workflow",
+      "trigger": "/skill:execute-staging-pr-workflow",
+      "description": "Creates staging when missing, runs build/type checks (with a fix loop), ships a feature/bug branch as a PR to staging, recovers stalled CI, merges, and clears merged feature branches."
+    },
+    {
+      "name": "promote-staging-to-dev",
+      "trigger": "/skill:promote-staging-to-dev",
+      "description": "Opens a staging -> dev PR, waits for CI checks with stall recovery, merges it, and keeps the staging branch."
+    },
+    {
+      "name": "promote-dev-to-main",
+      "trigger": "/skill:promote-dev-to-main",
+      "description": "Opens a dev -> main production PR, verifies CI, requires explicit confirmation, merges it, and keeps dev and main."
     }
   ]
 }

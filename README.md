@@ -61,6 +61,9 @@ A project-specific workflow system for OpenCode agents, modeled after `.kimi` an
 ├── skills/                      # Project-level skills (21+ skills)
 │   ├── commit/                  # Git commit & PR workflow
 │   ├── create-dev-pr/           # Create PR to dev branch
+│   ├── execute-staging-pr-workflow/ # Feature/fix -> staging (creates staging, clears branches)
+│   ├── promote-staging-to-dev/  # staging -> dev promotion PR
+│   ├── promote-dev-to-main/     # dev -> main production release PR
 │   ├── find-gaps/               # Design-to-code gap analysis
 │   ├── fix-gaps/                # Fix identified gaps
 │   ├── generate-docs/           # Generate API & knowledge docs
@@ -119,6 +122,9 @@ Skills are loaded by OpenCode and invoked with `/skill:<name>`:
 |-------|---------|---------|
 | `commit` | `/skill:commit` | Git commit & PR workflow |
 | `create-dev-pr` | `/skill:create-dev-pr` | Create PR to dev with validation |
+| `execute-staging-pr-workflow` | `/skill:execute-staging-pr-workflow` | Feature/fix → staging PR (auto-creates staging, clears branches) |
+| `promote-staging-to-dev` | `/skill:promote-staging-to-dev` | Promote staging → dev (keeps staging) |
+| `promote-dev-to-main` | `/skill:promote-dev-to-main` | Promote dev → main release (keeps both) |
 | `find-gaps` | `/skill:find-gaps` | Design-to-code gap analysis |
 | `fix-gaps` | `/skill:fix-gaps` | Fix identified gaps |
 | `generate-docs` | `/skill:generate-docs` | Generate API & knowledge docs |
