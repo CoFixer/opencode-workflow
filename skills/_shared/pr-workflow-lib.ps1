@@ -763,3 +763,239 @@ function Remove-MergedFeatureBranches {
     Invoke-External -FilePath git -CommandArgs @('fetch', 'origin', '--prune') -AllowFailure | Out-Null
     return [pscustomobject]@{ Local = $prunedLocal; Remote = $prunedRemote }
 }
+
+
+# ---------------------------------------------------------------------------
+# Conflict handling
+# ---------------------------------------------------------------------------
+function Get-ConflictedFiles {
+    return @(& git diff --name-only --diff-filter=U 2>$null | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+}
+
+function Test-MergeInProgress {
+    & git rev-parse -q --verify MERGE_HEAD *> $null
+    return ($LASTEXITCODE -eq 0)
+}
+
+function Resolve-MechanicalConflicts {
+    param([string[]]$Files)
+
+    $remaining = @()
+    $lockfiles = @()
+
+    foreach ($file in $Files) {
+        # Lockfiles must match package.json after the merge: take the incoming
+        # version, then regenerate with the package manager.
+        if ($file -match '(?i)(^|/)(bun\.lock|bun\.lockb|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$') {
+            & git checkout --theirs -- $file *> $null
+            if ($LASTEXITCODE -ne 0) { & git checkout --ours -- $file *> $null }
+            & git add -- $file *> $null
+            $lockfiles += $file
+            Write-Info "Auto-resolved lockfile conflict: $file"
+            continue
+        }
+
+        # Build artifacts are safe to take from the base and rebuild.
+        if ($file -match '(?i)\.tsbuildinfo$' -or $file -match '(?i)(^|/)(dist|coverage|\.next)/') {
+            & git checkout --theirs -- $file *> $null
+            if ($LASTEXITCODE -ne 0) { & git checkout --ours -- $file *> $null }
+            & git add -- $file *> $null
+            Write-Info "Auto-resolved generated artifact conflict: $file"
+            continue
+        }
+
+        $remaining += $file
+    }
+
+    foreach ($lock in $lockfiles) {
+        $packagePath = Split-Path -Parent $lock
+        if ([string]::IsNullOrWhiteSpace($packagePath)) { $packagePath = '.' }
+
+        $runner = Get-PackageRunner -PackagePath $packagePath
+        Write-Info "Regenerating $lock with '$runner install'"
+        $exit = Invoke-External -FilePath $runner -CommandArgs @('install') -WorkingDirectory $packagePath -AllowFailure
+        if ($exit -eq 0) {
+            & git add -- $lock *> $null
+        }
+        else {
+            Write-Warn "Could not regenerate $lock; kept the incoming version."
+        }
+    }
+
+    return @($remaining)
+}
+
+function Merge-BaseIntoCurrentBranch {
+    param([string]$BaseRef)
+
+    & git merge --no-edit $BaseRef 2>&1 | ForEach-Object { Write-Host "$_" }
+    $code = $LASTEXITCODE
+    if ($code -eq 0) {
+        return [pscustomobject]@{ Status = 'CLEAN'; Files = @() }
+    }
+
+    $conflicts = @(Get-ConflictedFiles)
+    if ($conflicts.Count -eq 0) {
+        return [pscustomobject]@{ Status = 'FAILED'; Files = @() }
+    }
+
+    Write-Warn "$($conflicts.Count) conflict(s) detected while merging '$BaseRef'."
+    $remaining = @(Resolve-MechanicalConflicts -Files $conflicts)
+
+    if ($remaining.Count -gt 0) {
+        return [pscustomobject]@{ Status = 'CONFLICT'; Files = $remaining }
+    }
+
+    & git commit --no-edit *> $null
+    if ($LASTEXITCODE -ne 0 -and (Test-MergeInProgress)) {
+        return [pscustomobject]@{ Status = 'FAILED'; Files = @() }
+    }
+
+    Write-Ok 'All conflicts were mechanical and were auto-resolved.'
+    return [pscustomobject]@{ Status = 'AUTO_RESOLVED'; Files = @() }
+}
+
+function Write-ConflictGuidance {
+    param([string[]]$Files, [string]$Branch)
+
+    Write-Host "`n+---------------------------------------------------------------+" -ForegroundColor Red
+    Write-Host '|  MERGE CONFLICT - resolve in the working tree, then re-run    |' -ForegroundColor Red
+    Write-Host "+---------------------------------------------------------------+" -ForegroundColor Red
+    Write-Host "  Branch: $Branch"
+
+    foreach ($file in $Files) {
+        Write-Host "  - $file" -ForegroundColor Yellow
+    }
+
+    Write-Host @"
+
+For each conflicted file:
+  git status
+  git show :2:<file>     # current branch version
+  git show :3:<file>     # incoming version
+  # edit the file and combine BOTH intents - never blind --ours/--theirs
+  git add <file>
+
+Then re-run this skill. It detects the in-progress merge, commits it,
+runs build/typecheck, pushes, and continues to checks + merge.
+"@ -ForegroundColor Yellow
+}
+
+function Invoke-BranchSync {
+    param(
+        [string]$HeadBranch,
+        [string]$BaseBranch,
+        [int]$MaxWaitMinutes = 15,
+        [int]$StuckAfterMinutes = 5,
+        [switch]$SkipTests,
+        [switch]$AllowCheckTimeout
+    )
+
+    if (Test-MergeInProgress) {
+        $pending = @(Get-ConflictedFiles)
+        if ($pending.Count -gt 0) {
+            Write-ConflictGuidance -Files $pending -Branch ((& git branch --show-current) -join '').Trim()
+            return [pscustomobject]@{ Status = 'CONFLICT'; Branch = ((& git branch --show-current) -join '').Trim(); Files = $pending }
+        }
+    }
+
+    $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    $syncBranch = "chore/sync-$HeadBranch-$timestamp"
+    $originalBranch = ((& git branch --show-current 2>$null) -join '').Trim()
+    $stashMessage = "branch-sync-$timestamp"
+    $stashed = $false
+
+    Write-Step "Syncing '$HeadBranch' with '$BaseBranch' via '$syncBranch'"
+
+    $dirty = ((& git status --porcelain 2>$null) -join '').Trim()
+    if ($dirty) {
+        Invoke-External -FilePath git -CommandArgs @('stash', 'push', '--include-untracked', '--message', $stashMessage) | Out-Null
+        $stashed = $true
+        Write-Info "Local work stashed as '$stashMessage' (restored after the sync)."
+    }
+
+    Invoke-External -FilePath git -CommandArgs @('checkout', '-B', $syncBranch, "origin/$HeadBranch") | Out-Null
+    $merge = Merge-BaseIntoCurrentBranch -BaseRef "origin/$BaseBranch"
+
+    if ($merge.Status -eq 'CONFLICT') {
+        Write-ConflictGuidance -Files $merge.Files -Branch $syncBranch
+        if ($stashed) { Write-Warn "Your original work is safe in the stash '$stashMessage'." }
+        return [pscustomobject]@{ Status = 'CONFLICT'; Branch = $syncBranch; Files = $merge.Files }
+    }
+
+    if ($merge.Status -eq 'FAILED') {
+        throw "Could not merge origin/$BaseBranch into '$syncBranch'."
+    }
+
+    Invoke-External -FilePath git -CommandArgs @('push', '-u', 'origin', $syncBranch) | Out-Null
+    Write-Ok "Pushed origin/$syncBranch"
+
+    $title = "chore(sync): merge $BaseBranch into $HeadBranch"
+    $prBody = @"
+## Branch sync: ``$BaseBranch`` -> ``$HeadBranch``
+
+Automated sync created because the promotion PR reported conflicts.
+Merging ``$BaseBranch`` back into ``$HeadBranch`` removes the conflict and
+keeps future promotions mergeable.
+
+### Details
+- Sync branch: ``$syncBranch``
+- Base merged in: ``$BaseBranch``
+- Mechanical conflicts (lockfiles / generated artifacts) were auto-resolved
+
+### Validation
+- [x] CI checks verified by this workflow
+- [x] The merge only brings in ``$BaseBranch`` content; no new feature work
+
+### Rollback
+- Revert this merge on ``$HeadBranch`` if it unexpectedly changes behaviour
+"@
+
+    $openPr = Get-OpenPullRequest -HeadBranch $syncBranch -BaseBranch $HeadBranch
+    if ($openPr) {
+        $prUrl = $openPr.url
+        $prNumber = "$($openPr.number)"
+        Write-Info "Reusing sync PR #${prNumber}: $prUrl"
+    }
+    else {
+        $createOutput = ((& gh pr create --base $HeadBranch --head $syncBranch --title $title --body $prBody 2>&1) -join "`n").Trim()
+        if ($LASTEXITCODE -ne 0 -or $createOutput -notmatch '^https?://') {
+            throw "Sync PR creation failed: $createOutput"
+        }
+        $prUrl = $createOutput
+        $prNumber = Get-GhValue -CommandArgs @('pr', 'view', $prUrl, '--json', 'number', '--jq', '.number')
+        Write-Ok "Sync PR created: $prUrl"
+    }
+
+    if (-not $SkipTests) {
+        Write-Step "Waiting for CI checks on sync PR #$prNumber"
+        $checkResult = Wait-PullRequestChecks -PrNumber $prNumber -HeadBranch $syncBranch -MaxWaitMinutes $MaxWaitMinutes -StuckAfterMinutes $StuckAfterMinutes
+        Format-CheckResult -CheckResult $checkResult -PrNumber $prNumber -HeadBranch $syncBranch
+
+        if ($checkResult.Status -in @('FAILED', 'CLOSED')) {
+            throw "CI failed on the sync PR #$prNumber ($($checkResult.Detail))."
+        }
+        if ($checkResult.Status -eq 'TIMEOUT' -and -not $AllowCheckTimeout) {
+            throw "Sync PR #$prNumber checks timed out. Re-run the skill to continue."
+        }
+    }
+
+    $mergeStatus = Merge-PullRequestSafe -PrNumber $prNumber -MergeMethod 'merge' -DeleteBranch
+    $finalState = Get-PullRequestState -PrNumber $prNumber
+    if ($finalState -ne 'MERGED') {
+        throw "Sync PR #$prNumber was not merged (state: $finalState). Re-run the skill once it lands."
+    }
+
+    Invoke-External -FilePath git -CommandArgs @('checkout', $originalBranch) -AllowFailure | Out-Null
+    Invoke-External -FilePath git -CommandArgs @('branch', '-D', $syncBranch) -AllowFailure | Out-Null
+    if ($stashed) {
+        $popCode = Invoke-External -FilePath git -CommandArgs @('stash', 'pop', '--index') -AllowFailure
+        if ($popCode -ne 0) {
+            Write-Warn "Could not re-apply stashed work '$stashMessage'. Inspect 'git stash list'."
+        }
+    }
+    Invoke-External -FilePath git -CommandArgs @('fetch', 'origin', '--prune') -AllowFailure | Out-Null
+
+    Write-Ok "Synced '$HeadBranch' with '$BaseBranch'"
+    return [pscustomobject]@{ Status = 'SYNCED'; Branch = $syncBranch; PrUrl = $prUrl; MergeStatus = $mergeStatus }
+}

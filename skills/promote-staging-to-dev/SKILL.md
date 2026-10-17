@@ -1,6 +1,6 @@
 ---
 name: "promote-staging-to-dev"
-description: "Opens a PR from staging to dev, waits for CI checks with stall recovery, and merges it without deleting the staging branch. Invoke when user says '/skill:promote-staging-to-dev'."
+description: "Opens a PR from staging to dev, auto-syncs and resolves conflicts first when needed, waits for CI checks with stall recovery, and merges it without deleting the staging branch. Invoke when user says '/skill:promote-staging-to-dev'."
 ---
 
 # Promote Staging → Dev
@@ -8,8 +8,10 @@ description: "Opens a PR from staging to dev, waits for CI checks with stall rec
 Promotes the integrated `staging` branch into `dev`:
 
 ```
-staging (verified) -> promotion PR -> CI checks -> merge into dev
-                                              -> staging branch kept
+staging (verified) -> conflict check
+                   -> conflicts? sync PR (dev -> staging), auto-resolve, merge
+                   -> promotion PR -> CI checks -> merge into dev
+                   -> staging branch kept
 ```
 
 This is the second gate of the release pipeline:
@@ -31,6 +33,7 @@ feature branches -> staging -> dev -> main
 - **Never delete `dev`**
 - Never commit directly to `staging` or `dev`
 - Never force-push `staging` or `dev`
+- Never run `git merge --abort` to escape a sync conflict — resolve it
 - Never merge while checks are failing
 - Only promote content that already passed the staging workflow
 - Prompt the user before merging if the PR includes migrations or breaking changes
@@ -129,7 +132,8 @@ release: add bed charge refresh + payment reconciliation (+4 more)
 | `2` | Local gate failed (`-RunBuildGates`) | Fix code through `execute-staging-pr-workflow`, then retry |
 | `3` | CI failed or PR closed | Fix through staging, then `-Resume` |
 | `4` | CI still running / stalled | Wait, then `-Resume` |
-| `5` | Merge blocked | Resolve conflict/protection, then `-Resume` |
+| `5` | Merge blocked | Resolve protection/conflict, then `-Resume` |
+| `7` | Conflict needs a human decision | Enter the **conflict loop** below |
 
 ### CI failed (exit 3)
 
@@ -164,9 +168,46 @@ gh pr checks <pr-number>
 powershell -File .opencode/skills/promote-staging-to-dev/run-promotion.ps1 -Resume
 ```
 
+### Conflicts (handled automatically, exit 7 for real conflicts)
+
+Before opening the promotion PR, the script runs `git merge-tree`. If the branches
+conflict it creates a **sync PR** first:
+
+```
+origin/dev -> chore/sync-staging-<timestamp> -> PR into staging -> checks -> merge
+```
+
+Then the promotion continues from the refreshed `staging`. This keeps `staging`
+and `dev` compatible without pushing directly to either branch.
+
+Mechanical conflicts are auto-resolved inside the sync:
+- lockfiles → incoming version + regenerate with the package manager
+- generated artifacts (`*.tsbuildinfo`, `dist/`, `coverage/`, `.next/`) → incoming version
+
+If a **real code conflict** remains, the script exits `7` and leaves the merge
+in progress on the sync branch:
+
+1. Inspect:
+   ```powershell
+   git status
+   git diff --name-only --diff-filter=U
+   ```
+2. Compare both sides for each file:
+   ```powershell
+   git show :2:<file>   # staging side
+   git show :3:<file>   # dev side
+   ```
+3. Combine both intents — never blindly `--ours`/`--theirs`, never `git merge --abort`.
+4. `git add <file>`.
+5. Re-run this skill. It finishes the sync PR, then retries the promotion.
+
+Do not report the conflict to the user without attempting at least one full
+resolution pass.
+
 ### Merge blocked (exit 5)
 
-- `CONFLICTING` / `DIRTY` → merge `dev` into `staging` via a feature branch, then retry
+- `CONFLICTING` / `DIRTY` → the automatic sync should have handled this; if it still
+  fails, resolve on the sync branch and re-run
 - `BLOCKED` (review required) → obtain the approval, then `-Resume`
 - `BEHIND` → handled automatically; otherwise `gh pr update-branch <pr>`
 

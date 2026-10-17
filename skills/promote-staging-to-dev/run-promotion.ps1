@@ -106,6 +106,59 @@ try {
         Write-Warn "'$BaseBranch' contains $behind commit(s) not in '$HeadBranch'. The merge commit will preserve them."
     }
 
+    # --- 2. Conflict check + automatic sync -------------------------------
+    $syncAttempts = 0
+    while ($true) {
+        Write-Step 'Checking for merge conflicts'
+
+        $mergeTreeOutput = @(& git merge-tree --write-tree $baseRef $headRef 2>&1)
+        $mergeTreeText = ($mergeTreeOutput -join "`n")
+        $hasConflicts = ($LASTEXITCODE -ne 0 -and $mergeTreeText -match '(?i)conflict')
+
+        if (-not $hasConflicts) {
+            Write-Ok 'No merge conflicts'
+            break
+        }
+
+        if ($DryRun) {
+            Write-Warn 'The branches conflict. A real run would create and merge a sync PR first.'
+            return
+        }
+
+        if ($syncAttempts -ge 1) {
+            Write-Fail 'Conflicts remain after the automatic sync. Resolve them manually, then re-run.'
+            exit 5
+        }
+
+        $syncAttempts++
+        Write-Warn "Conflicts detected between '$BaseBranch' and '$HeadBranch'."
+        Write-Info "Creating a sync PR that merges '$BaseBranch' into '$HeadBranch' first."
+
+        try {
+            $sync = Invoke-BranchSync -HeadBranch $HeadBranch -BaseBranch $BaseBranch -MaxWaitMinutes $MaxWaitMinutes -StuckAfterMinutes $StuckAfterMinutes -SkipTests:$SkipTests -AllowCheckTimeout:$AllowCheckTimeout
+        }
+        catch {
+            Write-Fail $_.Exception.Message
+            Write-Host 'The sync PR must land before this promotion can continue. Fix it, then re-run.' -ForegroundColor Yellow
+            exit 5
+        }
+
+        if ($sync.Status -eq 'CONFLICT') {
+            Write-Warn "Resolve the conflicts on branch '$($sync.Branch)', then re-run this skill."
+            exit 7
+        }
+        if ($sync.Status -ne 'SYNCED') {
+            throw "Branch sync did not complete (status: $($sync.Status))."
+        }
+
+        Invoke-External -FilePath git -CommandArgs @('fetch', 'origin', '--prune') -AllowFailure | Out-Null
+        $baseSha = Get-GitValue -CommandArgs @('rev-parse', '--short', $baseRef)
+        $headSha = Get-GitValue -CommandArgs @('rev-parse', '--short', $headRef)
+        $ahead = [int](Get-GitValue -CommandArgs @('rev-list', '--count', "$baseRef..$headRef"))
+        $behind = [int](Get-GitValue -CommandArgs @('rev-list', '--count', "$headRef..$baseRef"))
+        Write-Info "Refreshed: $BaseBranch @ $baseSha | $HeadBranch @ $headSha (ahead $ahead, behind $behind)"
+    }
+
     $changedFiles = @(& git diff --name-only "$baseRef...$headRef" 2>$null | Where-Object { $_ })
     $areas = @(Get-Areas -Files $changedFiles)
     Write-Info "$($changedFiles.Count) file(s) changed across: $($areas.Name -join ', ')"

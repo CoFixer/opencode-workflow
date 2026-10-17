@@ -1,6 +1,6 @@
 ---
 name: "execute-staging-pr-workflow"
-description: "Creates the staging branch when missing, runs build/typecheck gates (fixing failures before committing), ships a feature or bug branch as a PR into staging, recovers stalled CI, merges it, and clears merged feature branches. Invoke when user says '/skill:execute-staging-pr-workflow'."
+description: "Creates the staging branch when missing, runs build/typecheck gates (fixing failures before committing), ships a feature or bug branch as a PR into staging, merges the base branch and resolves conflicts, recovers stalled CI, merges it, and clears merged feature branches. Invoke when user says '/skill:execute-staging-pr-workflow'."
 ---
 
 # Execute Staging PR Workflow
@@ -9,7 +9,8 @@ Ships work into the **`staging`** integration branch, end to end:
 
 ```
 changes -> create staging (if missing) -> build/typecheck -> feature branch
-        -> commit + push -> PR to staging -> CI checks -> squash merge
+        -> commit -> merge origin/staging (auto-resolve conflicts)
+        -> PR to staging -> CI checks -> squash merge
         -> delete feature branch -> prune merged feature branches
 ```
 
@@ -32,6 +33,7 @@ instead of `dev`. `dev` only receives work through `promote-staging-to-dev`.
 - Never merge while build/typecheck is failing
 - Never use `-SkipBuild` to bypass a real type/build error — only for a verified tooling failure
 - Never force-push
+- Never run `git merge --abort` to escape a conflict — resolve it
 - Do not touch `main`; this skill stops at `staging`
 
 ## Step 1 — Verify the starting point
@@ -113,6 +115,7 @@ same branch and reuses the open PR.
 | `3` | **CI failed / PR closed** | Enter the **CI fix loop** below |
 | `4` | **CI still running / stalled** | Wait, then re-run with `-Resume` |
 | `5` | **Merge blocked** | Resolve protection/conflict, then `-Resume` |
+| `7` | **Merge conflict needs a decision** | Enter the **conflict loop** below |
 
 ### Fix loop (mandatory, max 3 attempts)
 
@@ -147,6 +150,41 @@ substitute for the loop above.
    pushes, waits for the re-run, then merges.
 
 Do **not** open a second PR for the same fix.
+
+### Conflict loop (exit 7, max 3 attempts)
+
+Before pushing, the script merges `origin/<base>` into the feature branch so the
+PR never sits in a conflicted state.
+
+**Auto-resolved without asking:**
+- lockfiles (`bun.lock`, `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`) →
+  re-take the incoming version and regenerate with the package manager
+- generated artifacts (`*.tsbuildinfo`, `dist/`, `coverage/`, `.next/`) → incoming version
+
+**Anything else stops with the conflicted file list** and leaves the merge in
+progress. **Never run `git merge --abort`** to escape it.
+
+1. Inspect:
+   ```powershell
+   git status
+   git diff --name-only --diff-filter=U
+   ```
+2. Read both sides of each file:
+   ```powershell
+   git show :2:<file>   # current branch version
+   git show :3:<file>   # incoming (staging) version
+   ```
+3. Edit the file so **both intents are preserved**. Never blindly pick
+   `--ours`/`--theirs` and never delete code just to silence the conflict.
+4. Stage the resolution:
+   ```powershell
+   git add <file>
+   ```
+5. Re-run the skill. It detects the in-progress merge, commits it, re-runs
+   build/typecheck, pushes, and continues to checks + merge.
+
+Do not report the conflict to the user without attempting at least one full
+resolution pass.
 
 ### Stalled CI (exit 4)
 

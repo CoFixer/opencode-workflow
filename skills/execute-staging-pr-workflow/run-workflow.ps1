@@ -3,16 +3,18 @@
     Execute Staging PR Workflow - ship a change into the `staging` integration branch.
 
 .DESCRIPTION
-    Full lifecycle with resilience built in:
+    Full lifecycle with resilience and conflict handling built in:
       1. Creates `staging` on origin from `dev` when it does not exist yet.
       2. Detects and classifies the working-tree changes.
       3. Runs typecheck + build gates. On failure: prints a fix loop and exits 2
          (optionally applies package auto-fixes first with -AutoFix).
-      4. Creates a feature branch based on `origin/staging` (work is stashed and re-applied),
-         or reuses the current branch when it already has an open PR (idempotent re-run).
-      5. Commits, pushes, and opens a PR into `staging` with a generated title/body.
-      6. Waits for CI with stuck-detection, automatic workflow re-runs, and a bounded timeout.
-      7. Merges (squash by default), deletes the feature branch and prunes merged branches.
+      4. Creates a feature branch based on `origin/staging`, or reuses the current
+         branch when it already owns an open PR or has commits ahead of staging.
+      5. Commits, merges origin/staging to remove drift, auto-resolves mechanical
+         conflicts, and stops with exit 7 when real code conflicts need resolution.
+      6. Pushes, opens a PR into `staging` with a generated title/body.
+      7. Waits for CI with stuck-detection/recovery and a bounded timeout.
+      8. Merges (squash by default), deletes the feature branch, prunes merged branches.
 
     Exit codes:
       0  success (or PR created with -NoWait)
@@ -21,6 +23,7 @@
       3  CI failed / PR closed      -> inspect logs, fix, then re-run with -Resume
       4  CI still running/timed out -> re-run with -Resume later
       5  merge blocked              -> resolve protection/conflicts, then re-run with -Resume
+      7  merge conflict needs a human decision -> resolve, then re-run
 
 .EXAMPLE
     .\run-workflow.ps1 -CommitMessage "feat(backend): add bed charge refresh endpoint"
@@ -60,6 +63,14 @@ param(
 )
 
 . (Join-Path $PSScriptRoot '..\_shared\pr-workflow-lib.ps1')
+
+function Get-BranchPrimarySubject {
+    param([string]$BaseBranch)
+
+    $subjects = @(& git log --no-merges --format='%s' "origin/$BaseBranch..HEAD" 2>$null | Where-Object { $_ })
+    if ($subjects.Count -gt 0) { return $subjects[$subjects.Count - 1] }
+    return $null
+}
 
 try {
     Write-Host @'
@@ -107,8 +118,8 @@ try {
         Write-Ok "'origin/$BaseBranch' already exists"
     }
 
-    # --- 2. Detect changes and any in-flight PR ----------------------------
-    Write-Step 'Detecting changes'
+    # --- 2. Detect state (changes / PR / merge in progress) ----------------
+    Write-Step 'Detecting state'
 
     $allChanged = @(Get-ChangedFiles)
     $workFiles = @($allChanged | Where-Object { Test-CommittableFile -Path $_ })
@@ -120,13 +131,13 @@ try {
         ($currentBranch -match '^(feat|fix|refactor|docs|test|chore)/')
 
     $openPr = $null
-    if ($currentIsFeature) {
+    if ($currentIsFeature -and -not (Test-MergeInProgress)) {
         $openPr = Get-OpenPullRequest -HeadBranch $currentBranch -BaseBranch $BaseBranch
     }
 
     $resumeBranch = $null
     # -Resume with an explicit branch name: switch to it so the PR can be re-attached.
-    if ($Resume -and $CustomBranchName -and -not $openPr) {
+    if ($Resume -and $CustomBranchName -and -not $openPr -and -not (Test-MergeInProgress)) {
         $candidate = $null
         if ($CustomBranchName -match '^(feat|fix|refactor|docs|test|chore)/') {
             $candidate = $CustomBranchName
@@ -161,24 +172,73 @@ try {
         }
     }
 
-    if ($workFiles.Count -gt 0) {
-        Write-Info "Detected $($workFiles.Count) committable file(s):"
-        $workFiles | ForEach-Object { Write-Host "    - $_" -ForegroundColor DarkGray }
+    $mergeInProgress = Test-MergeInProgress
+    $conflicts = @()
+    if ($mergeInProgress) { $conflicts = @(Get-ConflictedFiles) }
+
+    $aheadOfBase = 0
+    if ($currentIsFeature -and -not $mergeInProgress) {
+        $aheadOfBase = [int](Get-GitValue -CommandArgs @('rev-list', '--count', "origin/$BaseBranch..HEAD") -AllowFailure)
     }
-    elseif ($openPr) {
-        Write-Info "No local changes. Resuming open PR #$($openPr.number): $($openPr.url)"
-        $Resume = $true
-    }
-    else {
-        Write-Warn 'No committable changes and no open PR to resume. Nothing to do.'
+
+    $reuseCurrent = ($null -ne $openPr) -or ($currentIsFeature -and $aheadOfBase -gt 0)
+
+    $mode = 'none'
+    if ($mergeInProgress) { $mode = 'merge-recovery' }
+    elseif ($workFiles.Count -gt 0) { $mode = 'commit' }
+    elseif ($openPr) { $mode = 'resume-pr' }
+    elseif ($reuseCurrent) { $mode = 'publish' }
+
+    if ($mode -eq 'none' -and -not $openPr) {
+        Write-Warn 'No committable changes and no branch to publish. Nothing to do.'
         return
     }
 
-    if ($Resume -and -not $openPr -and $workFiles.Count -eq 0) {
-        throw "Nothing to resume: current branch '$currentBranch' has no open PR into '$BaseBranch'."
+    if ($mode -eq 'merge-recovery' -and $protectedBranches -contains $currentBranch) {
+        throw "A merge is in progress on protected branch '$currentBranch'. Finish or abort it, then run from a feature branch."
     }
 
-    # --- 3. Classify -------------------------------------------------------
+    if ($workFiles.Count -gt 0 -and $mode -eq 'commit') {
+        Write-Info "Detected $($workFiles.Count) committable file(s)"
+    }
+
+    Write-Info "Mode: $mode"
+
+    # --- 3. Merge-recovery: resolve and finish the in-progress merge -------
+    $commitSha = $null
+    $prFiles = @()
+
+    if ($mode -eq 'merge-recovery') {
+        if ($conflicts.Count -gt 0) {
+            $remaining = @(Resolve-MechanicalConflicts -Files $conflicts)
+            if ($remaining.Count -gt 0) {
+                Write-ConflictGuidance -Files $remaining -Branch $currentBranch
+                exit 7
+            }
+            Write-Ok 'Mechanical conflicts auto-resolved'
+        }
+
+        Invoke-External -FilePath git -CommandArgs @('add', '-A') | Out-Null
+        foreach ($pattern in @('.env', '.env.*', '*.pem', '*.key', '*.p12', '*.pfx', 'id_rsa*', 'credentials*.json', 'secrets*.json', '*.tsbuildinfo')) {
+            Invoke-External -FilePath git -CommandArgs @('reset', '-q', 'HEAD', '--', $pattern) -AllowFailure | Out-Null
+        }
+        Invoke-External -FilePath git -CommandArgs @('reset', '-q', 'HEAD', '--', '.opencode', '.commandcode', '.gitmodules') -AllowFailure | Out-Null
+
+        Invoke-External -FilePath git -CommandArgs @('commit', '--no-edit') | Out-Null
+        $commitSha = Get-GitValue -CommandArgs @('rev-parse', '--short', 'HEAD')
+        Write-Ok "Merge committed as $commitSha"
+    }
+
+    # --- 4. Classify -------------------------------------------------------
+    if ([string]::IsNullOrWhiteSpace($CommitMessage)) {
+        if ($mode -eq 'commit') {
+            $CommitMessage = $null
+        }
+        else {
+            $CommitMessage = Get-BranchPrimarySubject -BaseBranch $BaseBranch
+        }
+    }
+
     $messageType = Get-ConventionalType -Message $CommitMessage
     $messageScope = Get-ConventionalScope -Message $CommitMessage
 
@@ -189,7 +249,14 @@ try {
         else { $resolvedType = 'feat' }
     }
 
-    $areas = @(if ($workFiles.Count -gt 0) { Get-Areas -Files $workFiles } else { @([pscustomobject]@{ Name = 'project'; Count = 0 }) })
+    $scopeFiles = if ($mode -eq 'commit') {
+        $workFiles
+    }
+    else {
+        @(& git diff --name-only "origin/$BaseBranch...HEAD" 2>$null | Where-Object { $_ } | Where-Object { Test-CommittableFile -Path $_ })
+    }
+
+    $areas = @(if ($scopeFiles.Count -gt 0) { Get-Areas -Files $scopeFiles } else { @([pscustomobject]@{ Name = 'project'; Count = 0 }) })
 
     $knownAreas = @('backend', 'frontend', 'dashboard', 'print-agent', 'mobile')
     $messageAreas = @()
@@ -209,8 +276,8 @@ try {
     }
     if ([string]::IsNullOrWhiteSpace($scope)) { $scope = 'project' }
 
-    $moduleHint = if ($workFiles.Count -gt 0) { Get-ModuleHint -Files $workFiles -Fallback $primaryArea } else { $primaryArea }
-    $isFollowUp = $null -ne $openPr
+    $moduleHint = if ($scopeFiles.Count -gt 0) { Get-ModuleHint -Files $scopeFiles -Fallback $primaryArea } else { $primaryArea }
+    $isFollowUp = ($null -ne $openPr) -or ($mode -in @('merge-recovery', 'publish'))
 
     if ([string]::IsNullOrWhiteSpace($CommitMessage)) {
         $verb = 'update'
@@ -235,11 +302,8 @@ try {
     }
 
     $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-    if ($openPr) {
+    if ($mode -eq 'merge-recovery' -or $reuseCurrent) {
         $branchName = $currentBranch
-    }
-    elseif ($resumeBranch) {
-        $branchName = $resumeBranch
     }
     elseif ([string]::IsNullOrWhiteSpace($CustomBranchName)) {
         $branchName = "$resolvedType/$primaryArea-$timestamp"
@@ -251,36 +315,29 @@ try {
         $branchName = "$resolvedType/$($CustomBranchName.Trim('/'))"
     }
 
-    if ($workFiles.Count -gt 0) {
-        Write-Ok "Type:   $resolvedType"
-        Write-Ok "Areas:  $($areas.Name -join ', ')"
-    }
     Write-Ok "Branch: $branchName"
-    Write-Ok "Commit: $CommitMessage"
+    Write-Ok "Title:  $CommitMessage"
 
-    # --- 4. Dry run --------------------------------------------------------
+    # --- 5. Dry run --------------------------------------------------------
     if ($DryRun) {
         Write-Step 'Dry run summary'
         Write-Host "  Base branch : origin/$BaseBranch"
         Write-Host "  Feature     : $branchName"
-        Write-Host "  Commit      : $CommitMessage"
+        Write-Host "  Title       : $CommitMessage"
         Write-Host "  PR target   : $BaseBranch (merge via $MergeMethod)"
         Write-Host "  Local gates : $(if ($SkipBuild) { 'skipped' } else { 'typecheck + build for affected packages' })"
+        Write-Host "  Conflicts   : mechanical auto-fix, then a guided fix loop (exit 7)"
         Write-Host "  CI checks   : $(if ($SkipTests) { 'skipped' } else { "wait up to $MaxWaitMinutes min (auto-recovery on stalls)" })"
         Write-Host "  Cleanup     : delete merged feature branch + prune merged feature branches"
         return
     }
 
-    $prUrl = $null
-    $prNumber = $null
-    $commitSha = $null
     $validation = @()
-    $stagedFiles = @()
     $finalState = 'NOT_MERGED'
     $checkStatus = 'SKIPPED'
 
-    # --- 5. Commit the work (if any) --------------------------------------
-    if ($workFiles.Count -gt 0) {
+    # --- 6. Commit the work (if any) --------------------------------------
+    if ($mode -eq 'commit') {
         Write-Step 'Running local build + typecheck gates'
         if (-not $SkipBuild) {
             $gateResults = @(Invoke-BuildGates -Files $workFiles -AutoFix:$AutoFix)
@@ -299,9 +356,8 @@ try {
             Write-Warn 'Skipping local build gates (-SkipBuild)'
         }
 
-        # Branch selection: reuse the current branch only when it already owns an open PR.
-        if ($openPr) {
-            Write-Step "Reusing branch '$branchName' (PR #$($openPr.number) is still open)"
+        if ($reuseCurrent) {
+            Write-Step "Reusing branch '$branchName'"
         }
         else {
             Write-Step "Creating branch '$branchName' from origin/$BaseBranch"
@@ -351,48 +407,125 @@ try {
         if ($stagedFiles.Count -eq 0) { throw 'Nothing staged after the secret/submodule filters. Aborting.' }
         Write-Ok "$($stagedFiles.Count) file(s) staged"
 
-        Write-Step 'Committing and pushing'
         Invoke-External -FilePath git -CommandArgs @('commit', '-m', $CommitMessage) | Out-Null
         $commitSha = Get-GitValue -CommandArgs @('rev-parse', '--short', 'HEAD')
         Write-Ok "Commit $commitSha"
+    }
 
-        $upstream = Get-GitValue -CommandArgs @('rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}') -AllowFailure
-        if ([string]::IsNullOrWhiteSpace($upstream)) {
-            Invoke-External -FilePath git -CommandArgs @('push', '-u', 'origin', $branchName) | Out-Null
+    # --- 7. Sync with the base branch (fix drift / conflicts) -------------
+    if ($mode -in @('commit', 'publish', 'resume-pr')) {
+        Write-Step "Syncing with origin/$BaseBranch"
+
+        $merge = Merge-BaseIntoCurrentBranch -BaseRef "origin/$BaseBranch"
+
+        if ($merge.Status -eq 'CONFLICT') {
+            Write-ConflictGuidance -Files $merge.Files -Branch $branchName
+            exit 7
+        }
+        if ($merge.Status -eq 'FAILED') {
+            throw "Could not merge origin/$BaseBranch into '$branchName'. Check 'git status' and re-run."
+        }
+
+        if ($merge.Status -eq 'CLEAN') {
+            Write-Ok 'Already up to date with the base branch'
         }
         else {
-            Invoke-External -FilePath git -CommandArgs @('push', 'origin', $branchName) | Out-Null
+            Write-Ok 'Base branch merged'
+
+            # Validate the code that arrived from the base branch.
+            if (-not $SkipBuild -and $mode -ne 'publish') {
+                $incoming = @(& git diff --name-only 'ORIG_HEAD' 'HEAD' 2>$null | Where-Object { $_ } | Where-Object { Test-CommittableFile -Path $_ })
+                if ($incoming.Count -gt 0) {
+                    Write-Step "Re-running gates for $($incoming.Count) incoming file(s)"
+                    $gateResults = @(Invoke-BuildGates -Files $incoming -AutoFix:$AutoFix)
+                    $failedGates = @($gateResults | Where-Object { -not $_.Success })
+                    if ($failedGates.Count -gt 0) {
+                        Write-FixGuidance -Results $gateResults
+                        exit 2
+                    }
+                    $validation += @($gateResults | Where-Object { $_.Success } | ForEach-Object { "$($_.Package) :: $($_.Script)" })
+                }
+            }
         }
-        Write-Ok "Pushed origin/$branchName"
+    }
+
+    # --- 8. Publish the branch --------------------------------------------
+    $prFiles = @(& git diff --name-only "origin/$BaseBranch...HEAD" 2>$null | Where-Object { $_ } | Where-Object { Test-CommittableFile -Path $_ })
+    $prAreas = @(if ($prFiles.Count -gt 0) { Get-Areas -Files $prFiles } else { $areas })
+
+    if ($prFiles.Count -eq 0) {
+        throw "No committable diff against origin/$BaseBranch. Nothing to publish."
+    }
+
+    if (-not $SkipBuild -and $mode -in @('publish', 'merge-recovery')) {
+        Write-Step "Running gates for the branch diff ($($prFiles.Count) file(s))"
+        $gateResults = @(Invoke-BuildGates -Files $prFiles -AutoFix:$AutoFix)
+        $failedGates = @($gateResults | Where-Object { -not $_.Success })
+        if ($failedGates.Count -gt 0) {
+            Write-FixGuidance -Results $gateResults
+            exit 2
+        }
+        $validation += @($gateResults | Where-Object { $_.Success } | ForEach-Object { "$($_.Package) :: $($_.Script)" })
     }
 
     if ([string]::IsNullOrWhiteSpace($commitSha)) {
-        $commitSha = Get-GitValue -CommandArgs @('rev-parse', '--short', $branchName) -AllowFailure
+        $commitSha = Get-GitValue -CommandArgs @('rev-parse', '--short', 'HEAD') -AllowFailure
     }
 
-    # --- 6. Create or reuse the PR ----------------------------------------
+    Write-Step 'Pushing branch'
+    $upstream = Get-GitValue -CommandArgs @('rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}') -AllowFailure
+    if ([string]::IsNullOrWhiteSpace($upstream)) {
+        Invoke-External -FilePath git -CommandArgs @('push', '-u', 'origin', $branchName) | Out-Null
+    }
+    else {
+        Invoke-External -FilePath git -CommandArgs @('push', 'origin', $branchName) | Out-Null
+    }
+    Write-Ok "Pushed origin/$branchName"
+
+    # --- 9. Create or reuse the PR ----------------------------------------
+    $prUrl = $null
+    $prNumber = $null
+
+    # A merge-recovery run may have an existing PR that was not visible earlier.
     if (-not $openPr) {
+        $openPr = Get-OpenPullRequest -HeadBranch $branchName -BaseBranch $BaseBranch
+    }
+
+    if ($openPr) {
+        $prUrl = $openPr.url
+        $prNumber = "$($openPr.number)"
+        Write-Info "Using open PR #${prNumber}: $prUrl"
+    }
+    else {
         Write-Step "Creating PR: $branchName -> $BaseBranch"
 
-        $summaryLines = @(Get-SummaryBullets -Files $stagedFiles -Subject $CommitMessage)
-        $areaLines = @($areas | Where-Object { $_.Count -gt 0 } | ForEach-Object { "- ``$($_.Name)``: $($_.Count) file(s)" })
+        $summaryLines = @("- $CommitMessage")
+        foreach ($area in $prAreas) {
+            $areaFiles = @($prFiles | Where-Object { $_ -like "$($area.Name)/*" })
+            if ($areaFiles.Count -eq 0) { continue }
+            $summaryLines += "- ``$($area.Name)``: $($areaFiles.Count) file(s)"
+        }
+
+        $areaLines = @($prAreas | Where-Object { $_.Count -gt 0 } | ForEach-Object { "- ``$($_.Name)``: $($_.Count) file(s)" })
         $validationLines = if ($validation.Count -gt 0) {
-            @($validation | ForEach-Object { "- [x] ``$_``" })
+            @($validation | Select-Object -Unique | ForEach-Object { "- [x] ``$_``" })
         }
         else {
             @('- [x] No local package gates applied')
         }
 
-        $filePreview = @($stagedFiles | Select-Object -First 50)
+        $filePreview = @($prFiles | Select-Object -First 50)
         $fileLines = @($filePreview | ForEach-Object { "- ``$_``" })
-        if ($stagedFiles.Count -gt $filePreview.Count) {
-            $fileLines += "- ... and $($stagedFiles.Count - $filePreview.Count) more file(s)"
+        if ($prFiles.Count -gt $filePreview.Count) {
+            $fileLines += "- ... and $($prFiles.Count - $filePreview.Count) more file(s)"
         }
 
         $summaryBlock = $summaryLines -join [Environment]::NewLine
         $areaBlock = $areaLines -join [Environment]::NewLine
         $validationBlock = $validationLines -join [Environment]::NewLine
         $fileBlock = $fileLines -join [Environment]::NewLine
+
+        $conflictNote = if ($mode -eq 'merge-recovery') { '- [x] Merge conflicts resolved (mechanical + reviewed)' } else { '' }
 
         $prBody = @"
 ## Summary
@@ -407,37 +540,28 @@ $areaBlock
 ## Validation
 $validationBlock
 - [x] CI checks verified by this workflow (see PR checks)
+$conflictNote
 
 ## Branching
 - Base: ``$BaseBranch`` (integration)
 - Head: ``$branchName``
 - Commit: ``$commitSha``
-- Based on: ``origin/$BaseBranch``
+- Based on: latest ``origin/$BaseBranch`` (drift merged before push)
 
-## Files changed ($($stagedFiles.Count))
+## Files changed ($($prFiles.Count))
 $fileBlock
 
 ## Rollback
 - Revert on ``$BaseBranch``: ``git revert $commitSha``
 "@
 
-        $openPr = Get-OpenPullRequest -HeadBranch $branchName -BaseBranch $BaseBranch
-        if ($openPr) {
-            Write-Info "Reusing existing PR #$($openPr.number): $($openPr.url)"
+        $createOutput = ((& gh pr create --base $BaseBranch --head $branchName --title $CommitMessage --body $prBody 2>&1) -join "`n").Trim()
+        if ($LASTEXITCODE -ne 0 -or $createOutput -notmatch '^https?://') {
+            throw "PR creation failed: $createOutput"
         }
-        else {
-            $createOutput = ((& gh pr create --base $BaseBranch --head $branchName --title $CommitMessage --body $prBody 2>&1) -join "`n").Trim()
-            if ($LASTEXITCODE -ne 0 -or $createOutput -notmatch '^https?://') {
-                throw "PR creation failed: $createOutput"
-            }
-            Write-Ok "PR created: $createOutput"
-            $openPr = [pscustomobject]@{ url = $createOutput; number = $null }
-        }
-    }
-
-    $prUrl = $openPr.url
-    $prNumber = if ($openPr.number) { "$($openPr.number)" } else {
-        Get-GhValue -CommandArgs @('pr', 'view', $prUrl, '--json', 'number', '--jq', '.number')
+        Write-Ok "PR created: $createOutput"
+        $prUrl = $createOutput
+        $prNumber = Get-GhValue -CommandArgs @('pr', 'view', $prUrl, '--json', 'number', '--jq', '.number')
     }
 
     if ($NoWait) {
@@ -453,7 +577,7 @@ $fileBlock
         return
     }
 
-    # --- 7. Wait for checks ----------------------------------------------
+    # --- 10. Wait for checks ----------------------------------------------
     if (-not $SkipTests) {
         Write-Step "Waiting for CI checks on PR #$prNumber"
         Write-Info "Bounded wait: $MaxWaitMinutes min, stall recovery after $StuckAfterMinutes min."
@@ -484,7 +608,7 @@ $fileBlock
         Write-Warn 'Skipping CI checks (-SkipTests)'
     }
 
-    # --- 8. Merge ---------------------------------------------------------
+    # --- 11. Merge --------------------------------------------------------
     Write-Step "Merging PR #$prNumber into $BaseBranch"
 
     try {
@@ -508,7 +632,7 @@ Resolve the blocker, then re-run this skill with -Resume.
         Write-Warn "Merge status: $mergeStatus (PR state: $finalState)"
     }
 
-    # --- 9. Cleanup -------------------------------------------------------
+    # --- 12. Cleanup ------------------------------------------------------
     if ($mergeStatus -eq 'MERGED') {
         Write-Step 'Cleaning up branches'
         Invoke-External -FilePath git -CommandArgs @('checkout', $BaseBranch) -AllowFailure | Out-Null
@@ -527,7 +651,7 @@ Resolve the blocker, then re-run this skill with -Resume.
         Write-Info 'Feature branch kept because the merge is still pending.'
     }
 
-    # --- 10. Summary ------------------------------------------------------
+    # --- 13. Summary ------------------------------------------------------
     Write-Host @"
 
 +---------------------------------------------------------------+

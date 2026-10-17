@@ -1,6 +1,6 @@
 ---
 name: "promote-dev-to-main"
-description: "Opens a production PR from dev to main, verifies CI, asks for explicit confirmation, merges it without deleting dev, and can tag the release. Invoke when user says '/skill:promote-dev-to-main'."
+description: "Opens a production PR from dev to main, auto-syncs main into dev and resolves conflicts first when needed, verifies CI, asks for explicit confirmation, merges it without deleting dev, and can tag the release. Invoke when user says '/skill:promote-dev-to-main'."
 ---
 
 # Promote Dev → Main (Production Release)
@@ -8,7 +8,9 @@ description: "Opens a production PR from dev to main, verifies CI, asks for expl
 Promotes the verified `dev` branch into `main`:
 
 ```
-dev (verified) -> release PR -> CI checks -> explicit confirmation
+dev (verified) -> conflict check
+               -> conflicts? sync PR (main -> dev), auto-resolve, merge
+               -> release PR -> CI checks -> explicit confirmation
                -> merge into main -> optional tag -> dev + main kept
 ```
 
@@ -31,6 +33,7 @@ feature branches -> staging -> dev -> main
 - **Never delete `dev` or `main`**
 - Never commit directly to `dev` or `main`
 - Never force-push `main`
+- Never run `git merge --abort` to escape a sync conflict — resolve it
 - Never merge while checks are failing
 - Never tag a release that did not merge
 - Stop and report if migrations or breaking changes are present without a stated plan
@@ -127,8 +130,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File `
 | `2` | Local gate failed (`-RunBuildGates`) | Fix through the staging pipeline, then retry |
 | `3` | CI failed or PR closed | Fix through the staging pipeline, then `-Resume` |
 | `4` | CI still running / stalled | Wait, then `-Resume -Yes` |
-| `5` | Merge blocked or conflict | Resolve, then `-Resume -Yes` |
+| `5` | Merge blocked or sync failed | Resolve, then `-Resume -Yes` |
 | `6` | Confirmation missing/declined | Ask the user, then re-run with `-Yes` |
+| `7` | Conflict needs a human decision | Enter the **conflict loop** below |
 
 ### CI failed (exit 3)
 
@@ -161,10 +165,47 @@ gh pr checks <pr-number>
 powershell -File .opencode/skills/promote-dev-to-main/run-promotion.ps1 -Resume -Yes
 ```
 
+### Conflicts (handled automatically, exit 7 for real conflicts)
+
+Before opening the production PR, the script runs `git merge-tree`. If `main` and
+`dev` conflict it creates a **sync PR** first:
+
+```
+origin/main -> chore/sync-dev-<timestamp> -> PR into dev -> checks -> merge
+```
+
+Then the release continues from the refreshed `dev`. This is how hotfixes that
+landed on `main` get folded back into `dev` without pushing directly to either
+branch.
+
+Mechanical conflicts are auto-resolved inside the sync:
+- lockfiles → incoming version + regenerate with the package manager
+- generated artifacts (`*.tsbuildinfo`, `dist/`, `coverage/`, `.next/`) → incoming version
+
+If a **real code conflict** remains, the script exits `7` and leaves the merge
+in progress on the sync branch:
+
+1. Inspect:
+   ```powershell
+   git status
+   git diff --name-only --diff-filter=U
+   ```
+2. Compare both sides:
+   ```powershell
+   git show :2:<file>   # dev side
+   git show :3:<file>   # main side
+   ```
+3. Combine both intents — never blindly `--ours`/`--theirs`, never `git merge --abort`.
+4. `git add <file>`.
+5. Re-run this skill. It finishes the sync PR, then retries the release.
+
+Do not report the conflict to the user without attempting at least one full
+resolution pass.
+
 ### Merge blocked (exit 5)
 
-- `CONFLICTING` / `DIRTY` → the script stops before creating the PR; merge `main`
-  back into `dev` through the staging pipeline, then retry
+- `CONFLICTING` / `DIRTY` → the automatic sync should have handled this; if it still
+  fails, resolve on the sync branch and re-run
 - `BLOCKED` (review required) → obtain approval, then `-Resume -Yes`
 - `BEHIND` → handled automatically; otherwise `gh pr update-branch <pr>`
 
