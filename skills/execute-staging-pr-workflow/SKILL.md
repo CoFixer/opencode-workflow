@@ -116,6 +116,8 @@ same branch and reuses the open PR.
 
 ### Fix loop (mandatory, max 3 attempts)
 
+**Never hand exit code 2 back to the user without attempting this loop.**
+
 1. Read the failing package + script from the output.
 2. Reproduce locally with the exact command:
    ```powershell

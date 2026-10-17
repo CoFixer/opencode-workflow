@@ -514,6 +514,7 @@ function Wait-PullRequestChecks {
     $lastChangeAt = Get-Date
     $rerunAttempts = 0
     $maxReruns = 2
+    $noChecksExtended = $false
 
     while ((Get-Date) -lt $deadline) {
         Start-Sleep -Seconds 10
@@ -534,6 +535,24 @@ function Wait-PullRequestChecks {
 
         if ($entries.Count -eq 0) {
             if ((Get-Date) -gt $noChecksDeadline) {
+                if (-not $noChecksExtended) {
+                    $runsRaw = & gh run list --branch $HeadBranch --limit 5 --json status 2>$null
+                    $hasActiveRuns = $false
+                    if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace(($runsRaw -join ''))) {
+                        $branchRuns = ($runsRaw -join "`n") | ConvertFrom-Json
+                        $hasActiveRuns = @($branchRuns | Where-Object {
+                                $_.status -in @('queued', 'in_progress', 'waiting', 'pending', 'requested')
+                            }).Count -gt 0
+                    }
+
+                    if ($hasActiveRuns) {
+                        Write-Info 'Workflow runs exist for this branch but no checks are attached yet; continuing to wait.'
+                        $noChecksDeadline = (Get-Date).AddMinutes([math]::Max(2, $StuckAfterMinutes))
+                        $noChecksExtended = $true
+                        continue
+                    }
+                }
+
                 return [pscustomobject]@{
                     Status = 'NO_CHECKS'
                     Detail = 'No CI checks were reported. The workflows may not trigger for this branch/path.'

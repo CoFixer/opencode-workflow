@@ -132,7 +132,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File `
 
 ### CI failed (exit 3)
 
-Never fix `main` or `dev` directly. Route the fix through the pipeline:
+Never fix `main` or `dev` directly. Perform the fix loop yourself (do not just
+report the failure) through the pipeline:
 
 1. Inspect:
    ```powershell

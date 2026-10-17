@@ -133,8 +133,8 @@ release: add bed charge refresh + payment reconciliation (+4 more)
 
 ### CI failed (exit 3)
 
-The promotion PR **must not** be fixed by pushing directly to `staging`. Fix it
-the normal way:
+The promotion PR **must not** be fixed by pushing directly to `staging`. Perform
+the fix loop yourself (do not just report the failure) using the normal path:
 
 1. Inspect logs:
    ```powershell
