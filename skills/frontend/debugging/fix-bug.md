@@ -161,11 +161,11 @@ import { useNavigate } from 'react-router-dom'; // Old import
 import { useNavigate } from 'react-router';
 
 // ❌ Route path mismatch
-// Route: /patient/:id
-// Link: /patient/123/details  // No match
+// Route: /member/:id
+// Link: /member/123/details  // No match
 
 // ✅ Ensure exact path match or use wildcard
-// Route: /patient/:id/*
+// Route: /member/:id/*
 
 // ❌ Protected route redirect loop
 // Checking auth in useEffect after render

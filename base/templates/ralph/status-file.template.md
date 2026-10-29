@@ -1,7 +1,7 @@
 # {WORKFLOW_NAME} Status - {PROJECT_NAME}
 
 > Auto-generated status file for Ralph workflow tracking.
-> Template: `.pi/base/templates/ralph/status-file.template.md`
+> Template: `.opencode/base/templates/ralph/status-file.template.md`
 
 ---
 
@@ -18,7 +18,7 @@
 ```yaml
 workflow: {WORKFLOW_NAME}
 project: {PROJECT_NAME}
-skill: .pi/{STACK}/skills/{SKILL_FILE}
+skill: .opencode/skills/{SKILL_FILE}
 created: {DATE}
 last_run: null
 ```

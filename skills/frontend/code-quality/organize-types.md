@@ -140,7 +140,7 @@ When running this skill, provide a report like this:
 **3. Centralization Opportunities**
 - `Tab` interface used in:
   - components/ui/tab-switcher.tsx
-  - pages/patient/settings.tsx
+  - pages/member/settings.tsx
   **Action**: Move to types/ui/shared.d.ts
 
 ### 📊 Summary

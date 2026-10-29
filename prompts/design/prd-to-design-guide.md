@@ -42,7 +42,7 @@ This is a **comprehensive reusable template** for converting any Product Require
 | Timeline | Timeline/Deadline section | "4 weeks", "2 months", "6 weeks" | `[TIMELINE]` |
 | Project Type | App Type section | "Web Application", "Mobile App", "Dashboard" | `[TYPE]` |
 | Target Platform | Platform section | "Desktop-first", "Mobile-first", "Cross-platform" | `[PLATFORM]` |
-| User Types | User Roles section | "Guest, User, Admin", "Patient, Doctor, Admin" | `[USER_TYPES]` |
+| User Types | User Roles section | "Guest, User, Admin", "Member, Doctor, Admin" | `[USER_TYPES]` |
 | Total Pages | Count from Page Breakdown section | "28 pages", "15 pages", "42 pages" | `[TOTAL_PAGES]` |
 
 ### Page Count Breakdown:

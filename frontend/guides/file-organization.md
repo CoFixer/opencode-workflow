@@ -1,6 +1,6 @@
 # File Organization
 
-Proper file and directory structure for maintainable, scalable frontend code in the ActivityCoaching application.
+Proper file and directory structure for maintainable, scalable frontend code in the Project application.
 
 ---
 

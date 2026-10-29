@@ -1,15 +1,10 @@
 {
   "version": "1.0",
-  "name": "storepilot",
-  "description": "Project workspace settings for StorePilot",
+  "name": "{PROJECT_NAME}",
+  "description": "Workspace configuration template. Replace {PROJECT_NAME} and packages per project; project-specific knowledge belongs in .project/.",
   "workspace": {
     "root": "../../",
-    "packages": [
-      "backend",
-      "frontend",
-      "dashboard",
-      "storepilot-plugin"
-    ]
+    "packages": []
   },
   "skills": {
     "enabled": true,

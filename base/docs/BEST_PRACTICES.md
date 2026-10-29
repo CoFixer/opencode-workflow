@@ -1,6 +1,6 @@
 ﻿# Best Practices
 
-Generic, framework-agnostic coding standards and framework resource guide for all projects using the `.pi/` configuration system.
+Generic, framework-agnostic coding standards and framework resource guide for all projects using the `.opencode/` configuration system.
 
 ---
 
@@ -134,7 +134,7 @@ Controllers (HTTP only) -> Services (business logic) -> Repositories (data acces
 - Descriptive test names: `should return 404 when user not found`
 - Arrange-Act-Assert pattern in every test
 - Mock only external dependencies (APIs, databases), not internal code
-- See `.pi/docs/E2E_TESTING.md` for Playwright patterns
+- See `.opencode/base/docs/E2E_TESTING.md` for Playwright patterns
 
 ### Git Workflow
 
@@ -156,7 +156,7 @@ Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `style`, `perf`
 - Include summary, test plan, and screenshots where applicable
 - Require code review before merge
 
-**Details**: See `.pi/docs/COMMIT_WORKFLOW_GUIDE.md` for full workflow.
+**Details**: See `.opencode/base/docs/COMMIT_WORKFLOW_GUIDE.md` for full workflow.
 
 ### Code Review Checklist
 
@@ -191,24 +191,24 @@ Install via `/setup-OpenCode` (interactive) or `/migrate-submodules` (flags).
 
 | Module | Path | Repository | Content |
 |--------|------|-----------|---------|
-| **NestJS** | `.pi/nestjs/` | [OpenCode-nestjs](https://github.com/CoFixer/opencode-nestjs) | Controllers, Services, DTOs, TypeORM, Swagger, Socket.IO |
-| **React** | `.pi/react/` | [OpenCode-react](https://github.com/CoFixer/opencode-react) | React 19, TailwindCSS, shadcn/ui, React Router, Playwright |
-| **React Native** | `.pi/react-native/` | [OpenCode-react-native](https://github.com/CoFixer/opencode-react-native) | NativeWind, React Navigation, Detox, Native Modules |
+| **NestJS** | `.opencode/backend/` | [OpenCode-nestjs](https://github.com/CoFixer/opencode-nestjs) | Controllers, Services, DTOs, TypeORM, Swagger, Socket.IO |
+| **React** | `.opencode/frontend/` | [OpenCode-react](https://github.com/CoFixer/opencode-react) | React 19, TailwindCSS, shadcn/ui, React Router, Playwright |
+| **React Native** | `.opencode/mobile/` | [OpenCode-react-native](https://github.com/CoFixer/opencode-react-native) | NativeWind, React Navigation, Detox, Native Modules |
 
 #### Department Modules
 
 | Module | Path | Repository | Content |
 |--------|------|-----------|---------|
-| **Marketing** | `.pi/marketing/` | [OpenCode-marketing](https://github.com/CoFixer/opencode-marketing) | CRO, copywriting, SEO, analytics |
-| **Operations** | `.pi/operations/` | [OpenCode-operations](https://github.com/CoFixer/opencode-operations) | Process automation, workflows, documentation |
-| **Content** | `.pi/content/` | [OpenCode-content](https://github.com/CoFixer/opencode-content) | Content strategy, blog posts, video scripts |
+| **Marketing** | `.opencode/marketing/` | [OpenCode-marketing](https://github.com/CoFixer/opencode-marketing) | CRO, copywriting, SEO, analytics |
+| **Operations** | `.opencode/operations/` | [OpenCode-operations](https://github.com/CoFixer/opencode-operations) | Process automation, workflows, documentation |
+| **Content** | `.opencode/content/` | [OpenCode-content](https://github.com/CoFixer/opencode-content) | Content strategy, blog posts, video scripts |
 
 ### Resource Structure
 
 Each framework submodule follows a consistent structure:
 
 ```
-.pi/{framework}/
+.opencode/{framework}/
 ├── guides/      # Patterns and best practices (Read first)
 ├── skills/      # Specialized framework skills
 ├── agents/      # Framework-specific subagents
@@ -221,34 +221,34 @@ Each framework submodule follows a consistent structure:
 
 #### NestJS Backend
 ```
-1. Read `.pi/nestjs/guides/best-practices.md` (CRITICAL - MANDATORY)
-2. Read task-specific guides from `.pi/nestjs/guides/`:
+1. Read `.opencode/backend/guides/best-practices.md` (CRITICAL - MANDATORY)
+2. Read task-specific guides from `.opencode/backend/guides/`:
    - database-patterns.md (entities, migrations, relations)
    - routing-and-controllers.md (endpoints, DTOs)
    - validation-patterns.md (class-validator, pipes)
    - authentication-cookies.md (JWT, guards)
    - middleware-guide.md (interceptors, filters)
-3. Read `.pi/docs/guides/nestjs-backend-guide.md` (detailed workflows)
+3. Read `.opencode/base/docs/guides/nestjs-backend-guide.md` (detailed workflows)
 ```
 
 #### React Frontend
 ```
-1. Read `.pi/react/guides/file-organization.md` (MANDATORY - directory structure)
-2. Read `.pi/react/guides/best-practices.md` (MANDATORY - coding standards)
-3. Read `.pi/docs/guides/frontend-alignment-assessment.md` (codebase alignment)
+1. Read `.opencode/frontend/guides/file-organization.md` (MANDATORY - directory structure)
+2. Read `.opencode/frontend/guides/best-practices.md` (MANDATORY - coding standards)
+3. Read `.opencode/base/docs/guides/frontend-alignment-assessment.md` (codebase alignment)
 ```
 
 #### React Native Mobile
 ```
-1. Read relevant guides from `.pi/react-native/guides/`
-2. Read relevant skills from `.pi/react-native/skills/`
+1. Read relevant guides from `.opencode/mobile/guides/`
+2. Read relevant skills from `.opencode/mobile/skills/`
 ```
 
 ### If Framework Submodules Are Not Installed
 
 If the framework paths above don't exist:
 1. Use the **cross-cutting practices** in this document as your baseline
-2. Check `.pi/docs/guides/` for extracted framework guides (available without submodules)
+2. Check `.opencode/base/docs/guides/` for extracted framework guides (available without submodules)
 3. Run **`/setup-OpenCode`** to interactively add framework submodules
 
 ---
@@ -257,9 +257,9 @@ If the framework paths above don't exist:
 
 | Document | Path | Purpose |
 |----------|------|---------|
-| Agent Framework Mapping | `.pi/docs/AGENT_FRAMEWORK_MAPPING.md` | How agents auto-receive framework resources |
-| Commit Workflow | `.pi/docs/COMMIT_WORKFLOW_GUIDE.md` | Git branching, commit format, PR process |
-| E2E Testing | `.pi/docs/E2E_TESTING.md` | Playwright Page Object Model, test fixtures |
-| Troubleshooting | `.pi/docs/TROUBLESHOOTING.md` | Common issues and solutions |
+| Agent Framework Mapping | `.opencode/base/docs/AGENT_FRAMEWORK_MAPPING.md` | How agents auto-receive framework resources |
+| Commit Workflow | `.opencode/base/docs/COMMIT_WORKFLOW_GUIDE.md` | Git branching, commit format, PR process |
+| E2E Testing | `.opencode/base/docs/E2E_TESTING.md` | Playwright Page Object Model, test fixtures |
+| Troubleshooting | `.opencode/base/docs/TROUBLESHOOTING.md` | Common issues and solutions |
 | Setup Command | `/setup-OpenCode` | Add framework submodules interactively |
 | Submodule Check | `/submodule-check` | Validate submodule health and sync |

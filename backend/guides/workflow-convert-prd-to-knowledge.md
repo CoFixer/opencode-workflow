@@ -1,360 +1,187 @@
-﻿# PRD to PROJECT_KNOWLEDGE Converter
+﻿# Workflow: Convert PRD → Project Knowledge
 
-Convert a Product Requirements Document (PRD) PDF into structured `.project/docs/PROJECT_KNOWLEDGE.md` documentation.
-
----
-
-## Iteration Behavior
-
-This skill is iteration-aware:
-
-### Iteration 1 (Initial)
-- Full extraction from PRD to PROJECT_KNOWLEDGE.md
-
-### Iteration N (Improvement)
-1. **Read both versions**: Current PROJECT_KNOWLEDGE.md AND updated prd.pdf
-2. **Generate diff**: Identify what changed in the PRD
-3. **Update incrementally**: Add new sections, modify changed sections
-4. **Preserve architecture**: Never overwrite the Architecture Overview section
+Generic workflow for turning a product requirements document into `.project/docs/PROJECT_KNOWLEDGE.md` (and the companion docs). Applies to any project using the `.opencode` workflow.
 
 ---
 
 ## Purpose
 
-This resource guides the transformation of `prd.pdf` (located in the project root) into structured PROJECT_KNOWLEDGE.md documentation, providing OpenCode with product context for development tasks.
+Give agents reliable product context without re-reading the PRD on every task. The knowledge doc captures architecture, roles, terminology, and constraints; the PRD remains the requirement source.
+
+## Inputs
+
+| Input | Path | Required |
+|-------|------|----------|
+| PRD index | `.project/prd/prd.md` | Yes (preferred) |
+| PRD parts | `.project/prd/01-…` … `06-…` | Load only relevant parts |
+| Original PDF | `.project/prd/prd.pdf` | Fallback only |
+| Existing docs | `.project/docs/PROJECT_*.MD` | For iteration N |
+| Implementation evidence | repo + `.project/status/` | For as-built accuracy |
+
+> If the PRD is one large file, read it in sections. If it is split (recommended), read the index, then only the parts needed for the task.
 
 ---
 
-## When to Use
+## Iteration awareness
 
-- Initial project setup from PRD
-- After PRD updates to sync documentation
-- When PROJECT_KNOWLEDGE.md needs regeneration
-- When asked to "update project knowledge from PRD"
+### Iteration 1 — initial
+- Extract the full product context.
+- Create `PROJECT_KNOWLEDGE.md` plus `PROJECT_API.md`, `PROJECT_DATABASE.md`, and the design guide.
 
----
-
-## Prerequisites
-
-- `prd.pdf` must exist in the project root directory
-- Write access to `.project/docs/PROJECT_KNOWLEDGE.md`
-
----
-
-## Execution Steps
-
-### Step 1: Read the PRD
-
-Use OpenCode's Read tool to read the PDF:
-
-```
-Read ./prd.pdf
-```
-
-### Step 2: Extract Information
-
-From the PRD content, extract the following categories:
-
-#### 1. Product Overview
-- Application purpose (from document header/intro)
-- Target users and their roles
-
-#### 2. User Types
-- PATIENT: Description and default sign-up behavior
-- COACH: Description and assignment process
-
-#### 3. Core Features by Role
-
-**Common Features (Section 1)**
-- Authentication (Login)
-- Sign-up process
-- Password reset flow
-
-**Patient Features (Section 2)**
-- Home Dashboard
-- Exercise Module
-- Daily Survey
-- Chat functionality
-
-**Coach Features (Section 3)**
-- Home Dashboard
-- My Patients management
-- Chat functionality
-
-#### 4. Key Data Entities
-Infer from feature inputs/outputs:
-- User fields
-- Exercise fields
-- ExerciseLog fields
-- DailySurvey fields
-- ZoomMeeting fields
-- ChatRoom/ChatMessage fields
-
-#### 5. Business Rules
-Collect all "Rules" subsections from the PRD, including:
-- Validation rules
-- Status transition rules
-- Automatic actions
-- Conditional behaviors
-
-### Step 3: Read Existing Architecture Section
-
-Read the current PROJECT_KNOWLEDGE.md to preserve the Architecture Overview section:
-
-```
-Read .project/docs/PROJECT_KNOWLEDGE.md
-```
-
-Extract and preserve:
-- Architecture Overview
-- Technology Stack
-- Four-Layer Architecture diagram
-- Base Classes Pattern
-- Project Structure
-- Integration Points
-- Common Workflows
-
-### Step 4: Generate PROJECT_KNOWLEDGE.md
-
-Write the complete file to `.project/docs/PROJECT_KNOWLEDGE.md` using the template below.
+### Iteration N — sync
+1. Read the **existing** docs first.
+2. Read the PRD index and the changed part(s).
+3. Diff requirements against the docs and the code.
+4. Update only what changed.
+5. **Never overwrite as-built sections** (module map, env vars, security implementation) with PRD ideals.
+6. Record deliberate deviations instead of hiding them.
 
 ---
 
-## Output Template
+## Execution steps
+
+### 1. Read the PRD
+
+```
+Read .project/prd/prd.md
+Read the relevant part file(s):
+  01-product-strategy.md
+  02-design-and-ux.md
+  03-feature-specifications.md
+  04-architecture-and-technical.md
+  05-business-and-operations.md
+  06-appendices.md
+```
+
+### 2. Extract categories
+
+| Category | Look for |
+|----------|----------|
+| Product overview | Vision, problem, value proposition |
+| Goals & metrics | KPIs, targets, success criteria |
+| User types | Roles, permissions, personas |
+| Terminology | Domain terms, acronyms |
+| Architecture | Apps/services, stack, integration points |
+| Screens/routes | Navigation, layouts, screen inventory |
+| API | Endpoint groups, auth, payload shapes |
+| Data model | Entities, relationships, enums |
+| Design | Tokens, typography, components |
+| Security | Auth, RBAC, confirmation rules, audit |
+| Operations | Deployment, environments, monitoring |
+| Business | Pricing, plans, roadmap |
+
+### 3. Reconcile with the codebase
+
+For every extracted item decide:
+
+| State | Action |
+|-------|--------|
+| Matches implementation | Document once |
+| PRD only (not built) | Mark as requirement/gap |
+| Code only (not in PRD) | Mark as extension |
+| Conflict | Document both + deviation + decision |
+
+Do **not** invent missing values. Use `<!-- TODO: not found in PRD -->` and report it.
+
+### 4. Write the docs
+
+| File | Content |
+|------|---------|
+| `PROJECT_KNOWLEDGE.MD` | Overview, goals, roles, terminology, stack, architecture, modules, env, security, operations |
+| `PROJECT_API.MD` | Conventions, auth, endpoint tables, request/response samples, contract deviations |
+| `PROJECT_DATABASE.MD` | Tables, columns, enums, relationships, indexes, migrations |
+| `PROJECT_DESIGN_GUIDELINES.MD` | Tokens, typography, spacing, components, motion, a11y |
+| `PROJECT_API_INTEGRATION.MD` | Screen ↔ route ↔ endpoint mapping |
+| `status/…/PRD_TRACEABILITY.MD` | Requirement → status → gap matrix |
+
+Every doc starts with:
+- Source(s) and date
+- Authority order
+- Link to related docs
+- A short "how to use" note
+
+### 5. Update status
+
+- Mark each requirement `Implemented` / `Partial` / `Stub` / `Missing` / `Extension`.
+- Cite evidence (file/module/route).
+- Keep gap IDs (e.g. C1, M4) stable for cross-references.
+
+### 6. Report
+
+Summarize:
+- Files created/updated
+- Requirements not found in the PRD
+- Conflicts and accepted deviations
+- Top gaps / next actions
+
+---
+
+## Output shape (PROJECT_KNOWLEDGE)
 
 ```markdown
-# Project Knowledge
+# Project Knowledge: {Project}
 
-## Product Overview
+> Sources, date, authority order, traceability link
 
-### Application Purpose
-
-{Summarize the application's purpose in 1-2 paragraphs. Include:
-- What the app does
-- Who it serves (Patients and Coaches)
-- Core value proposition (exercise therapy management, health tracking, communication)}
-
-### User Types
-
-| Role        | Description                                      | Default Sign-up     |
-| ----------- | ------------------------------------------------ | ------------------- |
-| **PATIENT** | {description from PRD}                           | {sign-up rule}      |
-| **COACH**   | {description from PRD}                           | {assignment rule}   |
-
-### Core Features
-
-#### Common (All Users)
-
-- **Authentication**: {from PRD Login page - username + password, JWT tokens}
-- **Sign-up**: {from PRD Sign Up page - required fields, verification}
-- **Password Reset**: {from PRD Forgot password - verification method}
-
-#### Patient Features
-
-1. **Home Dashboard**
-   {from PRD Section 2 - Home Tab}
-   - Calendar with completion indicators
-   - Today's exercise status
-   - Today's survey status
-   - Upcoming Zoom meeting
-
-2. **Exercise Module**
-   {from PRD Section 2 - Exercise Tab}
-   - Exercise list with video links
-   - Timer functionality
-   - Intensity ratings
-   - Exercise history
-
-3. **Daily Survey**
-   {from PRD Section 2 - Survey Tab}
-   - Sleep tracking fields
-   - Muscle pain level
-   - Step count
-   - Medication compliance
-   - Survey history
-
-4. **Chat**
-   {from PRD Section 2 - Chat Tab}
-   - Text & image messaging
-   - System messages
-
-#### Coach Features
-
-1. **Home Dashboard**
-   {from PRD Section 3 - Home Tab}
-   - Today's Zoom meetings
-   - Calendar view
-   - Meeting management
-
-2. **My Patients**
-   {from PRD Section 3 - My patients Tab}
-   - Patient list
-   - Patient detail view
-   - Exercise/survey history viewing
-
-3. **Chat**
-   {from PRD Section 3 - Chat Tab}
-   - Multi-patient chat rooms
-   - Search functionality
-
-### Key Data Entities
-
-| Entity      | Description                                                                          |
-| ----------- | ------------------------------------------------------------------------------------ |
-| User        | username, password, fullName, phoneNumber, email, role (PATIENT/COACH)               |
-| Exercise    | title, description, videoUrl, sets, reps/duration                                    |
-| ExerciseLog | userId, date, totalTime, exercises[], overallIntensityRating                         |
-| DailySurvey | userId, date, bedtime, wakeUpTime, sleepQuality, musclePain, stepCount, etc.         |
-| ZoomMeeting | coachId, patientId, dateTime, zoomLink, status (scheduled/completed/cancelled), memo |
-| ChatRoom    | participants[]                                                                       |
-| ChatMessage | senderId, content, imageUrl, type (user/system), timestamp                           |
-
-### Business Rules
-
-{Bullet list of all rules extracted from PRD "Rules" sections:}
-
-- After successful sign-up, role = PATIENT
-- User logs in with username + password
-- UI greetings always use Full Name (not username)
-- Patients can re-submit daily surveys (overwrites previous)
-- Exercise time accumulates per day across sessions
-- Zoom "Join" button enabled 10 minutes before meeting start
-- Auto-reminder to coach if meeting still "scheduled" 1 hour after end time
-- Changing/cancelling Zoom meeting sends system chat message
-- {additional rules from PRD...}
-
----
-
-## Architecture Overview
-
-{PRESERVE THIS ENTIRE SECTION FROM EXISTING PROJECT_KNOWLEDGE.md}
-
-### Technology Stack
-
-- **Backend**: NestJS 11, TypeScript 5.7+, TypeORM 0.3.27
-- **Database**: PostgreSQL 16
-- **Authentication**: JWT Bearer tokens with Passport
-- **Validation**: class-validator decorators
-- **API Documentation**: Swagger/OpenAPI
-- **Error Tracking**: Sentry v8 (optional)
-
-### Four-Layer Architecture
-
-{PRESERVE ASCII diagram from existing file}
-
-### Base Classes Pattern
-
-{PRESERVE from existing file}
-
-## Project Structure
-
-{PRESERVE from existing file}
-
-## Integration Points
-
-{PRESERVE from existing file}
-
-## Common Workflows
-
-{PRESERVE from existing file}
-
----
-
-**Related Documentation**:
-
-- [Backend Development Guidelines](../skills/best-practices.md)
-- [Error Tracking Guide](../invocable/track-errors/SKILL.md)
-- [Route Testing Guide](../invocable/test-routes.md)
-- [Best Practices](BEST_PRACTICES.md)
-- [Troubleshooting Guide](TROUBLESHOOTING.md)
+## Source of Truth
+## PRD Alignment Summary   (surfaces, roles, naming deviations)
+## Product Goals & Metrics
+## Personas
+## Overview
+## User Types / RBAC
+## Tech Stack
+## Architecture
+## Screen Inventory
+## Key Decisions
+## Known Gaps
+## Terminology
+## Environment Variables
+## Security
+## Operations
 ```
 
 ---
 
-## Transformation Rules
+## Error handling
 
-### PRD Section to Output Mapping
+**PRD not found**
+```
+Error: no PRD at .project/prd/prd.md (or prd.pdf).
+Place the file there or provide the path.
+```
 
-| PRD Section | PROJECT_KNOWLEDGE Section | Notes |
-|-------------|---------------------------|-------|
-| Header/Intro | Product Overview > Application Purpose | Summarize purpose |
-| Section 1. Common | Core Features > Common | Login, Signup, Password |
-| Section 2. Patient | Core Features > Patient Features | All patient tabs |
-| Section 3. Coach | Core Features > Coach Features | All coach tabs |
-| Navigation Menus | Core Features structure | Use for organization |
-| "Rules" subsections | Business Rules | Collect all rules |
-| Feature inputs/fields | Key Data Entities | Infer entity structures |
+**Partial PRD**
+- Generate what exists.
+- Mark the rest `<!-- TODO: not found in PRD -->`.
+- List missing sections in the report.
 
-### Entity Inference from PRD Features
+**Missing existing docs (iteration N)**
+- Create from scratch.
+- Flag that no baseline existed, so the diff is unknown.
 
-| PRD Feature | Entity Fields to Extract |
-|-------------|--------------------------|
-| Sign Up inputs | User: username, password, fullName, phoneNumber, email |
-| Exercise List | Exercise: title, description, videoUrl, status |
-| Exercise Timer | ExerciseLog: timeSpentSeconds, date |
-| Intensity Rating | ExerciseLog: intensityRating (1-10), eachIntensityRating (3-level) |
-| Survey questions | DailySurvey: all 7 fields from PRD |
-| Zoom meeting details | ZoomMeeting: patient, date, time, zoomLink, memo, status |
-| Chat features | ChatRoom, ChatMessage: senderId, content, imageUrl, type |
+**Code/docs conflict**
+- Do not silently pick one.
+- Document the conflict, the current behavior, and the recommended resolution.
 
 ---
 
-## Error Handling
+## Example invocations
 
-### PDF Not Found
-
-If `prd.pdf` does not exist in the project root:
-
-```
-Error: prd.pdf not found in project root.
-
-Please either:
-1. Place the PRD PDF at ./prd.pdf
-2. Provide the correct path to your PRD file
-```
-
-### Incomplete PRD Content
-
-If PRD sections are missing:
-1. Generate what is available
-2. Mark missing sections with: `<!-- TODO: Section not found in PRD -->`
-3. Inform user of incomplete sections
-
-### Architecture Section Not Found
-
-If existing PROJECT_KNOWLEDGE.md doesn't exist or lacks Architecture section:
-1. Use default Architecture template
-2. Mark sections that need manual completion
-3. Notify user to review and complete technical details
-
----
-
-## Example Invocations
-
-Users can trigger this with:
-- "Update PROJECT_KNOWLEDGE.md from the PRD"
-- "Convert prd.pdf to project knowledge"
-- "Regenerate project knowledge from PRD"
-- "Sync project documentation with PRD"
+- "Update PROJECT_KNOWLEDGE from the PRD"
+- "Sync the docs with the latest PRD part 04"
+- "Regenerate the API and database docs from the PRD"
+- "Build a PRD traceability matrix"
 
 ---
 
 ## Checklist
 
-Before completing, verify:
-
-- [ ] Product Overview section is complete
-- [ ] All user types are documented
-- [ ] Core features match PRD structure
-- [ ] Key data entities are inferred correctly
-- [ ] Business rules are comprehensive
-- [ ] Architecture section is preserved from existing file
-- [ ] Related documentation links are correct
-
----
-
-## Related Resources
-
-- [Architecture Overview](architecture-overview.md) - Technical architecture details
-- [Database Patterns](database-patterns.md) - Entity design patterns
-- [API Docs Generator](generate-api-docs.md) - Similar documentation generation pattern
+- [ ] Read the index before the parts
+- [ ] Extracted all required categories
+- [ ] Compared PRD against code
+- [ ] Marked extensions vs gaps
+- [ ] Preserved as-built sections
+- [ ] Added sources + date to each doc
+- [ ] Linked traceability matrix
+- [ ] Reported conflicts and missing sections
+- [ ] No project-specific values written into `.opencode/`

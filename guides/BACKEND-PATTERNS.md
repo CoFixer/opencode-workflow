@@ -1,158 +1,178 @@
-# Backend Patterns for OpenCode
+# Backend Patterns (NestJS)
 
-Quick reference for NestJS backend development in StorePilot.
+Generic NestJS conventions for any project using the `.opencode` workflow. Project-specific commands, ports, and module names belong in `.project/docs/`, not here.
 
-## Response Pattern
+> **Before coding**: read the project's `PROJECT_KNOWLEDGE` / `PROJECT_API` docs and any `AGENTS.md`. If a project convention conflicts with this guide, the project wins.
 
-Always use the standardized response wrapper:
+## Response shape
+
+Use **one** envelope consistently. Two common choices:
 
 ```typescript
-// Success
-{
-  success: true,
-  data: { ... },
-  message: "Operation successful"
-}
+// Interceptor-based envelope
+{ data: unknown, status: 'success', message?: string, statusCode: number, timestamp: string }
 
-// Error
-{
-  success: false,
-  error: {
-    code: "ERROR_CODE",
-    message: "User-friendly message"
-  }
-}
+// Or minimal envelope
+{ success: true, data: unknown, message?: string }
 ```
 
-See `.pi/backend/guides/RESPONSE-LAYOUT-GUIDE.md` for details.
+Rules:
+- Pick the project's existing envelope; do not introduce a second one.
+- Errors: `{ statusCode, message, error, timestamp }` unless the project defines otherwise.
+- Never leak stack traces or internal error codes to clients.
 
-## Controller Pattern
+## Controller
 
-Extend `BaseController` and use `@One()` decorator:
+Keep controllers thin: validation + delegation.
 
 ```typescript
-@Controller('products')
-export class ProductController extends BaseController {
-  @One('product', CreateProductDto, UpdateProductDto)
-  async create(@Body() dto: CreateProductDto) {
+@Controller('resources')
+export class ResourceController {
+  constructor(private readonly service: ResourceService) {}
+
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  create(@Body() dto: CreateResourceDto) {
     return this.service.create(dto);
   }
 }
 ```
 
-See `.pi/backend/guides/BASE-CONTROLLER-GUIDE.md` and `ONE-DECORATOR-GUIDE.md`.
+Checklist:
+- DTO on every body/query/param (`class-validator`).
+- Explicit guards on protected routes (avoid relying only on a global guard).
+- Swagger decorators when the project uses Swagger.
+- No business logic in the controller.
 
-## Service Pattern
+## Service
 
 ```typescript
 @Injectable()
-export class ProductService {
+export class ResourceService {
+  private readonly logger = new Logger(ResourceService.name);
+
+  constructor(private readonly repository: ResourceRepository) {}
+
+  async create(dto: CreateResourceDto) {
+    const entity = this.repository.create(dto);
+    return this.repository.save(entity);
+  }
+}
+```
+
+Rules:
+- Throw Nest HTTP exceptions (`NotFoundException`, `ForbiddenException`, …), not raw `Error`.
+- Log with context; never log secrets or tokens.
+- Keep transactions in the service, not the controller.
+- Emit side effects (queues, events) through injected providers.
+
+## Repository / data access
+
+TypeORM 0.3+ uses injected repositories. Avoid the deprecated `@EntityRepository` decorator.
+
+```typescript
+@Injectable()
+export class ResourceRepository {
   constructor(
-    private readonly repository: ProductRepository,
-    private readonly logger: Logger,
+    @InjectRepository(Resource)
+    private readonly repo: Repository<Resource>,
   ) {}
 
-  async create(dto: CreateProductDto) {
-    try {
-      const entity = this.repository.create(dto);
-      return await this.repository.save(entity);
-    } catch (error) {
-      this.logger.error('Failed to create product', error);
-      throw new BadRequestException('Failed to create product');
-    }
+  findByOwner(ownerId: string) {
+    return this.repo.find({ where: { ownerId } });
   }
 }
 ```
 
-## Repository Pattern
+Rules:
+- Always scope tenant-owned queries by the tenant key (e.g. `workspaceId`).
+- Prefer query builder for complex joins; parameterize everything.
+- Pagination: return `{ items, total, page, totalPages }` or the project's documented shape.
+
+## DTO + validation
 
 ```typescript
-@EntityRepository(Product)
-export class ProductRepository extends Repository<Product> {
-  async findByCategory(categoryId: string) {
-    return this.find({ where: { categoryId } });
-  }
-}
-```
-
-## DTO Pattern
-
-```typescript
-export class CreateProductDto {
+export class CreateResourceDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  @MaxLength(255)
+  name!: string;
 
-  @IsNumber()
-  @IsPositive()
-  price: number;
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  quantity?: number;
 }
 ```
 
-## Error Handling
+- Enable `whitelist` + `forbidNonWhitelisted` in the global validation pipe.
+- Validate enums with `@IsEnum`.
+- Do not accept role/tenant IDs from the client when they can be derived from the session.
 
-- Use custom exceptions from `exceptions/` folder
-- Wrap in `ExceptionFilter` for consistent responses
-- Log errors with context
+## Auth & RBAC
 
-## RBAC
+- Guards: authentication → authorization → resource ownership.
+- Decorators like `@Public()`, `@Roles()`, `@CurrentUser()` keep controllers readable.
+- Enforce the same rule at the query level (defense in depth), not only in the guard.
+- Long-lived credentials (API keys) should be hashed at rest.
 
-```typescript
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
-@Controller('admin/users')
-```
+## Errors & logging
+
+- Central `ExceptionFilter` for consistent error bodies.
+- Structured logs with request ID / user ID where available.
+- Log failures at the boundary; rethrow domain-appropriate exceptions.
 
 ## Testing
 
 ```typescript
-describe('ProductService', () => {
-  let service: ProductService;
-  let repository: jest.Mocked<ProductRepository>;
+describe('ResourceService', () => {
+  let service: ResourceService;
+  const repository = { save: jest.fn(), create: jest.fn() };
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        ProductService,
-        { provide: ProductRepository, useValue: mockRepository() },
+        ResourceService,
+        { provide: ResourceRepository, useValue: repository },
       ],
     }).compile();
-
-    service = module.get(ProductService);
-    repository = module.get(ProductRepository);
+    service = module.get(ResourceService);
   });
 
-  it('should create product', async () => {
-    const dto = { name: 'Test', price: 100 };
-    repository.save.mockResolvedValue({ id: '1', ...dto });
-    
-    const result = await service.create(dto);
-    
-    expect(result).toEqual({ id: '1', ...dto });
+  it('creates a resource', async () => {
+    repository.create.mockReturnValue({ name: 'x' });
+    repository.save.mockResolvedValue({ id: '1', name: 'x' });
+    await expect(service.create({ name: 'x' })).resolves.toEqual({ id: '1', name: 'x' });
   });
 });
 ```
 
-## Common Commands
+- Unit tests for services and guards.
+- E2E tests for auth boundaries and critical write paths.
+- Use a test database or transaction rollback; never hit production.
+
+## Commands
+
+Read the project's `package.json` rather than assuming script names. Typical:
 
 ```bash
-cd backend
-
-# Dev server
 npm run start:dev
-
-# Tests
+npm run build
+npm run lint
 npm test
 npm run test:e2e
-
-# Type check
-npm run type-check
-
-# Lint
-npm run lint:check
-
-# Database
 npm run migration:generate -- -n MigrationName
 npm run migration:run
-npm run migration:revert
 ```
+
+## Where project specifics live
+
+| Need | Location |
+|------|----------|
+| Module map, stack, ports | `.project/docs/PROJECT_KNOWLEDGE.MD` |
+| Endpoints | `.project/docs/PROJECT_API.MD` |
+| Entities | `.project/docs/PROJECT_DATABASE.MD` |
+| Current gaps | `.project/status/` |
+
+Do **not** hardcode project names, package lists, or ports in `.opencode`.

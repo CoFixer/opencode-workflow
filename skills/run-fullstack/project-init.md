@@ -87,12 +87,12 @@ Header: "Dashboards"
 Options:
   - label: "Admin Dashboard"
     description: "System administration interface (uses React)"
-  - label: "Coach Dashboard"
-    description: "Coach/user-specific management interface (uses React)"
+  - label: "Admin Dashboard"
+    description: "Admin/user-specific management interface (uses React)"
   - label: "None"
     description: "No dashboard needed for this project"
 ```
-Store as: `$DASHBOARDS` = [] | ["admin"] | ["coach"] | ["admin", "coach"]
+Store as: `$DASHBOARDS` = [] | ["admin"] | ["admin"] | ["admin", "admin"]
 
 ### A.2 Create OpenCode config Repository
 
@@ -156,7 +156,7 @@ Based on tech stack selection:
 | NestJS | CoFixer/nestjs-starter-kit | backend/ |
 | React Web | CoFixer/react-starter-kit | frontend/ |
 | Dashboard | CoFixer/react-starter-kit | dashboard/ |
-| Coach Dashboard | CoFixer/react-starter-kit | frontend-coach-dashboard/ |
+| Admin Dashboard | CoFixer/react-starter-kit | frontend-admin-dashboard/ |
 | React Native | CoFixer/react-native-starter-kit | mobile/ |
 
 ```bash

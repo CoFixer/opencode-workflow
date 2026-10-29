@@ -2,7 +2,7 @@
 
 ## Overview
 
-The ActivityCoaching platform uses **httpOnly cookie-based authentication** for secure session management. This document provides a high-level overview of the authentication architecture.
+The Project platform uses **httpOnly cookie-based authentication** for secure session management. This document provides a high-level overview of the authentication architecture.
 
 ---
 
@@ -67,16 +67,16 @@ AuthGuard makes routing decisions
 
 | Role | Backend Value | Dashboard | Description |
 |------|---------------|-----------|-------------|
-| COACH | 'COACH' or 4 | /coach | Physical therapists, trainers |
-| PATIENT | 'PATIENT' | /patient | Users receiving coaching |
+| ADMIN | 'ADMIN' or 4 | /admin | Physical therapists, trainers |
+| MEMBER | 'MEMBER' | /member | Users receiving domain |
 
 ### Route Protection
 
 | Route Pattern | Guard | Behavior |
 |---------------|-------|----------|
 | `/`, `/login`, `/signup` | `guestOnly` | Redirect logged-in users to home |
-| `/coach/*` | `requiredRole="coach"` | Require coach role |
-| `/patient/*` | `requiredRole="patient"` | Require patient role |
+| `/admin/*` | `requiredRole="admin"` | Require admin role |
+| `/member/*` | `requiredRole="member"` | Require member role |
 
 ---
 
@@ -95,7 +95,7 @@ Wraps layouts to enforce authentication rules:
 ```typescript
 mapToAuthUser(backendUser)    // Map API user to AuthUser
 getHomeRouteForRole(role)     // Get home route for role
-isCoachRole(role)             // Check if role is coach
+isAdminRole(role)             // Check if role is admin
 ```
 
 ### 3. Redux Auth Slice
@@ -145,8 +145,8 @@ Runs on app load to restore session from cookies.
 **Solution**: Ensure `withCredentials: true` in httpService
 
 ### Role check failing
-**Cause**: Backend returns role as string ('COACH') or number (4)
-**Solution**: Use `isCoachRole()` utility which handles both
+**Cause**: Backend returns role as string ('ADMIN') or number (4)
+**Solution**: Use `isAdminRole()` utility which handles both
 
 ---
 

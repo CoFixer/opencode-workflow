@@ -191,7 +191,7 @@ describe('Login Screen', () => {
 
   describe('Successful Login', () => {
     it('should navigate to home on valid credentials', async () => {
-      await loginScreen.login(testUsers.patient.email, testUsers.patient.password);
+      await loginScreen.login(testUsers.member.email, testUsers.member.password);
       await homeScreen.waitForScreen();
       await homeScreen.isVisible();
     });
@@ -199,7 +199,7 @@ describe('Login Screen', () => {
 
   describe('Failed Login', () => {
     it('should show error for wrong password', async () => {
-      await loginScreen.login(testUsers.patient.email, 'wrongpassword');
+      await loginScreen.login(testUsers.member.email, 'wrongpassword');
       await loginScreen.expectErrorVisible();
     });
   });

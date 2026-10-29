@@ -631,7 +631,7 @@ mkdir -p .project/prd
 ### 9.2 Save File
 Filename format: `[AppName]_PRD_[YYMMDD].md`
 - Sanitize app name: Replace spaces with underscores, remove special characters
-- Example: `ActivityCoaching_PRD_260112.md`
+- Example: `Project_PRD_260112.md`
 
 Location: `.project/prd/`
 

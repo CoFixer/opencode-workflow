@@ -26,8 +26,8 @@ Automatically fetches all project tickets from Notion, processes sequentially wi
 
 ### Via Ralph Loop (Autonomous)
 ```
-/ralph fix-tickets activitycoaching
-/ralph fix-tickets activitycoaching --incremental
+/ralph fix-tickets activitydomain
+/ralph fix-tickets activitydomain --incremental
 ```
 
 ## Arguments
@@ -180,7 +180,7 @@ Compare fetched tickets against existing status file:
 ### 2B.4. Display Overview
 
 ```
-Found [N] tickets for project (Activity Coaching):
+Found [N] tickets for project (My Project):
 
 Previously Fixed: [X] (skipping)
 Needs Review: [Z] (skipping)
@@ -280,8 +280,8 @@ Enter plan mode - Fix ticket: Calendar gap between elements
 
 ### Batch Mode via Ralph Loop
 ```
-/ralph fix-tickets activitycoaching
-/ralph fix-tickets activitycoaching --incremental
+/ralph fix-tickets activitydomain
+/ralph fix-tickets activitydomain --incremental
 ```
 
 ---
@@ -378,7 +378,7 @@ This file tracks ticket processing across runs. It follows the Ralph status file
 
 ### Template
 ```markdown
-# Fix Tickets Status - activitycoaching
+# Fix Tickets Status - activitydomain
 
 ## Quick Summary
 
@@ -389,7 +389,7 @@ This file tracks ticket processing across runs. It follows the Ralph status file
 ## Configuration
 
 workflow: fix-tickets
-project: activitycoaching
+project: activitydomain
 skill: .opencode/skills/notion-ticket-reviewer/prompts/batch-fix.md
 database_id: <NOTION_DATABASE_ID>
 project_id: <NOTION_PROJECT_ID>

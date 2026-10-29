@@ -100,7 +100,7 @@ jq '.dependencies | keys[]' package.json
 | Database | .project/docs/PROJECT_DATABASE.md | Schema & ERD |
 | Integration | .project/docs/PROJECT_API_INTEGRATION.md | Frontend-API mapping |
 | Design System | .project/docs/PROJECT_DESIGN_GUIDELINES.md | Component styling |
-| PRD | .project/prd/prd.pdf | Original requirements |
+| PRD | .project/prd/prd.md | Requirements index + part files |
 | HTML Screens | .project/resources/HTML/ | Prototype screens |
 
 ## Framework Resources
@@ -142,7 +142,7 @@ When planning implementation, ALWAYS consult these resources:
 - `.project/docs/PROJECT_DESIGN_GUIDELINES.md` — Design system
 - `.project/docs/PROJECT_DATABASE.md` — Database schema & ERD
 - `.project/docs/PROJECT_KNOWLEDGE.md` — Architecture & tech stack
-- `.project/prd/prd.pdf` — Source of truth
+- `.project/prd/prd.md` — Source of truth (index + split parts)
 
 ## Memory & Context System
 

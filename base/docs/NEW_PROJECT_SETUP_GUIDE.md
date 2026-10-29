@@ -12,8 +12,8 @@ Setting up a new project involves **two separate concerns**:
 
 | Command | Purpose | What it creates |
 |---------|---------|-----------------|
-| `/new-project` | **One-command setup** (recommended) | Everything: `.pi/`, boilerplate, docker-compose |
-| `/initialize-OpenCode` | OpenCode configuration only | `.pi/` submodule with AI context |
+| `/new-project` | **One-command setup** (recommended) | Everything: `.opencode/`, boilerplate, docker-compose |
+| `/initialize-OpenCode` | OpenCode configuration only | `.opencode/` submodule with AI context |
 | `/create-mono-repo` | Boilerplate code only | `backend/`, `frontend/`, etc. |
 
 ---
@@ -28,7 +28,7 @@ mkdir monkey && cd monkey
 This single command will:
 1. Ask for your tech stack (backend + frontend choices)
 2. Create `CoFixer/monkey-OpenCode` repo on GitHub
-3. Set up `.pi/` submodule with framework patterns
+3. Set up `.opencode/` submodule with framework patterns
 4. Clone selected boilerplate repos
 5. Generate `docker-compose.yml`
 6. Create `.project/` documentation structure
@@ -128,7 +128,7 @@ After both commands, "Monkey" project looks like:
 
 ```
 monkey-project/
-├── .pi/                    ← OpenCode config (from /initialize)
+├── .opencode/                    ← OpenCode config (from /initialize)
 │   ├── base/                   → OpenCode-base submodule
 │   ├── nestjs/                 → OpenCode-nestjs submodule
 │   ├── react/                  → OpenCode-react submodule

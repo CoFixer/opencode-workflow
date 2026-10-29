@@ -71,13 +71,13 @@ test.describe('[FormPage] Tests', () => {
 
 ## List Page Tests
 
-For patients, exercises, chat lists:
+For members, exercises, chat lists:
 
 ```typescript
 test.describe('[ListPage] Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Authenticate before accessing protected pages
-    await authenticateAsCoach(page);
+    await authenticateAsAdmin(page);
   });
 
   test.describe('Page Load', () => {
@@ -132,14 +132,14 @@ test.describe('[ListPage] Tests', () => {
 
 ## Detail Page Tests
 
-For patient detail, exercise detail:
+For member detail, exercise detail:
 
 ```typescript
 test.describe('[DetailPage] Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await authenticateAsPatient(page);
+    await authenticateAsMember(page);
     // Navigate to specific detail page
-    await page.goto('/patient/exercise/1');
+    await page.goto('/member/exercise/1');
   });
 
   test.describe('Page Load', () => {
@@ -166,7 +166,7 @@ test.describe('[DetailPage] Tests', () => {
   test.describe('Navigation', () => {
     test('should navigate back to list', async ({ page }) => {
       await page.getByRole('button', { name: /back/i }).click();
-      await page.waitForURL('/patient/exercise');
+      await page.waitForURL('/member/exercise');
     });
   });
 });
@@ -176,7 +176,7 @@ test.describe('[DetailPage] Tests', () => {
 
 ## Multi-Step Flow Tests
 
-For patient signup with OTP, wizards:
+For member signup with OTP, wizards:
 
 ```typescript
 test.describe('[MultiStepFlow] Tests', () => {
@@ -262,8 +262,8 @@ test.describe('Login Page', () => {
 
   test.describe('Successful Login', () => {
     test('should redirect to dashboard on valid credentials', async ({ page }) => {
-      await loginPage.login('coach@test.com', 'CoachTest@123');
-      await page.waitForURL('/coach');
+      await loginPage.login('admin@test.com', 'AdminTest@123');
+      await page.waitForURL('/admin');
     });
   });
 });
@@ -274,34 +274,34 @@ test.describe('Login Page', () => {
 ## Complete Example: List Page Tests
 
 ```typescript
-// frontend/test/tests/coach/patients.spec.ts
+// frontend/test/tests/admin/members.spec.ts
 import { test, expect } from '@playwright/test';
-import { PatientsPage } from '../../pages/coach/patients.page';
-import { authenticateAsCoach } from '../../fixtures/auth.fixture';
+import { MembersPage } from '../../pages/admin/members.page';
+import { authenticateAsAdmin } from '../../fixtures/auth.fixture';
 
-test.describe('Patients List Page', () => {
-  let patientsPage: PatientsPage;
+test.describe('Members List Page', () => {
+  let membersPage: MembersPage;
 
   test.beforeEach(async ({ page }) => {
-    await authenticateAsCoach(page);
-    patientsPage = new PatientsPage(page);
-    await patientsPage.navigate();
+    await authenticateAsAdmin(page);
+    membersPage = new MembersPage(page);
+    await membersPage.navigate();
   });
 
-  test('should display patient list', async () => {
-    await expect(patientsPage.title).toBeVisible();
-    const count = await patientsPage.getPatientCount();
+  test('should display member list', async () => {
+    await expect(membersPage.title).toBeVisible();
+    const count = await membersPage.getMemberCount();
     expect(count).toBeGreaterThan(0);
   });
 
-  test('should filter patients by name', async () => {
-    await patientsPage.searchPatient('이재활');
-    await patientsPage.expectPatientVisible('이재활');
+  test('should filter members by name', async () => {
+    await membersPage.searchMember('이재활');
+    await membersPage.expectMemberVisible('이재활');
   });
 
-  test('should navigate to patient detail', async ({ page }) => {
-    await patientsPage.clickPatient('이재활');
-    await page.waitForURL(/\/coach\/patient\/\d+/);
+  test('should navigate to member detail', async ({ page }) => {
+    await membersPage.clickMember('이재활');
+    await page.waitForURL(/\/admin\/member\/\d+/);
   });
 });
 ```

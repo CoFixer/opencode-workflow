@@ -50,12 +50,12 @@ Install the Ralph Wiggum plugin:
 
 ### Design QA - All Screens
 ```bash
-/ralph design-qa frontend-coach-dashboard
+/ralph design-qa frontend-admin-dashboard
 ```
 
 ### E2E Tests - Incremental
 ```bash
-/ralph e2e-tests frontend-coach-dashboard --incremental
+/ralph e2e-tests frontend-admin-dashboard --incremental
 ```
 
 ### Backend API QA - Auth Category Only
@@ -108,7 +108,7 @@ If the workflow argument contains `+` (e.g., `rule-check-backend+rule-check-fron
 
 ```
 workflow = $1 (e.g., "design-qa")
-project = $2 (e.g., "frontend-coach-dashboard")
+project = $2 (e.g., "frontend-admin-dashboard")
 options = remaining args
 ```
 

@@ -256,28 +256,28 @@ Detailed validation checklists for API integration auditing. Referenced by the a
 
 ### Framework Compliance Gaps
 
-This section provides a generic, framework-agnostic checklist for verifying that the codebase follows established patterns from the `.pi/[framework-tier]/` directory structure. Replace `[framework-tier]` with the actual framework being audited (e.g., `nestjs`, `react`, `react-native`).
+This section provides a generic, framework-agnostic checklist for verifying that the codebase follows established patterns from the `.opencode/[framework-tier]/` directory structure. Replace `[framework-tier]` with the actual framework being audited (e.g., `nestjs`, `react`, `react-native`).
 
 #### Framework Detection Checklist
-- [ ] Framework tier directories identified in `.pi/` (e.g., nestjs, react, react-native)
+- [ ] Framework tier directories identified in `.opencode/` (e.g., nestjs, react, react-native)
 - [ ] Backend framework tier detected (check `backend/package.json` or `backend/requirements.txt`)
 - [ ] Frontend framework tier detected (check `frontend*/package.json`)
 - [ ] Mobile framework tier detected (check `mobile/package.json`)
-- [ ] Framework-specific guides directory exists at `.pi/[framework-tier]/guides/`
-- [ ] Framework-specific skills directory exists at `.pi/[framework-tier]/skills/`
-- [ ] Framework-specific agents directory exists at `.pi/[framework-tier]/agents/`
+- [ ] Framework-specific guides directory exists at `.opencode/[framework-tier]/guides/`
+- [ ] Framework-specific skills directory exists at `.opencode/[framework-tier]/skills/`
+- [ ] Framework-specific agents directory exists at `.opencode/[framework-tier]/agents/`
 
 #### Guide Compliance Gaps - Architecture & Patterns
-- [ ] Architecture patterns in code don't match `.pi/[framework-tier]/guides/architecture-overview.md`
+- [ ] Architecture patterns in code don't match `.opencode/[framework-tier]/guides/architecture-overview.md`
 - [ ] Code structure deviates from directory conventions in guides
 - [ ] Layer separation not following documented architecture (e.g., controller/service/repository)
 - [ ] Module organization inconsistent with guide recommendations
 - [ ] Naming conventions not following documented standards
 - [ ] Import patterns deviating from guide specifications
-- [ ] File organization not matching `.pi/[framework-tier]/guides/file-organization.md`
+- [ ] File organization not matching `.opencode/[framework-tier]/guides/file-organization.md`
 
 #### Guide Compliance Gaps - Best Practices
-- [ ] Code doesn't follow `.pi/[framework-tier]/guides/best-practices.md` patterns
+- [ ] Code doesn't follow `.opencode/[framework-tier]/guides/best-practices.md` patterns
 - [ ] Error handling patterns not matching documented approach
 - [ ] Logging patterns inconsistent with guide recommendations
 - [ ] Configuration management deviating from documented patterns
@@ -286,7 +286,7 @@ This section provides a generic, framework-agnostic checklist for verifying that
 - [ ] Code comments/documentation not following guide conventions
 
 #### Guide Compliance Gaps - Data Layer
-- [ ] Database patterns not following `.pi/[backend-tier]/guides/database-patterns.md`
+- [ ] Database patterns not following `.opencode/[backend-tier]/guides/database-patterns.md`
 - [ ] Entity/Model definitions missing base class inheritance
 - [ ] Repository patterns deviating from documented approach
 - [ ] Query patterns not optimized per guide recommendations
@@ -295,8 +295,8 @@ This section provides a generic, framework-agnostic checklist for verifying that
 - [ ] Index usage not following performance guidelines
 
 #### Guide Compliance Gaps - API Layer
-- [ ] Controller patterns not matching `.pi/[backend-tier]/guides/routing-and-controllers.md`
-- [ ] DTO/Serializer patterns not following `.pi/[backend-tier]/guides/validation-patterns.md`
+- [ ] Controller patterns not matching `.opencode/[backend-tier]/guides/routing-and-controllers.md`
+- [ ] DTO/Serializer patterns not following `.opencode/[backend-tier]/guides/validation-patterns.md`
 - [ ] Response format inconsistent with documented standards
 - [ ] Error response structure deviating from guide patterns
 - [ ] Pagination implementation not matching documented approach
@@ -304,38 +304,38 @@ This section provides a generic, framework-agnostic checklist for verifying that
 - [ ] API documentation (Swagger/OpenAPI) not following guide conventions
 
 #### Guide Compliance Gaps - Frontend Patterns
-- [ ] Component patterns not following `.pi/[frontend-tier]/guides/component-patterns.md`
-- [ ] State management deviating from `.pi/[frontend-tier]/guides/common-patterns.md`
-- [ ] Data fetching not following `.pi/[frontend-tier]/guides/data-fetching.md`
-- [ ] API integration not matching `.pi/[frontend-tier]/guides/api-integration.md`
-- [ ] Styling approach inconsistent with `.pi/[frontend-tier]/guides/styling-guide.md`
-- [ ] TypeScript usage deviating from `.pi/[frontend-tier]/guides/typescript-standards.md`
-- [ ] Loading/error states not following `.pi/[frontend-tier]/guides/loading-and-error-states.md`
-- [ ] Routing patterns not matching `.pi/[frontend-tier]/guides/routing-guide.md`
+- [ ] Component patterns not following `.opencode/[frontend-tier]/guides/component-patterns.md`
+- [ ] State management deviating from `.opencode/[frontend-tier]/guides/common-patterns.md`
+- [ ] Data fetching not following `.opencode/[frontend-tier]/guides/data-fetching.md`
+- [ ] API integration not matching `.opencode/[frontend-tier]/guides/api-integration.md`
+- [ ] Styling approach inconsistent with `.opencode/[frontend-tier]/guides/styling-guide.md`
+- [ ] TypeScript usage deviating from `.opencode/[frontend-tier]/guides/typescript-standards.md`
+- [ ] Loading/error states not following `.opencode/[frontend-tier]/guides/loading-and-error-states.md`
+- [ ] Routing patterns not matching `.opencode/[frontend-tier]/guides/routing-guide.md`
 
 #### Guide Compliance Gaps - Testing
-- [ ] Test patterns not following `.pi/[framework-tier]/guides/testing-guide.md`
+- [ ] Test patterns not following `.opencode/[framework-tier]/guides/testing-guide.md`
 - [ ] Test file naming conventions inconsistent with guide
 - [ ] Test organization deviating from documented structure
 - [ ] Mock patterns not following guide recommendations
 - [ ] Fixture patterns inconsistent with documented approach
-- [ ] E2E test patterns not matching `.pi/[framework-tier]/skills/e2e-testing/SKILL.md`
+- [ ] E2E test patterns not matching `.opencode/[framework-tier]/skills/e2e-testing/SKILL.md`
 
 #### Skill Compliance Gaps - Backend
-- [ ] API development not following `.pi/[backend-tier]/skills/api-development/` patterns
-- [ ] Database seeding not using `.pi/[backend-tier]/skills/database-seeding/` approach
-- [ ] Debugging approach not following `.pi/[backend-tier]/skills/debugging/` methodology
-- [ ] Code quality checks not using `.pi/[backend-tier]/skills/code-quality/` standards
-- [ ] E2E testing not following `.pi/[backend-tier]/skills/e2e-testing/` patterns
+- [ ] API development not following `.opencode/[backend-tier]/skills/api-development/` patterns
+- [ ] Database seeding not using `.opencode/[backend-tier]/skills/database-seeding/` approach
+- [ ] Debugging approach not following `.opencode/[backend-tier]/skills/debugging/` methodology
+- [ ] Code quality checks not using `.opencode/[backend-tier]/skills/code-quality/` standards
+- [ ] E2E testing not following `.opencode/[backend-tier]/skills/e2e-testing/` patterns
 
 #### Skill Compliance Gaps - Frontend
-- [ ] API integration not following `.pi/[frontend-tier]/skills/api-integration/` patterns
-- [ ] Component building not using `.pi/[frontend-tier]/skills/builders/` approach
-- [ ] Design QA not following `.pi/[frontend-tier]/skills/qa/` methodology
-- [ ] Converter patterns not using `.pi/[frontend-tier]/skills/converters/` approach
-- [ ] Debugging not following `.pi/[frontend-tier]/skills/debugging/` methodology
-- [ ] E2E testing not matching `.pi/[frontend-tier]/skills/e2e-testing/` patterns
-- [ ] Code quality not following `.pi/[frontend-tier]/skills/code-quality/` standards
+- [ ] API integration not following `.opencode/[frontend-tier]/skills/api-integration/` patterns
+- [ ] Component building not using `.opencode/[frontend-tier]/skills/builders/` approach
+- [ ] Design QA not following `.opencode/[frontend-tier]/skills/qa/` methodology
+- [ ] Converter patterns not using `.opencode/[frontend-tier]/skills/converters/` approach
+- [ ] Debugging not following `.opencode/[frontend-tier]/skills/debugging/` methodology
+- [ ] E2E testing not matching `.opencode/[frontend-tier]/skills/e2e-testing/` patterns
+- [ ] Code quality not following `.opencode/[frontend-tier]/skills/code-quality/` standards
 
 #### Agent Delegation Gaps
 - [ ] Backend implementation not delegated to `[backend-tier]/agents/backend-developer`
@@ -397,21 +397,21 @@ For each detected `[framework-tier]`, enumerate available resources:
 
 ```bash
 # List available guides
-fd -e md . .pi/[framework-tier]/guides/
+fd -e md . .opencode/[framework-tier]/guides/
 
 # List available skills
-fd -e md . .pi/[framework-tier]/skills/
+fd -e md . .opencode/[framework-tier]/skills/
 
 # List available agents
-fd -e md . .pi/[framework-tier]/agents/
+fd -e md . .opencode/[framework-tier]/agents/
 ```
 
 ### Step 3: Read Mandatory Guides
 
 Before auditing, read these guides in order:
-1. `.pi/[framework-tier]/guides/README.md` - Index of all guides
-2. `.pi/[framework-tier]/guides/best-practices.md` - Mandatory patterns
-3. `.pi/[framework-tier]/guides/architecture-overview.md` - Structure patterns
+1. `.opencode/[framework-tier]/guides/README.md` - Index of all guides
+2. `.opencode/[framework-tier]/guides/best-practices.md` - Mandatory patterns
+3. `.opencode/[framework-tier]/guides/architecture-overview.md` - Structure patterns
 
 ### Step 4: Apply Framework-Specific Checklist Items
 

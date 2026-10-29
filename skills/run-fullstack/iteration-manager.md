@@ -187,7 +187,15 @@ Compare all phases against current PRD to identify improvements.
 
 1. **Read PRD**
    ```
-   Read .project/prd/prd.pdf (or prd.md)
+   Read .project/prd/prd.md first (index: scope, roles, contracts)
+   Then load only the relevant part file(s), e.g.:
+     01-product-strategy.md
+     02-design-and-ux.md
+     03-feature-specifications.md
+     04-architecture-and-technical.md
+     05-business-and-operations.md
+     06-appendices.md
+   Fall back to prd.pdf only if the markdown edition is missing.
    Extract:
    - User flows / screens
    - Data entities / fields

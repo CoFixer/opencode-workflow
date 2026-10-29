@@ -44,7 +44,7 @@ Layout Component Mounts
     ↓
 useAuthGuard() → Read Redux state
     ↓
-Protected Route (coach/patient):
+Protected Route (admin/member):
 ├─ isLoading? → <LoadingSpinner fullScreen />
 ├─ !authenticated? → <Navigate to="/login" />
 ├─ wrong role? → <Navigate to="/correct-dashboard" />
@@ -145,18 +145,18 @@ import { AuthGuard } from '~/components/auth';
 </AuthGuard>
 
 // For protected pages - requires authentication + role
-<AuthGuard requiredRole="patient">
-  <PatientDashboard />
+<AuthGuard requiredRole="member">
+  <MemberDashboard />
 </AuthGuard>
 
-<AuthGuard requiredRole="coach">
-  <CoachDashboard />
+<AuthGuard requiredRole="admin">
+  <AdminDashboard />
 </AuthGuard>
 ```
 
 **Props**:
 - `guestOnly`: Block authenticated users (for auth pages)
-- `requiredRole`: Require specific role ('coach' | 'patient')
+- `requiredRole`: Require specific role ('admin' | 'member')
 - `fallback`: Custom loading component
 
 **See**: [auth-guards.md](./auth-guards.md) for detailed patterns
@@ -168,19 +168,19 @@ import { AuthGuard } from '~/components/auth';
 **File**: [app/lib/utils/auth.ts](../../../frontend/app/lib/utils/auth.ts)
 
 ```typescript
-import { mapToAuthUser, getHomeRouteForRole, isCoachRole } from '~/lib/utils/auth';
+import { mapToAuthUser, getHomeRouteForRole, isAdminRole } from '~/lib/utils/auth';
 
 // Map backend user to AuthUser
 const authUser = mapToAuthUser(backendUser);
 
 // Get home route for role
-getHomeRouteForRole('coach')    // → '/coach'
-getHomeRouteForRole('patient')  // → '/patient'
+getHomeRouteForRole('admin')    // → '/admin'
+getHomeRouteForRole('member')  // → '/member'
 
-// Check if role is coach
-isCoachRole('COACH')  // → true
-isCoachRole('4')      // → true
-isCoachRole('PATIENT')// → false
+// Check if role is admin
+isAdminRole('ADMIN')  // → true
+isAdminRole('4')      // → true
+isAdminRole('MEMBER')// → false
 ```
 
 ---
@@ -210,26 +210,26 @@ export default function AuthLayout() {
 
 **Protection Logic**:
 1. Not initialized → Show loading spinner
-2. Authenticated → Redirect to their home (/coach or /patient)
+2. Authenticated → Redirect to their home (/admin or /member)
 3. Not authenticated → Render login/register pages
 
 ---
 
-### Pattern 2: Protected Layout (Coach)
+### Pattern 2: Protected Layout (Admin)
 
-**File**: [app/pages/coach/layout.tsx](../../../frontend/app/pages/coach/layout.tsx)
+**File**: [app/pages/admin/layout.tsx](../../../frontend/app/pages/admin/layout.tsx)
 
 ```typescript
 import { Outlet } from "react-router";
 import { AuthGuard } from "~/components/auth";
 import { BottomNav } from "~/components/layout/bottom-nav";
 
-export default function CoachLayout() {
+export default function AdminLayout() {
   return (
-    <AuthGuard requiredRole="coach">
+    <AuthGuard requiredRole="admin">
       <div className="max-w-md mx-auto min-h-screen bg-neutral-50">
         <Outlet />
-        <BottomNav variant="coach" />
+        <BottomNav variant="admin" />
       </div>
     </AuthGuard>
   );
@@ -239,26 +239,26 @@ export default function CoachLayout() {
 **Protection Logic**:
 1. Not initialized → Show loading spinner
 2. Not authenticated → Redirect to /login
-3. Wrong role (patient) → Redirect to /patient
-4. Correct role (coach) → Render protected content
+3. Wrong role (member) → Redirect to /member
+4. Correct role (admin) → Render protected content
 
 ---
 
-### Pattern 3: Patient Layout
+### Pattern 3: Member Layout
 
-**File**: [app/pages/patient/layout.tsx](../../../frontend/app/pages/patient/layout.tsx)
+**File**: [app/pages/member/layout.tsx](../../../frontend/app/pages/member/layout.tsx)
 
 ```typescript
 import { Outlet } from "react-router";
 import { AuthGuard } from "~/components/auth";
 import { BottomNav } from "~/components/layout/bottom-nav";
 
-export default function PatientLayout() {
+export default function MemberLayout() {
   return (
-    <AuthGuard requiredRole="patient">
+    <AuthGuard requiredRole="member">
       <div className="max-w-md mx-auto min-h-screen bg-neutral-50">
         <Outlet />
-        <BottomNav variant="patient" />
+        <BottomNav variant="member" />
       </div>
     </AuthGuard>
   );
@@ -468,7 +468,7 @@ export interface AuthUser {
   id: string;
   username: string;
   name: string;
-  role: 'patient' | 'coach' | null;
+  role: 'member' | 'admin' | null;
   email?: string;
   phone?: string;
 }
@@ -511,9 +511,9 @@ interface LoginResponse {
 After implementing authentication:
 
 - [ ] Logged-in users cannot access `/login`, `/register`, etc.
-- [ ] Non-logged-in users cannot access `/coach/*` or `/patient/*`
-- [ ] Coach users redirected to `/coach` after login
-- [ ] Patient users redirected to `/patient` after login
+- [ ] Non-logged-in users cannot access `/admin/*` or `/member/*`
+- [ ] Admin users redirected to `/admin` after login
+- [ ] Member users redirected to `/member` after login
 - [ ] Page refresh maintains auth state via cookies
 - [ ] Logout clears session and redirects to login
 - [ ] No tokens stored in localStorage
@@ -544,7 +544,7 @@ After implementing authentication:
 
 ### Issue: Role check failing
 
-**Solution**: Backend may return role as string ('COACH') or number (4) - handle both.
+**Solution**: Backend may return role as string ('ADMIN') or number (4) - handle both.
 
 ---
 
@@ -559,8 +559,8 @@ After implementing authentication:
 | [authService.ts](../../../frontend/app/services/httpServices/authService.ts) | API calls |
 | [errorHandler.ts](../../../frontend/app/utils/errorHandler.ts) | 401 handling |
 | [auth/layout.tsx](../../../frontend/app/pages/auth/layout.tsx) | Auth routes protection |
-| [coach/layout.tsx](../../../frontend/app/pages/coach/layout.tsx) | Coach routes protection |
-| [patient/layout.tsx](../../../frontend/app/pages/patient/layout.tsx) | Patient routes protection |
+| [admin/layout.tsx](../../../frontend/app/pages/admin/layout.tsx) | Admin routes protection |
+| [member/layout.tsx](../../../frontend/app/pages/member/layout.tsx) | Member routes protection |
 | [auth-guards.md](./auth-guards.md) | Detailed guard patterns |
 
 ---

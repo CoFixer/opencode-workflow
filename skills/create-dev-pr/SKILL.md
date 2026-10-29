@@ -131,7 +131,7 @@ Use conventional commit style:
 | Type | Description | Example |
 |------|-------------|---------|
 | `fix:` | Bug fix | `fix: Resolve login redirect loop` |
-| `feat:` | New feature | `feat: Add coach dashboard API integration` |
+| `feat:` | New feature | `feat: Add admin dashboard API integration` |
 | `refactor:` | Code refactoring | `refactor: Simplify auth token storage` |
 | `docs:` | Documentation | `docs: Update API integration guide` |
 | `style:` | Styling changes | `style: Update button hover states` |
@@ -140,8 +140,8 @@ Use conventional commit style:
 ### Generate Title from Branch Name
 
 ```bash
-# Branch: feature/coach-dashboard-api
-# Title: feat: Coach dashboard api
+# Branch: feature/admin-dashboard-api
+# Title: feat: Admin dashboard api
 
 # Branch: fix/login-redirect
 # Title: fix: Login redirect

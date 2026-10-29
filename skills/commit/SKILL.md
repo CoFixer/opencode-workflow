@@ -37,85 +37,84 @@ $status = git status --porcelain
 if (-not $status) { throw "No changes to commit." }
 ```
 
-### 2) Detect changed packages
+### 2) Detect changed packages (generic)
 
-Determine changed roots from `git status --porcelain`:
+Do **not** hardcode package names. Discover workspace roots dynamically:
 
-- `backend/`
-- `frontend/`
-- `dashboard/`
-- `storepilot-plugin/`
-- If none match, treat scope as `monorepo`
+- Preferred: read the workspace config (`package.json` → `workspaces`, `pnpm-workspace.yaml`, `turbo.json`, `lerna.json`, `nx.json`).
+- Fallback: top-level directories containing `package.json`, `composer.json`, or `pyproject.toml`.
 
 ```powershell
 $changedFiles = ($status | ForEach-Object { $_.Substring(3) })
-$hasBackend = $changedFiles | Where-Object { $_ -like 'backend/*' }
-$hasFrontend = $changedFiles | Where-Object { $_ -like 'frontend/*' }
-$hasDashboard = $changedFiles | Where-Object { $_ -like 'dashboard/*' }
-$hasPlugin = $changedFiles | Where-Object { $_ -like 'storepilot-plugin/*' }
+$changedRoots = $changedFiles | ForEach-Object { ($_ -split '/')[0] } | Sort-Object -Unique
+$packageRoots = @($changedRoots | Where-Object {
+  (Test-Path (Join-Path $_ 'package.json')) -or
+  (Test-Path (Join-Path $_ 'composer.json')) -or
+  (Test-Path (Join-Path $_ 'pyproject.toml'))
+})
+# Empty list = repo-root change. Run only the gates that exist.
 ```
 
-### 3) bun.lock sync (only when needed)
+### 3) Lockfile sync (only when needed)
 
-Run only if **both** are true:
-- package contains `bun.lock`
+For each changed package root, run only if **both** are true:
+- the package contains a lockfile (`bun.lock`, `bun.lockb`, `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`)
 - `package.json` (or the lock itself) changed in that package
 
-Also stop if `bun` is required but not installed.
+Also stop if the required package manager is not installed.
 
 ```powershell
-function Ensure-Bun {
-  if (-not (Get-Command bun -ErrorAction SilentlyContinue)) {
-    throw "bun is required to update bun.lock, but bun is not installed/available in PATH."
-  }
-}
-
-function Sync-BunLock([string]$pkgPath) {
+function Sync-Lockfile([string]$pkgPath) {
   $pkgJsonChanged = $changedFiles | Where-Object { $_ -eq "$pkgPath/package.json" }
-  $bunLockChanged = $changedFiles | Where-Object { $_ -eq "$pkgPath/bun.lock" }
-  $hasBunLock = Test-Path (Join-Path $pkgPath 'bun.lock')
-  if ($hasBunLock -and ($pkgJsonChanged -or $bunLockChanged)) {
-    Ensure-Bun
+  if (-not $pkgJsonChanged) { return }
+
+  if (Test-Path (Join-Path $pkgPath 'bun.lock')) {
+    if (-not (Get-Command bun -ErrorAction SilentlyContinue)) {
+      throw "bun.lock exists in $pkgPath but bun is not installed."
+    }
     Push-Location $pkgPath
-    bun install
-    Pop-Location
+    try { bun install } finally { Pop-Location }
+  }
+  elseif (Test-Path (Join-Path $pkgPath 'pnpm-lock.yaml')) {
+    Push-Location $pkgPath
+    try { pnpm install --lockfile-only } finally { Pop-Location }
+  }
+  elseif (Test-Path (Join-Path $pkgPath 'yarn.lock')) {
+    Push-Location $pkgPath
+    try { yarn install --mode update-lockfile } finally { Pop-Location }
+  }
+  elseif (Test-Path (Join-Path $pkgPath 'package-lock.json')) {
+    Push-Location $pkgPath
+    try { npm install --package-lock-only } finally { Pop-Location }
   }
 }
 
-if ($hasBackend) { Sync-BunLock 'backend' }
-if ($hasFrontend) { Sync-BunLock 'frontend' }
-if ($hasDashboard) { Sync-BunLock 'dashboard' }
-if ($hasPlugin) { Sync-BunLock 'storepilot-plugin' }
+foreach ($pkg in $packageRoots) { Sync-Lockfile $pkg }
 ```
 
 ### 4) Build + typecheck gates (only for changed packages)
 
+Run the first matching script that exists in each package. Never assume script names.
+
 ```powershell
-if ($hasBackend) {
-  Push-Location backend
-  npm run type-check
-  npm run build
-  Pop-Location
+function Invoke-ScriptIfPresent([string]$pkg, [string[]]$scriptNames) {
+  $pkgJsonPath = Join-Path $pkg 'package.json'
+  if (-not (Test-Path $pkgJsonPath)) { return }
+  $pkgJson = Get-Content $pkgJsonPath -Raw | ConvertFrom-Json
+  if (-not $pkgJson.scripts) { return }
+  $available = $pkgJson.scripts.PSObject.Properties.Name
+  foreach ($name in $scriptNames) {
+    if ($available -contains $name) {
+      Push-Location $pkg
+      try { npm run $name } finally { Pop-Location }
+      return
+    }
+  }
 }
 
-if ($hasFrontend) {
-  Push-Location frontend
-  npm run typecheck
-  npm run build
-  Pop-Location
-}
-
-if ($hasDashboard) {
-  Push-Location dashboard
-  npm run typecheck
-  npm run build
-  Pop-Location
-}
-
-if ($hasPlugin) {
-  Push-Location storepilot-plugin
-  npm run build
-  Pop-Location
+foreach ($pkg in $packageRoots) {
+  Invoke-ScriptIfPresent $pkg @('type-check', 'typecheck', 'tsc')
+  Invoke-ScriptIfPresent $pkg @('build')
 }
 ```
 
@@ -134,7 +133,7 @@ git reset HEAD -- .opencode .gitmodules 2>$null
 ### 6) Create commit (Conventional Commits)
 
 - Type: `fix|feat|chore|refactor|test|docs|build|ci|perf|revert`
-- Scope: prefer `backend|frontend|dashboard|plugin|monorepo`
+- Scope: prefer the changed package root name (e.g. `backend|frontend|dashboard|plugin`) or `monorepo` when multiple roots change.
 
 If multiple packages changed, use `monorepo` scope.
 

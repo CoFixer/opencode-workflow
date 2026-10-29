@@ -267,13 +267,13 @@ const handleLogout = async () => {
 ### Protected Route Layout
 
 ```typescript
-// ~/pages/coach/layout.tsx
+// ~/pages/admin/layout.tsx
 import { Outlet } from "react-router";
 import { AuthGuard } from "~/components/auth";
 
-export default function CoachLayout() {
+export default function AdminLayout() {
   return (
-    <AuthGuard requiredRole="coach">
+    <AuthGuard requiredRole="admin">
       <Outlet />
     </AuthGuard>
   );

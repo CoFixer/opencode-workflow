@@ -19,7 +19,7 @@ Examples:
 
 If no project name provided, ask:
 ```
-What is the project name? (e.g., storepilot, my-platform)
+What is the project name? (e.g., my-platform, acme-app)
 ```
 
 Store as `$PROJECT_NAME` (lowercase, hyphenated).

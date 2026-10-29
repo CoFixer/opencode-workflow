@@ -128,10 +128,10 @@ To create a new token:
 
 **Input:**
 ```
-https://www.figma.com/design/66szKiU5yFXWIGNdbHkUGY/The-Coaching-Record-Web-Portal?node-id=16297-54644
+https://www.figma.com/design/66szKiU5yFXWIGNdbHkUGY/The-Admining-Record-Web-Portal?node-id=16297-54644
 ```
 
 **Output:**
-- Fetches page "Coach Web Portal - All Approved"
+- Fetches page "Admin Web Portal - All Approved"
 - Lists all sections with node IDs
 - Updates implementation status document

@@ -1,6 +1,6 @@
 # Loading & Error States
 
-Redux-based loading and error state handling for the ActivityCoaching application.
+Redux-based loading and error state handling for the Project application.
 
 ---
 
