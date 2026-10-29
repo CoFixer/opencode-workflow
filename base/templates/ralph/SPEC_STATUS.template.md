@@ -18,7 +18,7 @@
 ```yaml
 workflow: spec
 project: {PROJECT_NAME}
-skill: .pi/base/skills/dev/ouroboros-spec/SKILL.md
+skill: .opencode/skills/ouroboros-spec/SKILL.md
 created: {DATE}
 last_run: null
 ```

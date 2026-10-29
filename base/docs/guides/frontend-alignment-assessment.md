@@ -9,8 +9,8 @@ Checklist for evaluating React codebase alignment with project conventions. Refe
 **Purpose**: Systematically verify that the codebase adheres to patterns, conventions, and workflows documented in the framework tier.
 
 **Framework Tier Paths:**
-- **React**: `.pi/react/guides/`, `.pi/react/skills/`, `.pi/react/agents/`
-- **React Native**: `.pi/react-native/guides/`, `.pi/react-native/skills/`, `.pi/react-native/agents/`
+- **React**: `.opencode/frontend/guides/`, `.opencode/frontend/skills/`, `.opencode/frontend/agents/`
+- **React Native**: `.opencode/mobile/guides/`, `.opencode/mobile/skills/`, `.opencode/mobile/agents/`
 
 ### When to Run Assessment
 
@@ -31,31 +31,31 @@ Checklist for evaluating React codebase alignment with project conventions. Refe
 
 | Framework | Tier Path | Source Directory |
 |-----------|-----------|------------------|
-| React | `.pi/react` | `frontend*/app` or `dashboard*/app` |
-| NestJS | `.pi/nestjs` | `backend/src` |
-| React Native | `.pi/react-native` | `mobile/src` |
+| React | `.opencode/frontend` | `frontend*/app` or `dashboard*/app` |
+| NestJS | `.opencode/backend` | `backend/src` |
+| React Native | `.opencode/mobile` | `mobile/src` |
 
 **Step 2: Read Critical Guides FIRST**
 
 | Priority | Guide | Purpose |
 |----------|-------|---------|
-| **CRITICAL** | `.pi/{react|react-native}/guides/file-organization.md` | Directory structure, naming, imports |
-| **CRITICAL** | `.pi/{react|react-native}/guides/best-practices.md` | Coding standards, mandatory patterns |
-| HIGH | `.pi/{react|react-native}/guides/component-patterns.md` | Component/architecture patterns |
-| MEDIUM | `.pi/{react|react-native}/skills/README.md` | Available skills and triggers |
-| MEDIUM | `.pi/{react|react-native}/agents/README.md` | Agent capabilities and workflows |
+| **CRITICAL** | `.opencode/{react|react-native}/guides/file-organization.md` | Directory structure, naming, imports |
+| **CRITICAL** | `.opencode/{react|react-native}/guides/best-practices.md` | Coding standards, mandatory patterns |
+| HIGH | `.opencode/{react|react-native}/guides/component-patterns.md` | Component/architecture patterns |
+| MEDIUM | `.opencode/{react|react-native}/skills/README.md` | Available skills and triggers |
+| MEDIUM | `.opencode/{react|react-native}/agents/README.md` | Agent capabilities and workflows |
 
 ### Alignment Checklist Categories
 
 #### Category A: File Organization Alignment
-**Check Against**: `.pi/{react|react-native}/guides/file-organization.md`
+**Check Against**: `.opencode/{react|react-native}/guides/file-organization.md`
 
 - Components in correct directories (ui/, layout/, pages/)
 - Services in correct location (httpServices/)
 - No deep relative imports (should use `~/` alias)
 
 #### Category B: Naming Convention Alignment
-**Check Against**: `.pi/{react|react-native}/guides/file-organization.md`
+**Check Against**: `.opencode/{react|react-native}/guides/file-organization.md`
 
 | File Type | Expected Pattern |
 |-----------|------------------|
@@ -72,7 +72,7 @@ Checklist for evaluating React codebase alignment with project conventions. Refe
 - Import order: React → external libs → internal → types
 
 #### Category D: Pattern Implementation Alignment
-**Check Against**: `.pi/{react|react-native}/guides/best-practices.md`
+**Check Against**: `.opencode/{react|react-native}/guides/best-practices.md`
 
 - TypeScript strict mode enabled
 - Minimal use of `any` type
@@ -85,7 +85,7 @@ Checklist for evaluating React codebase alignment with project conventions. Refe
 - No direct API calls in components
 
 #### Category F: Skills Utilization Check
-**Check Against**: `.pi/{react|react-native}/skills/README.md`
+**Check Against**: `.opencode/{react|react-native}/skills/README.md`
 
 - Relevant skills consulted for current work
 - Skills documentation referenced when applicable
@@ -128,7 +128,7 @@ When refactoring is required, delegate to appropriate agents:
 ## Codebase Alignment Assessment Report
 
 **Date**: YYYY-MM-DD
-**Framework Tier**: .pi/{react|react-native}
+**Framework Tier**: .opencode/{react|react-native}
 **Scope**: [files/directories assessed]
 
 ### Overall Status: [ALIGNED | MINOR_MISALIGNMENT | MAJOR_MISALIGNMENT]

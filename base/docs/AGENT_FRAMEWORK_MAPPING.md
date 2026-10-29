@@ -72,23 +72,23 @@ This system automatically provides agents with framework-specific resources (gui
 
 For each framework assigned to an agent type, the system discovers:
 
-**1. Guides** ([.pi/{framework}/guides/](.pi/{framework}/guides/))
+**1. Guides** ([.opencode/{framework}/guides/](.opencode/{framework}/guides/))
 - Comprehensive patterns and best practices
 - Architecture overviews
 - Step-by-step tutorials
 - Examples: `architecture-overview.md`, `routing-and-controllers.md`, `database-integration.md`
 
-**2. Skills** ([.pi/{framework}/skills/](.pi/{framework}/skills/))
+**2. Skills** ([.opencode/{framework}/skills/](.opencode/{framework}/skills/))
 - Specialized framework skills
 - Task automation
 - Examples: `database-schema-designer`, `api-docs-generator`, `e2e-test-generator`
 
-**3. Agents** ([.pi/{framework}/agents/](.pi/{framework}/agents/))
+**3. Agents** ([.opencode/{framework}/agents/](.opencode/{framework}/agents/))
 - Framework-specific subagents
 - Deep expertise agents
 - Examples: `nestjs-expert`, `auth-route-debugger`
 
-**4. Commands** ([.pi/{framework}/commands/](.pi/{framework}/commands/))
+**4. Commands** ([.opencode/{framework}/commands/](.opencode/{framework}/commands/))
 - Framework-specific slash commands
 - Examples: `/nestjs-scaffold`, `/db-migrate`
 
@@ -118,7 +118,7 @@ Assigned Frameworks: nestjs
 
 📚 NESTJS RESOURCES:
 
-Guides (.pi/nestjs/guides/):
+Guides (.opencode/backend/guides/):
   → architecture-overview.md - NestJS four-layer architecture
   → routing-and-controllers.md - Route handling and decorators
   → services-and-repositories.md - Service patterns and data access
@@ -126,12 +126,12 @@ Guides (.pi/nestjs/guides/):
   → authentication-authorization.md - JWT guards and decorators
   (+ 7 more guides)
 
-Skills (.pi/nestjs/skills/):
+Skills (.opencode/backend/skills/):
   → database-schema-designer - Design TypeORM entities
   → api-docs-generator - Generate Swagger documentation
   → e2e-test-generator - Create E2E tests
 
-Agents (.pi/nestjs/agents/):
+Agents (.opencode/backend/agents/):
   → nestjs-expert - Deep NestJS expertise
   → auth-route-debugger - Authentication debugging
 
@@ -147,7 +147,7 @@ Reference guides for patterns, invoke skills for specialized tasks.
 
 ### agent-registry.json
 
-Central registry at [.pi/agents/agent-registry.json](.pi/agents/agent-registry.json):
+Central registry at [.opencode/agents/agent-registry.json](.opencode/agents/agent-registry.json):
 
 ```json
 {
@@ -197,7 +197,7 @@ tools: Read, Write, Edit, MultiEdit, Bash, Glob, Grep
 When implementing features, agents reference framework guides:
 
 ```typescript
-// Agent reads .pi/nestjs/guides/routing-and-controllers.md
+// Agent reads .opencode/backend/guides/routing-and-controllers.md
 // Then implements following the patterns:
 @Controller('users')
 export class UsersController extends BaseController<UsersService> {
@@ -213,7 +213,7 @@ Agents can invoke framework-specific skills:
 
 ```
 Backend-developer implementing new module:
-1. Reads .pi/nestjs/guides/architecture-overview.md
+1. Reads .opencode/backend/guides/architecture-overview.md
 2. Invokes database-schema-designer skill to create entities
 3. Implements service layer following guide patterns
 4. Invokes api-docs-generator skill to create Swagger docs
@@ -235,7 +235,7 @@ Backend-developer encounters auth issue:
 
 ### Step 1: Create Agent Markdown File
 
-Create `.pi/agents/your-agent.md`:
+Create `.opencode/agents/your-agent.md`:
 
 ```markdown
 ---
@@ -253,7 +253,7 @@ tools: Read, Write, Edit, Bash, Glob, Grep
 ## Framework Resources Available
 
 This agent automatically receives context from:
-- **NestJS**: .pi/nestjs/guides/, .pi/nestjs/skills/
+- **NestJS**: .opencode/backend/guides/, .opencode/backend/skills/
 
 Refer to these resources when implementing features.
 
@@ -263,7 +263,7 @@ Refer to these resources when implementing features.
 
 ### Step 2: Register in agent-registry.json
 
-Add to `.pi/agents/agent-registry.json`:
+Add to `.opencode/agents/agent-registry.json`:
 
 ```json
 {
@@ -279,7 +279,7 @@ Add to `.pi/agents/agent-registry.json`:
 
 ### Step 3: Document in agent-registry.json
 
-Add entry to [.pi/agents/agent-registry.json](.pi/agents/agent-registry.json):
+Add entry to [.opencode/agents/agent-registry.json](.opencode/agents/agent-registry.json):
 
 ```json
 {
@@ -326,7 +326,7 @@ yourframework/
 
 ### Step 3: Update Agent Registry
 
-Add to `.pi/agents/agent-registry.json`:
+Add to `.opencode/agents/agent-registry.json`:
 
 ```json
 {
@@ -360,7 +360,7 @@ Update existing agents or create new ones:
 
 ### Framework Context Builder
 
-Located at [.pi/hooks/lib/framework-context-builder.ts](.pi/hooks/lib/framework-context-builder.ts):
+Located at [.opencode/scripts/lib/framework-context-builder.ts](.opencode/scripts/lib/framework-context-builder.ts):
 
 **Key Functions:**
 - `discoverFrameworks(OpenCodeDir)` - Lists available framework directories
@@ -370,7 +370,7 @@ Located at [.pi/hooks/lib/framework-context-builder.ts](.pi/hooks/lib/framework-
 
 ### Agent Context Injector
 
-Located at [.pi/hooks/lib/agent-context-injector.ts](.pi/hooks/lib/agent-context-injector.ts):
+Located at [.opencode/scripts/lib/agent-context-injector.ts](.opencode/scripts/lib/agent-context-injector.ts):
 
 **Key Functions:**
 - `loadAgentRegistry()` - Loads agent-registry.json
@@ -393,14 +393,14 @@ Located at [.pi/hooks/lib/agent-context-injector.ts](.pi/hooks/lib/agent-context
    ```bash
    git submodule update --init --recursive
    ```
-4. Verify framework directory exists in `.pi/`
+4. Verify framework directory exists in `.opencode/`
 
 ### Framework Not Discovered
 
 **Symptoms:** Context shows no resources from a framework
 
 **Solutions:**
-1. Check framework directory exists: `.pi/nestjs/`, `.pi/react/`, etc.
+1. Check framework directory exists: `.opencode/backend/`, `.opencode/frontend/`, etc.
 2. Verify framework has correct structure:
    ```
    nestjs/
@@ -435,11 +435,11 @@ Located at [.pi/hooks/lib/agent-context-injector.ts](.pi/hooks/lib/agent-context
 **Solutions:**
 1. Verify TypeScript hooks are compiled:
    ```bash
-   cd .pi/hooks
+   cd .opencode/scripts
    npm install
    npx tsc
    ```
-2. Check [.pi/hooks/package.json](.pi/hooks/package.json) has dependencies
+2. Check [.opencode/scripts/package.json](.opencode/scripts/package.json) has dependencies
 3. Test resource discovery manually:
    ```typescript
    import { getFrameworkContext } from './lib/framework-context-builder';
@@ -515,7 +515,7 @@ System invokes: backend-developer
 Framework context injected: nestjs guides
 
 Agent process:
-1. Reads .pi/nestjs/guides/architecture-overview.md
+1. Reads .opencode/backend/guides/architecture-overview.md
 2. Follows four-layer architecture pattern
 3. Creates:
    - products.entity.ts (Entity layer)
@@ -536,13 +536,13 @@ System invokes: frontend-developer
 Framework context injected: react guides
 
 Agent process:
-1. Reads .pi/react/guides/component-patterns.md
+1. Reads .opencode/frontend/guides/component-patterns.md
 2. Analyzes HTML structure
 3. Creates React components:
    - LandingPage.tsx (main page)
    - Hero.tsx (hero section)
    - Features.tsx (features section)
-4. Applies TailwindCSS from .pi/react/guides/styling-guide.md
+4. Applies TailwindCSS from .opencode/frontend/guides/styling-guide.md
 5. Sets up routing with React Router v7
 ```
 
@@ -555,10 +555,10 @@ System invokes: mobile-developer
 Framework context injected: react-native guides
 
 Agent process:
-1. Reads .pi/react-native/guides/component-patterns.md
+1. Reads .opencode/mobile/guides/component-patterns.md
 2. Creates ProfileScreen.tsx
 3. Implements NativeWind styling from guides
-4. Adds navigation from .pi/react-native/guides/navigation.md
+4. Adds navigation from .opencode/mobile/guides/navigation.md
 5. Handles platform-specific code (iOS/Android)
 6. Integrates native APIs (camera, image picker)
 ```

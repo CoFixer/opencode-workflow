@@ -286,73 +286,73 @@ describe('[Resource] CRUD E2E', () => {
 });
 ```
 
-### Role-Based Access (Coach/Patient)
+### Role-Based Access (Admin/Member)
 
 ```typescript
 describe('[Resource] Role-Based Access', () => {
-    let coach: User;
-    let patient: User;
-    let otherCoach: User;
-    let coachToken: string;
-    let patientToken: string;
-    let otherCoachToken: string;
+    let admin: User;
+    let member: User;
+    let otherAdmin: User;
+    let adminToken: string;
+    let memberToken: string;
+    let otherAdminToken: string;
 
     beforeEach(async () => {
         const users = await seedTestUsers(dataSource);
-        coach = users.coach;
-        patient = users.patient;
-        otherCoach = await createTestUser(dataSource, {
-            email: 'other-coach@test.com',
+        admin = users.admin;
+        member = users.member;
+        otherAdmin = await createTestUser(dataSource, {
+            email: 'other-admin@test.com',
             password: TEST_PASSWORD,
             firstName: 'Other',
-            lastName: 'Coach',
-            role: RolesEnum.COACH,
+            lastName: 'Admin',
+            role: RolesEnum.ADMIN,
         });
 
-        coachToken = generateAccessToken(coach);
-        patientToken = generateAccessToken(patient);
-        otherCoachToken = generateAccessToken(otherCoach);
+        adminToken = generateAccessToken(admin);
+        memberToken = generateAccessToken(member);
+        otherAdminToken = generateAccessToken(otherAdmin);
 
-        // Setup coach-patient assignment if needed
+        // Setup admin-member assignment if needed
     });
 
-    it('should allow assigned coach to access patient data', async () => {
+    it('should allow assigned admin to access member data', async () => {
         const response = await request(app.getHttpServer())
-            .get(`/[resource]/patient/${patient.id}`)
-            .set(authHeader(coachToken))
+            .get(`/[resource]/member/${member.id}`)
+            .set(authHeader(adminToken))
             .expect(200);
 
         expect(response.body.success).toBe(true);
     });
 
-    it('should deny unassigned coach access', async () => {
+    it('should deny unassigned admin access', async () => {
         await request(app.getHttpServer())
-            .get(`/[resource]/patient/${patient.id}`)
-            .set(authHeader(otherCoachToken))
+            .get(`/[resource]/member/${member.id}`)
+            .set(authHeader(otherAdminToken))
             .expect(403);
     });
 
-    it('should allow patient to access own data', async () => {
+    it('should allow member to access own data', async () => {
         const response = await request(app.getHttpServer())
             .get(`/[resource]/my-data`)
-            .set(authHeader(patientToken))
+            .set(authHeader(memberToken))
             .expect(200);
 
         expect(response.body.success).toBe(true);
     });
 
-    it('should deny patient access to other patient data', async () => {
-        const otherPatient = await createTestUser(dataSource, {
-            email: 'other-patient@test.com',
+    it('should deny member access to other member data', async () => {
+        const otherMember = await createTestUser(dataSource, {
+            email: 'other-member@test.com',
             password: TEST_PASSWORD,
             firstName: 'Other',
-            lastName: 'Patient',
-            role: RolesEnum.PATIENT,
+            lastName: 'Member',
+            role: RolesEnum.MEMBER,
         });
 
         await request(app.getHttpServer())
-            .get(`/[resource]/patient/${otherPatient.id}`)
-            .set(authHeader(patientToken))
+            .get(`/[resource]/member/${otherMember.id}`)
+            .set(authHeader(memberToken))
             .expect(403);
     });
 });
@@ -410,12 +410,12 @@ import {
 
 // Create single user
 const admin = await createTestUser(dataSource, testUsers.admin);
-const coach = await createTestUser(dataSource, testUsers.coach);
-const patient = await createTestUser(dataSource, testUsers.patient);
+const admin = await createTestUser(dataSource, testUsers.admin);
+const member = await createTestUser(dataSource, testUsers.member);
 
 // Create all users at once
 const users = await seedTestUsers(dataSource);
-// users.admin, users.coach, users.patient, users.user
+// users.admin, users.admin, users.member, users.user
 
 // Custom user
 const customUser = await createTestUser(dataSource, {
@@ -423,7 +423,7 @@ const customUser = await createTestUser(dataSource, {
     password: TEST_PASSWORD,
     firstName: 'Custom',
     lastName: 'User',
-    role: RolesEnum.COACH,
+    role: RolesEnum.ADMIN,
 });
 ```
 
@@ -630,15 +630,15 @@ describe('Exercises E2E Tests', () => {
     describe('Exercise CRUD (Admin Only)', () => {
         let adminUser: User;
         let adminToken: string;
-        let coachUser: User;
-        let coachToken: string;
+        let adminUser: User;
+        let adminToken: string;
 
         beforeEach(async () => {
             const users = await seedTestUsers(dataSource);
             adminUser = users.admin;
-            coachUser = users.coach;
+            adminUser = users.admin;
             adminToken = generateAccessToken(adminUser);
-            coachToken = generateAccessToken(coachUser);
+            adminToken = generateAccessToken(adminUser);
         });
 
         describe('POST /exercises', () => {
@@ -661,7 +661,7 @@ describe('Exercises E2E Tests', () => {
             it('should deny non-admin users', async () => {
                 await request(app.getHttpServer())
                     .post('/exercises')
-                    .set(authHeader(coachToken))
+                    .set(authHeader(adminToken))
                     .send({
                         title: 'Push Ups',
                         description: 'Basic push up exercise',
@@ -685,7 +685,7 @@ describe('Exercises E2E Tests', () => {
 
                 const response = await request(app.getHttpServer())
                     .get('/exercises')
-                    .set(authHeader(coachToken))
+                    .set(authHeader(adminToken))
                     .expect(200);
 
                 expect(response.body.success).toBe(true);
@@ -695,7 +695,7 @@ describe('Exercises E2E Tests', () => {
             it('should filter by category', async () => {
                 const response = await request(app.getHttpServer())
                     .get('/exercises/category/STRENGTH')
-                    .set(authHeader(coachToken))
+                    .set(authHeader(adminToken))
                     .expect(200);
 
                 expect(response.body.success).toBe(true);
@@ -703,17 +703,17 @@ describe('Exercises E2E Tests', () => {
         });
     });
 
-    describe('Exercise Prescriptions (Coach to Patient)', () => {
-        let coach: User;
-        let patient: User;
-        let coachToken: string;
+    describe('Exercise Prescriptions (Admin to Member)', () => {
+        let admin: User;
+        let member: User;
+        let adminToken: string;
         let exerciseId: string;
 
         beforeEach(async () => {
             const users = await seedTestUsers(dataSource);
-            coach = users.coach;
-            patient = users.patient;
-            coachToken = generateAccessToken(coach);
+            admin = users.admin;
+            member = users.member;
+            adminToken = generateAccessToken(admin);
 
             // Create an exercise
             const adminToken = generateAccessToken(users.admin);
@@ -727,15 +727,15 @@ describe('Exercises E2E Tests', () => {
                 });
             exerciseId = exerciseResponse.body.data.id;
 
-            // TODO: Setup coach-patient assignment
+            // TODO: Setup admin-member assignment
         });
 
-        it('should create prescription for assigned patient', async () => {
+        it('should create prescription for assigned member', async () => {
             const response = await request(app.getHttpServer())
                 .post('/exercises/prescriptions')
-                .set(authHeader(coachToken))
+                .set(authHeader(adminToken))
                 .send({
-                    patientId: patient.id,
+                    memberId: member.id,
                     exerciseId: exerciseId,
                     sets: 3,
                     reps: 10,
@@ -744,24 +744,24 @@ describe('Exercises E2E Tests', () => {
                 .expect(201);
 
             expect(response.body.success).toBe(true);
-            expect(response.body.data.patientId).toBe(patient.id);
+            expect(response.body.data.memberId).toBe(member.id);
         });
 
-        it('should get patient prescriptions', async () => {
+        it('should get member prescriptions', async () => {
             // Create prescription first
             await request(app.getHttpServer())
                 .post('/exercises/prescriptions')
-                .set(authHeader(coachToken))
+                .set(authHeader(adminToken))
                 .send({
-                    patientId: patient.id,
+                    memberId: member.id,
                     exerciseId: exerciseId,
                     sets: 3,
                     reps: 10,
                 });
 
             const response = await request(app.getHttpServer())
-                .get(`/exercises/prescriptions/patient/${patient.id}`)
-                .set(authHeader(coachToken))
+                .get(`/exercises/prescriptions/member/${member.id}`)
+                .set(authHeader(adminToken))
                 .expect(200);
 
             expect(response.body.success).toBe(true);
@@ -817,12 +817,12 @@ describe('Exercises E2E Tests', () => {
 ### For Role-Based Endpoints
 
 - [ ] Admin can access admin routes
-- [ ] Coach can access coach routes
-- [ ] Patient can access patient routes
-- [ ] Coach can access assigned patient data
-- [ ] Coach cannot access unassigned patient data
-- [ ] Patient can access own data
-- [ ] Patient cannot access other patient data
+- [ ] Admin can access admin routes
+- [ ] Member can access member routes
+- [ ] Admin can access assigned member data
+- [ ] Admin cannot access unassigned member data
+- [ ] Member can access own data
+- [ ] Member cannot access other member data
 
 ---
 

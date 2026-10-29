@@ -5,7 +5,7 @@ argument-hint: "[error message or symptom description]"
 
 # /debug
 
-Help me debug an issue in the StorePilot project.
+Help me debug an issue in this project.
 
 ## Context
 

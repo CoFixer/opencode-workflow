@@ -15,7 +15,7 @@ You are a project initialization assistant. Your task is to set up a new project
 If $ARGUMENTS is provided, use it as the project name. Otherwise, ask the user:
 
 ```
-What is the project name? (e.g., myapp, coaching-platform)
+What is the project name? (e.g., myapp, domain-platform)
 This will be used for the config repo: <project-name>-OpenCode
 ```
 

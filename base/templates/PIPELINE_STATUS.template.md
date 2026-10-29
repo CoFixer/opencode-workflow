@@ -67,7 +67,7 @@ last_run: null
 tech_stack:
   backend: null          # nestjs
   frontends: []          # [react] | [react-native] | [react, react-native]
-  dashboards: []         # [admin] | [coach] | [admin, coach]
+  dashboards: []         # [admin] | [admin] | [admin, admin]
 has_html_prototypes: false
 has_prd: false
 ```

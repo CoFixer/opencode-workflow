@@ -85,7 +85,7 @@ Scope:    {all | frontend | backend}
 Read all project documentation to establish the baseline:
 
 ```
-.project/prd/prd.pdf              → Required features and screens
+.project/prd/prd.md              → PRD index; then relevant part files 01–06
 .project/docs/PROJECT_DESIGN_GUIDELINES.md → Design system rules
 .project/docs/PROJECT_API.md       → API endpoint specifications
 .project/docs/PROJECT_API_INTEGRATION.md → Frontend-API mapping

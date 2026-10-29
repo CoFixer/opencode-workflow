@@ -67,9 +67,27 @@ Agents are specialized roles for complex tasks:
    - feature-dev → gap-finder → gap-fixer → code-review → commit-workflow
 
 4. **Reference guides**
-   - Backend patterns → `.pi/backend/guides/`
+   - Backend patterns → `.opencode/backend/guides/`
    - Project specs → `.project/docs/`
-    - OpenCode workflows → `.opencode/guides/`
+   - OpenCode workflows → `.opencode/guides/`
+
+## Generic vs project-specific
+
+Keep the submodule reusable:
+
+| Belongs in `.opencode/` | Belongs in `.project/` |
+|-------------------------|------------------------|
+| Skills, agents, prompts, generic guides | Product requirements (`prd/`) |
+| Framework patterns | Architecture, API, database docs (`docs/`) |
+| Workflow templates | Status, gaps, traceability (`status/`) |
+| Empty/generic config templates | Decisions, preferences (`memory/`) |
+| Hooks and scripts | Visual prototypes (`resources/`) |
+
+Rules:
+- Never hardcode a project name, package list, port, route, or entity in `.opencode/`.
+- Detect packages from the workspace config at runtime (see `skills/commit/SKILL.md`).
+- If a workflow needs project facts, read them from `.project/docs/` instead of embedding them.
+- `.opencode/base/settings.json` is a template; project values are supplied by the host project.
 
 ## Adding New Skills
 

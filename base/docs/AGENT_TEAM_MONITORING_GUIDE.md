@@ -1,4 +1,4 @@
-﻿# Agent & Team Monitoring Guide
+# Agent & Team Monitoring Guide
 
 How to monitor individual agents and agent teams while they work in OpenCode.
 
@@ -190,7 +190,7 @@ Mark task #3 as completed
 
 Tasks are stored at:
 ```
-~/.pi/tasks/{team-name}/
+~/.opencode/tasks/{team-name}/
 ```
 
 ---
@@ -214,7 +214,7 @@ Key points:
 
 Team member info is stored at:
 ```
-~/.pi/teams/{team-name}/config.json
+~/.opencode/teams/{team-name}/config.json
 ```
 
 Contains:
@@ -311,7 +311,7 @@ Share a task list across sessions with an environment variable:
 CLAUDE_CODE_TASK_LIST_ID=my-project OpenCode
 ```
 
-This uses `~/.pi/tasks/my-project/` for all sessions, letting you pick up where you left off.
+This uses `~/.opencode/tasks/my-project/` for all sessions, letting you pick up where you left off.
 
 ---
 
@@ -328,7 +328,7 @@ This uses `~/.pi/tasks/my-project/` for all sessions, letting you pick up where 
 
 Subagent conversations are stored at:
 ```
-~/.pi/projects/{project}/{sessionId}/subagents/agent-{agentId}.jsonl
+~/.opencode/projects/{project}/{sessionId}/subagents/agent-{agentId}.jsonl
 ```
 
 Read these to understand what an agent did after it completes.

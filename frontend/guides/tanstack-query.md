@@ -259,13 +259,13 @@ export function ExerciseSummary() {
 import {
   useTodaySurveyStatus,
   useTodayExerciseSummary,
-  useNextMeetingForPatient
+  useNextMeetingForMember
 } from "~/services/httpServices"
 
-export function PatientDashboard() {
+export function MemberDashboard() {
   const { data: survey, isLoading: surveyLoading } = useTodaySurveyStatus();
   const { data: exercise, isLoading: exerciseLoading } = useTodayExerciseSummary();
-  const { data: meeting, isLoading: meetingLoading } = useNextMeetingForPatient();
+  const { data: meeting, isLoading: meetingLoading } = useNextMeetingForMember();
 
   const isLoading = surveyLoading || exerciseLoading || meetingLoading;
 

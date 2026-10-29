@@ -73,10 +73,10 @@ Determine how to filter Notion tickets to this project only:
    - If available → use it in Step 4 to filter by the `Project` relation property (most accurate, uses unique Notion page ID)
 2. **Fallback** (only if `NOTION_PROJECT_ID` was not provided despite being asked):
    - Derive the project name from the working directory folder name:
-     - Get the last segment of the path (e.g., `activitycoaching`)
+     - Get the last segment of the path (e.g., `activitydomain`)
      - Split on camelCase boundaries and common separators (hyphens, underscores)
      - Capitalize each word and join with spaces
-     - Example: `activitycoaching` → `Activity Coaching`, `my-project` → `My Project`
+     - Example: `activitydomain` → `My Project`, `my-project` → `My Project`
    - Use this name in Step 4 to filter by `App / Dashboard` multi_select (less accurate — multiple projects may share the same tag)
 
 ---
@@ -196,7 +196,7 @@ Combine tasks from both sources into a single list. Remove duplicates by:
 Output a plain numbered list:
 
 ```
-1. Setup activity coaching project
+1. Setup activity domain project
 2. Design login page
 3. Finish auth module
 ```

@@ -1,6 +1,6 @@
 # TypeScript Standards
 
-TypeScript best practices for type safety and maintainability in the ActivityCoaching frontend.
+TypeScript best practices for type safety and maintainability in the Project frontend.
 
 ---
 

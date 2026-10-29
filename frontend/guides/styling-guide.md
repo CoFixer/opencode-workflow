@@ -1,6 +1,6 @@
 # Styling Guide
 
-Modern styling patterns using Tailwind CSS 4, Shadcn/UI, and CSS variables for the ActivityCoaching application.
+Modern styling patterns using Tailwind CSS 4, Shadcn/UI, and CSS variables for the Project application.
 
 ---
 

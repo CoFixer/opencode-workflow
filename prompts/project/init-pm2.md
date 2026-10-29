@@ -145,7 +145,7 @@ function discoverServices() {
     .forEach(folder => {
       const packagePath = path.join(rootDir, folder, 'package.json');
       if (fs.existsSync(packagePath)) {
-        // Extract dashboard name (e.g., 'coach' from 'frontend-coach-dashboard')
+        // Extract dashboard name (e.g., 'admin' from 'frontend-admin-dashboard')
         const dashboardName = folder.replace('frontend-', '').replace('-dashboard', '');
         apps.push({
           name: dashboardName,

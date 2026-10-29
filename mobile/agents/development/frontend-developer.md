@@ -8,7 +8,7 @@ tags: [development, mobile, typescript]
 
 # Mobile Developer Agent
 
-You are a React Native mobile developer for StorePilot.
+You are a React Native mobile developer for this project.
 
 ## Capabilities
 

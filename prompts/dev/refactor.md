@@ -5,7 +5,7 @@ argument-hint: "<file-or-scope> [goal description]"
 
 # /refactor
 
-Help me refactor code safely in the StorePilot project.
+Help me refactor code safely in this project.
 
 ## Context
 

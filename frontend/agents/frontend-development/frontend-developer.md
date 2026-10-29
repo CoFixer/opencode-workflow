@@ -1,6 +1,6 @@
 ﻿---
 name: frontend-developer
-description: Use this agent for frontend development tasks including analyzing project documentation, mapping APIs to pages, updating API integration docs, and creating Playwright E2E tests. This agent reads PROJECT_KNOWLEDGE, PROJECT_API, and PROJECT_API_INTEGRATION to understand the system, then implements frontend features with proper testing.\n\nExamples:\n- <example>\n  Context: User wants to integrate backend APIs into a frontend page\n  user: "Integrate the exercise APIs into the patient exercise page"\n  assistant: "I'll use the frontend-developer agent to analyze the APIs and implement the integration"\n  <commentary>\n  API integration requires reading PROJECT_API docs and updating PROJECT_API_INTEGRATION with implementation details.\n  </commentary>\n  </example>\n- <example>\n  Context: User wants to update API integration documentation\n  user: "Update the API integration docs to show which endpoints the coach dashboard uses"\n  assistant: "Let me use the frontend-developer agent to analyze and update PROJECT_API_INTEGRATION.md"\n  <commentary>\n  Documentation updates require analyzing existing pages and mapping them to their required API endpoints.\n  </commentary>\n  </example>\n- <example>\n  Context: User wants E2E tests for a completed feature\n  user: "Create Playwright tests for the patient signup flow"\n  assistant: "I'll use the frontend-developer agent to create E2E tests following the Page Object Model pattern"\n  <commentary>\n  E2E tests should use the existing Playwright infrastructure with Page Objects, fixtures, and utilities.\n  </commentary>\n  </example>
+description: Use this agent for frontend development tasks including analyzing project documentation, mapping APIs to pages, updating API integration docs, and creating Playwright E2E tests. This agent reads PROJECT_KNOWLEDGE, PROJECT_API, and PROJECT_API_INTEGRATION to understand the system, then implements frontend features with proper testing.\n\nExamples:\n- <example>\n  Context: User wants to integrate backend APIs into a frontend page\n  user: "Integrate the exercise APIs into the member exercise page"\n  assistant: "I'll use the frontend-developer agent to analyze the APIs and implement the integration"\n  <commentary>\n  API integration requires reading PROJECT_API docs and updating PROJECT_API_INTEGRATION with implementation details.\n  </commentary>\n  </example>\n- <example>\n  Context: User wants to update API integration documentation\n  user: "Update the API integration docs to show which endpoints the admin dashboard uses"\n  assistant: "Let me use the frontend-developer agent to analyze and update PROJECT_API_INTEGRATION.md"\n  <commentary>\n  Documentation updates require analyzing existing pages and mapping them to their required API endpoints.\n  </commentary>\n  </example>\n- <example>\n  Context: User wants E2E tests for a completed feature\n  user: "Create Playwright tests for the member signup flow"\n  assistant: "I'll use the frontend-developer agent to create E2E tests following the Page Object Model pattern"\n  <commentary>\n  E2E tests should use the existing Playwright infrastructure with Page Objects, fixtures, and utilities.\n  </commentary>\n  </example>
 model: opus
 color: cyan
 ---
@@ -129,7 +129,7 @@ You are an expert frontend developer specializing in React/TypeScript applicatio
    ```typescript
    import { test, expect } from '@playwright/test';
    import { FeaturePage } from '../../pages/feature/feature.page';
-   import { authenticateAsPatient, authenticateAsCoach } from '../../fixtures/auth.fixture';
+   import { authenticateAsMember, authenticateAsAdmin } from '../../fixtures/auth.fixture';
    import { mockFeatureApi, setupCommonMocks } from '../../utils/api-mocking';
 
    test.describe('Feature Name', () => {
@@ -142,7 +142,7 @@ You are an expert frontend developer specializing in React/TypeScript applicatio
 
      test.describe('Page Load', () => {
        test('should display page correctly when authenticated', async ({ page }) => {
-         await authenticateAsPatient(page);
+         await authenticateAsMember(page);
          await mockFeatureApi(page);
          await featurePage.navigate();
          await featurePage.expectPageLoaded();
@@ -156,7 +156,7 @@ You are an expert frontend developer specializing in React/TypeScript applicatio
 
      test.describe('Form Submission', () => {
        test('should submit form successfully', async ({ page }) => {
-         await authenticateAsPatient(page);
+         await authenticateAsMember(page);
          await mockFeatureApi(page);
          await featurePage.navigate();
          await featurePage.fillForm({ value: 'test' });
@@ -165,7 +165,7 @@ You are an expert frontend developer specializing in React/TypeScript applicatio
        });
 
        test('should show validation errors for invalid input', async ({ page }) => {
-         await authenticateAsPatient(page);
+         await authenticateAsMember(page);
          await featurePage.navigate();
          await featurePage.submit();
          await expect(page.getByText('Required field')).toBeVisible();
@@ -174,7 +174,7 @@ You are an expert frontend developer specializing in React/TypeScript applicatio
 
      test.describe('Error Handling', () => {
        test('should display error message on API failure', async ({ page }) => {
-         await authenticateAsPatient(page);
+         await authenticateAsMember(page);
          await mockApiError(page, '/api/feature', 500);
          await featurePage.navigate();
          await featurePage.expectErrorToast();
@@ -311,13 +311,13 @@ All tests use Page Object Model for maintainability:
 test/tests/
 ├── auth/
 │   ├── login.spec.ts
-│   ├── patient-signup.spec.ts
-│   └── coach-signup.spec.ts
-├── coach/
-│   ├── patients.spec.ts
+│   ├── member-signup.spec.ts
+│   └── admin-signup.spec.ts
+├── admin/
+│   ├── members.spec.ts
 │   ├── calendar.spec.ts
 │   └── chat.spec.ts
-└── patient/
+└── member/
     ├── exercise.spec.ts
     ├── survey.spec.ts
     └── chat.spec.ts
@@ -326,13 +326,13 @@ test/tests/
 ### Authentication in Tests
 
 ```typescript
-import { authenticateAsPatient, authenticateAsCoach, authenticateViaStorage } from '../../fixtures/auth.fixture';
+import { authenticateAsMember, authenticateAsAdmin, authenticateViaStorage } from '../../fixtures/auth.fixture';
 
 // Full authentication flow (slower)
-await authenticateAsPatient(page);
+await authenticateAsMember(page);
 
 // Storage-based auth (faster, recommended)
-await authenticateViaStorage(page, testUsers.patient);
+await authenticateViaStorage(page, testUsers.member);
 
 // Check auth state
 const isLoggedIn = await isAuthenticated(page);

@@ -130,7 +130,7 @@ The backend consists of **25 feature modules** following consistent patterns:
 ### Infrastructure
 - **auth** - JWT authentication and authorization
 - **cache** - Redis caching abstraction
-- **cloudinary** - Image upload integration
+- **object-storage** - R2/RustFS file & image upload integration
 - **mail** - Email notification system
 - **sms** - SMS notification integration
 
@@ -184,6 +184,6 @@ async getOrderStats(startDate: Date, endDate: Date) {
 
 ---
 
-**Guide Source**: Merged from [nestjs-starter-kit](https://github.com/CoFixer/nestjs-starter-kit) and activitycoaching project
+**Guide Source**: Merged from [nestjs-starter-kit](https://github.com/CoFixer/nestjs-starter-kit) and activitydomain project
 **Last Updated**: 2026-01-19
 **Total Guides**: 21 guides + 5 workflows

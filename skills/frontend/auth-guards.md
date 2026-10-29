@@ -26,7 +26,7 @@ Protects private routes - redirects unauthenticated users to login and enforces 
 ```typescript
 interface AuthGuardProps {
   children: React.ReactNode;
-  requiredRole?: 'coach' | 'patient';  // Strict role matching
+  requiredRole?: 'admin' | 'member';  // Strict role matching
   guestOnly?: boolean;                  // For auth pages
   fallback?: React.ReactNode;           // Loading spinner
 }
@@ -40,14 +40,14 @@ interface AuthGuardProps {
   <LoginPage />
 </AuthGuard>
 
-// Patient-only pages
-<AuthGuard requiredRole="patient">
-  <PatientDashboard />
+// Member-only pages
+<AuthGuard requiredRole="member">
+  <MemberDashboard />
 </AuthGuard>
 
-// Coach-only pages
-<AuthGuard requiredRole="coach">
-  <CoachDashboard />
+// Admin-only pages
+<AuthGuard requiredRole="admin">
+  <AdminDashboard />
 </AuthGuard>
 ```
 
@@ -73,38 +73,38 @@ export default function AuthLayout() {
 }
 ```
 
-### Patient Layout (Role Required)
+### Member Layout (Role Required)
 
 ```typescript
-// pages/patient/layout.tsx
+// pages/member/layout.tsx
 import { Outlet } from "react-router";
 import { AuthGuard } from "~/components/auth";
 
-export default function PatientLayout() {
+export default function MemberLayout() {
   return (
-    <AuthGuard requiredRole="patient">
+    <AuthGuard requiredRole="member">
       <div className="...">
         <Outlet />
-        <BottomNav variant="patient" />
+        <BottomNav variant="member" />
       </div>
     </AuthGuard>
   );
 }
 ```
 
-### Coach Layout (Role Required)
+### Admin Layout (Role Required)
 
 ```typescript
-// pages/coach/layout.tsx
+// pages/admin/layout.tsx
 import { Outlet } from "react-router";
 import { AuthGuard } from "~/components/auth";
 
-export default function CoachLayout() {
+export default function AdminLayout() {
   return (
-    <AuthGuard requiredRole="coach">
+    <AuthGuard requiredRole="admin">
       <div className="...">
         <Outlet />
-        <BottomNav variant="coach" />
+        <BottomNav variant="admin" />
       </div>
     </AuthGuard>
   );
@@ -119,8 +119,8 @@ export default function CoachLayout() {
 |------------|--------------|-----------|------------------|------------|
 | Public (/, /about) | None | N/A | N/A | N/A |
 | Auth (/login, /signup) | `guestOnly` | Spinner | Allow | N/A |
-| Coach (/coach/*) | `requiredRole="coach"` | Spinner | → /login | → /patient |
-| Patient (/patient/*) | `requiredRole="patient"` | Spinner | → /login | → /coach |
+| Admin (/admin/*) | `requiredRole="admin"` | Spinner | → /login | → /member |
+| Member (/member/*) | `requiredRole="member"` | Spinner | → /login | → /admin |
 
 ---
 
@@ -154,14 +154,14 @@ interface AuthState {
 ### Available Functions
 
 ```typescript
-// Check if role is coach
-isCoachRole(role: string | number | undefined): boolean
+// Check if role is admin
+isAdminRole(role: string | number | undefined): boolean
 
 // Map backend user to AuthUser
 mapToAuthUser(backendUser: BackendUser): AuthUser
 
 // Get home route for role
-getHomeRouteForRole(role: UserRole): string  // '/coach' or '/patient'
+getHomeRouteForRole(role: UserRole): string  // '/admin' or '/member'
 
 // Check if path is public auth path
 isPublicAuthPath(pathname: string): boolean

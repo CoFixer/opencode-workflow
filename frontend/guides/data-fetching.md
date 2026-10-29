@@ -1,6 +1,6 @@
 # Data Fetching Patterns
 
-Data fetching using Axios HttpService with Redux Toolkit async thunks for the ActivityCoaching application.
+Data fetching using Axios HttpService with Redux Toolkit async thunks for the Project application.
 
 ---
 

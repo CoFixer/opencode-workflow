@@ -119,7 +119,7 @@ Randomly select one domain from the following list. Each domain comes with assoc
 
 | Domain | Example App Types | Common User Types |
 |--------|-------------------|-------------------|
-| Healthcare | Telemedicine, Patient Management, Fitness Tracking | Patient, Doctor, Admin, Caregiver |
+| Healthcare | Telemedicine, Member Management, Fitness Tracking | Member, Doctor, Admin, Caregiver |
 | Education | LMS, Tutoring Platform, Course Marketplace | Student, Teacher, Parent, Admin |
 | E-commerce | Marketplace, B2B Platform, Subscription Box | Buyer, Seller, Admin, Delivery Partner |
 | Social | Community Platform, Dating App, Professional Network | User, Creator, Moderator, Admin |
@@ -474,7 +474,7 @@ Running `/generate-random-project`:
 - **Project Name:** HealthBridge Pro
 - **Domain:** Healthcare
 - **Difficulty:** Level 4 (Complex)
-- **User Types:** 4 types (Patient, Doctor, Caregiver, Admin)
+- **User Types:** 4 types (Member, Doctor, Caregiver, Admin)
 - **Main Features:** 12 features
 - **Integrations:** 4 services (Google Auth, Stripe, Twilio, Google Maps)
 

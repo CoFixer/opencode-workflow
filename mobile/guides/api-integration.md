@@ -6,8 +6,8 @@ This guide maps frontend screens to their required backend API endpoints. Use th
 
 - [Quick Reference](#quick-reference)
 - [Public/Auth Routes](#publicauth-routes)
-- [Coach Routes](#coach-routes)
-- [Patient Routes](#patient-routes)
+- [Admin Routes](#admin-routes)
+- [Member Routes](#member-routes)
 - [Shared/Common APIs](#sharedcommon-apis)
 - [Implementation Patterns](#implementation-patterns)
 - [After Successful Integration](#after-successful-integration)
@@ -19,8 +19,8 @@ This guide maps frontend screens to their required backend API endpoints. Use th
 | Route Group | Screens | Total API Calls |
 |-------------|---------|-----------------|
 | Public/Auth | 8 | ~6 endpoints |
-| Coach | 10 | ~25 endpoints |
-| Patient | 10 | ~22 endpoints |
+| Admin | 10 | ~25 endpoints |
+| Member | 10 | ~22 endpoints |
 | Shared | - | 5 endpoints |
 
 **Full API documentation:** [PROJECT_API.md](../../../.project/docs/PROJECT_API.md)
@@ -53,78 +53,78 @@ This guide maps frontend screens to their required backend API endpoints. Use th
 | Request OTP | POST | `/auth/forgot-password` | Send password reset OTP |
 | Reset Password | POST | `/auth/reset-password` | Reset password with OTP |
 
-### Patient Signup (`/signup/patient`)
-**Component:** `pages/auth/signup/patient.tsx`
+### Member Signup (`/signup/member`)
+**Component:** `pages/auth/signup/member.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
-| Register | POST | `/users` | Create patient (role: PATIENT) |
+| Register | POST | `/users` | Create member (role: MEMBER) |
 
-### Coach Signup (`/signup/coach`)
-**Component:** `pages/auth/signup/coach.tsx`
+### Admin Signup (`/signup/admin`)
+**Component:** `pages/auth/signup/admin.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
-| Register | POST | `/users` | Create coach (role: COACH) |
+| Register | POST | `/users` | Create admin (role: ADMIN) |
 
 ---
 
-## Coach Routes
+## Admin Routes
 
-### Coach Dashboard (`/coach`)
-**Component:** `pages/coach/home.tsx`
+### Admin Dashboard (`/admin`)
+**Component:** `pages/admin/home.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
-| Today's Meetings | GET | `/meetings/coach/today` | Get today's sessions |
+| Today's Meetings | GET | `/meetings/admin/today` | Get today's sessions |
 | Check Login | GET | `/auth/check-login` | Verify authentication |
 
-### Patient List (`/coach/patients`)
-**Component:** `pages/coach/patients.tsx`
+### Member List (`/admin/members`)
+**Component:** `pages/admin/members.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
-| Get Patients | GET | `/users?role=PATIENT` | List coach's patients |
+| Get Members | GET | `/users?role=MEMBER` | List admin's members |
 
-### Patient Detail (`/coach/patient/:id`)
-**Component:** `pages/coach/patient-detail.tsx`
-
-| API | Method | Endpoint | Purpose |
-|-----|--------|----------|---------|
-| Get Patient | GET | `/users/:id` | Get patient info |
-| Get Prescriptions | GET | `/exercise-prescriptions/patient/:patientId` | Get patient's exercises |
-
-### Patient Exercise History (`/coach/patient/:id/exercise-history`)
-**Component:** `pages/coach/patient-exercise-history.tsx`
+### Member Detail (`/admin/member/:id`)
+**Component:** `pages/admin/member-detail.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
-| Exercise History | GET | `/exercise-days/patient/:patientId/history` | Get exercise day summaries |
-| Exercise Logs | GET | `/exercise-logs/patient/:patientId/range` | Get detailed exercise logs |
+| Get Member | GET | `/users/:id` | Get member info |
+| Get Prescriptions | GET | `/exercise-prescriptions/member/:memberId` | Get member's exercises |
 
-### Patient Survey History (`/coach/patient/:id/survey-history`)
-**Component:** `pages/coach/patient-survey-history.tsx`
-
-| API | Method | Endpoint | Purpose |
-|-----|--------|----------|---------|
-| Survey History | GET | `/surveys/patient/:patientId/history` | Get patient's surveys |
-
-### Coach Calendar (`/coach/calendar`)
-**Component:** `pages/coach/calendar.tsx`
+### Member Exercise History (`/admin/member/:id/exercise-history`)
+**Component:** `pages/admin/member-exercise-history.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
-| Get Meetings | GET | `/meetings/coach/range` | Get meetings for date range |
+| Exercise History | GET | `/exercise-days/member/:memberId/history` | Get exercise day summaries |
+| Exercise Logs | GET | `/exercise-logs/member/:memberId/range` | Get detailed exercise logs |
 
-### Chat List (`/coach/chat`)
-**Component:** `pages/coach/chat.tsx`
+### Member Survey History (`/admin/member/:id/survey-history`)
+**Component:** `pages/admin/member-survey-history.tsx`
+
+| API | Method | Endpoint | Purpose |
+|-----|--------|----------|---------|
+| Survey History | GET | `/surveys/member/:memberId/history` | Get member's surveys |
+
+### Admin Calendar (`/admin/calendar`)
+**Component:** `pages/admin/calendar.tsx`
+
+| API | Method | Endpoint | Purpose |
+|-----|--------|----------|---------|
+| Get Meetings | GET | `/meetings/admin/range` | Get meetings for date range |
+
+### Chat List (`/admin/chat`)
+**Component:** `pages/admin/chat.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
 | Get Rooms | GET | `/chat/rooms` | Get all chat rooms |
 
-### Chat Detail (`/coach/chat/:id`)
-**Component:** `pages/coach/chat-detail.tsx`
+### Chat Detail (`/admin/chat/:id`)
+**Component:** `pages/admin/chat-detail.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
@@ -133,15 +133,15 @@ This guide maps frontend screens to their required backend API endpoints. Use th
 | Send Message | POST | `/chat/rooms/:id/messages` | Send new message |
 | Mark Read | PUT | `/chat/rooms/:id/read` | Mark messages as read |
 
-### Create Session (`/coach/session/create`)
-**Component:** `pages/coach/session-create.tsx`
+### Create Session (`/admin/session/create`)
+**Component:** `pages/admin/session-create.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
 | Create Meeting | POST | `/meetings` | Create Zoom meeting |
 
-### Session Detail (`/coach/session/:id`)
-**Component:** `pages/coach/session-detail.tsx`
+### Session Detail (`/admin/session/:id`)
+**Component:** `pages/admin/session-detail.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
@@ -152,71 +152,71 @@ This guide maps frontend screens to their required backend API endpoints. Use th
 
 ---
 
-## Patient Routes
+## Member Routes
 
-### Patient Dashboard (`/patient`)
-**Component:** `pages/patient/home.tsx`
+### Member Dashboard (`/member`)
+**Component:** `pages/member/home.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
 | Today's Survey | GET | `/surveys/daily/today` | Check if survey completed |
-| Exercises with Logs | GET | `/exercise-prescriptions/patient/:id/with-logs` | Today's exercises + progress |
-| Next Meeting | GET | `/meetings/patient/next` | Get upcoming session |
+| Exercises with Logs | GET | `/exercise-prescriptions/member/:id/with-logs` | Today's exercises + progress |
+| Next Meeting | GET | `/meetings/member/next` | Get upcoming session |
 
-### Patient Calendar (`/patient/calendar`)
-**Component:** `pages/patient/calendar.tsx`
-
-| API | Method | Endpoint | Purpose |
-|-----|--------|----------|---------|
-| Get Meetings | GET | `/meetings/patient/range` | Get meetings for date range |
-
-### Exercise List (`/patient/exercise`)
-**Component:** `pages/patient/exercise.tsx`
+### Member Calendar (`/member/calendar`)
+**Component:** `pages/member/calendar.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
-| Get Prescriptions | GET | `/exercise-prescriptions/patient/:id` | Get assigned exercises |
+| Get Meetings | GET | `/meetings/member/range` | Get meetings for date range |
+
+### Exercise List (`/member/exercise`)
+**Component:** `pages/member/exercise.tsx`
+
+| API | Method | Endpoint | Purpose |
+|-----|--------|----------|---------|
+| Get Prescriptions | GET | `/exercise-prescriptions/member/:id` | Get assigned exercises |
 | Get Logs | GET | `/exercise-logs` | Get today's exercise logs |
 
-### Exercise Detail (`/patient/exercise/:id`)
-**Component:** `pages/patient/exercise-detail.tsx`
+### Exercise Detail (`/member/exercise/:id`)
+**Component:** `pages/member/exercise-detail.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
 | Get Exercise | GET | `/exercises/:id` | Get exercise details |
 | Log Exercise | POST | `/exercise-logs` | Record exercise completion |
 
-### Exercise History (`/patient/exercise/history`)
-**Component:** `pages/patient/exercise-history.tsx`
+### Exercise History (`/member/exercise/history`)
+**Component:** `pages/member/exercise-history.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
 | Get History | GET | `/exercise-days/history` | Get exercise day history |
 | Get Logs | GET | `/exercise-logs/range` | Get logs for date range |
 
-### Daily Survey (`/patient/survey`)
-**Component:** `pages/patient/survey.tsx`
+### Daily Survey (`/member/survey`)
+**Component:** `pages/member/survey.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
 | Submit Survey | POST | `/surveys/daily` | Submit daily survey |
 
-### Survey History (`/patient/survey/history`)
-**Component:** `pages/patient/survey-history.tsx`
+### Survey History (`/member/survey/history`)
+**Component:** `pages/member/survey-history.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
 | Get History | GET | `/surveys/history` | Get survey history |
 
-### Chat List (`/patient/chat`)
-**Component:** `pages/patient/chat.tsx`
+### Chat List (`/member/chat`)
+**Component:** `pages/member/chat.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
 | Get Rooms | GET | `/chat/rooms` | Get all chat rooms |
 
-### Chat Detail (`/patient/chat/:id`)
-**Component:** `pages/patient/chat-detail.tsx`
+### Chat Detail (`/member/chat/:id`)
+**Component:** `pages/member/chat-detail.tsx`
 
 | API | Method | Endpoint | Purpose |
 |-----|--------|----------|---------|
@@ -253,7 +253,7 @@ import type { Meeting, CreateMeetingDto } from '~/types/meeting';
 
 export const meetingService = {
   getTodayMeetings: () =>
-    httpService.get<Meeting[]>('/meetings/coach/today'),
+    httpService.get<Meeting[]>('/meetings/admin/today'),
 
   createMeeting: (data: CreateMeetingDto) =>
     httpService.post<Meeting>('/meetings', data),
@@ -306,7 +306,7 @@ const meetingSlice = createSlice({
 ### Using in a Component
 
 ```typescript
-// app/(coach)/home.tsx
+// app/(admin)/home.tsx
 import { useEffect } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -314,7 +314,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/store/hooks';
 import { fetchTodayMeetings } from '@/redux/features/meetingSlice';
 import { MeetingCard } from '@/components/MeetingCard';
 
-export default function CoachHome() {
+export default function AdminHome() {
   const dispatch = useAppDispatch();
   const { meetings, loading } = useAppSelector((state) => state.meetings);
 

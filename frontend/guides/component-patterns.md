@@ -1,6 +1,6 @@
 # Component Patterns
 
-Modern React component architecture for the ActivityCoaching application using Shadcn/UI, Tailwind CSS, and TypeScript.
+Modern React component architecture for the Project application using Shadcn/UI, Tailwind CSS, and TypeScript.
 
 ---
 

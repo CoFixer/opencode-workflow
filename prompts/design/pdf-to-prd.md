@@ -116,9 +116,16 @@ Create the markdown file with this exact structure:
 
 2. Save the markdown file:
    - Filename: [original-pdf-name].md (without .pdf extension)
-   - Location: .project/prd/
+   - Location: `.project/prd/`
 
-3. Report the output file location
+3. If the output exceeds ~40 KB (or ~1500 lines), split it:
+   - Keep `[original-pdf-name].md` as a short **index**: metadata, file manifest, section → file map, TL;DR, and reading order.
+   - Write one file per top-level part, prefixed for order, e.g. `01-product-strategy.md`, `02-design-and-ux.md`, `03-feature-specifications.md`, `04-architecture-and-technical.md`, `05-business-and-operations.md`, `06-appendices.md`.
+   - Each part starts with an H1 and a navigation line linking back to the index and to the next part.
+   - Do not duplicate content between the index and the parts.
+   - This keeps agent context small: load the index, then only the relevant part.
+
+4. Report the output file location(s).
 
 ## Step 6: Summary Report
 
@@ -139,9 +146,9 @@ After conversion, provide:
 
 **Input:**
 ```
-/pdf-to-prd /Users/user/Documents/coaching-record-prd.pdf
+/pdf-to-prd /Users/user/Documents/domain-record-prd.pdf
 ```
 
 **Output:**
-- File created: `.project/prd/coaching-record-prd.md`
+- File created: `.project/prd/domain-record-prd.md`
 - Sections extracted: Overview, Terminology, User Types, Project Structure, Page Architecture, Page List

@@ -41,7 +41,7 @@ Design context calls: X  ← MUST EQUAL screenshot calls
 When `get_design_context` exceeds token limits, it's **automatically saved to a file**:
 
 ```
-Output has been saved to /Users/.../.pi/projects/.../tool-results/mcp-figma-get_design_context-XXXXX.txt
+Output has been saved to /Users/.../.project/.../tool-results/mcp-figma-get_design_context-XXXXX.txt
 ```
 
 **Do NOT skip - read the file and extract values:**

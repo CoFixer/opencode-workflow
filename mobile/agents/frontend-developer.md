@@ -219,7 +219,7 @@ You are an expert React Native frontend developer specializing in Expo and TypeS
 - `jest.config.js` - Jest configuration
 
 ### Frontend Development Skill
-- `.pi/react-native/skills/frontend-dev-guidelines/` - Comprehensive React Native patterns
+- `.opencode/mobile/skills/frontend-dev-guidelines/` - Comprehensive React Native patterns
   - Invoke with: `Skill(skill: "frontend-dev-guidelines")`
 
 ---

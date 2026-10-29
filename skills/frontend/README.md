@@ -217,7 +217,7 @@ Each skill follows Anthropic's best practices:
 ### 📁 Directory Structure
 
 ```
-.pi/react/skills/
+.opencode/skills/frontend/
 ├── README.md                           # This file
 ├── skill-rules.json                    # Trigger configuration
 ├── qa/

@@ -18,26 +18,26 @@
 **Before writing ANY code, you MUST read these guides based on your task:**
 
 #### For ALL Tasks (Always Read):
-1. **`.pi/nestjs/guides/best-practices.md`** (CRITICAL RULES - MANDATORY)
+1. **`.opencode/backend/guides/best-practices.md`** (CRITICAL RULES - MANDATORY)
    - I18nHelper usage (NEVER hardcode strings)
    - Check existing APIs first (ALWAYS grep before creating)
    - Base class requirements (ALWAYS extend base classes)
    - Controller, service, repository separation rules
 
 #### For Database Work:
-2. **`.pi/nestjs/guides/database-patterns.md`** - Entity design, migrations, TypeORM patterns
-3. **`.pi/nestjs/guides/services-and-repositories.md`** - Repository patterns, service layer
+2. **`.opencode/backend/guides/database-patterns.md`** - Entity design, migrations, TypeORM patterns
+3. **`.opencode/backend/guides/services-and-repositories.md`** - Repository patterns, service layer
 
 #### For API Endpoints:
-4. **`.pi/nestjs/guides/routing-and-controllers.md`** - Controller patterns, decorators
-5. **`.pi/nestjs/guides/validation-patterns.md`** - DTO validation, class-validator
+4. **`.opencode/backend/guides/routing-and-controllers.md`** - Controller patterns, decorators
+5. **`.opencode/backend/guides/validation-patterns.md`** - DTO validation, class-validator
 
 #### For Authentication:
-6. **`.pi/nestjs/guides/authentication-cookies.md`** - Cookie-based auth (NO localStorage)
-7. **`.pi/nestjs/guides/middleware-guide.md`** - Guards, interceptors, pipes
+6. **`.opencode/backend/guides/authentication-cookies.md`** - Cookie-based auth (NO localStorage)
+7. **`.opencode/backend/guides/middleware-guide.md`** - Guards, interceptors, pipes
 
 #### For Testing:
-8. **`.pi/nestjs/guides/workflow-generate-e2e-tests.md`** - E2E testing patterns
+8. **`.opencode/backend/guides/workflow-generate-e2e-tests.md`** - E2E testing patterns
 
 ### Critical Rules Enforcement
 
@@ -122,7 +122,7 @@ Before proceeding to implementation, confirm you understand:
 ### 3. Database Integration
 
 **Entity Design:**
-- Reference `.pi/docs/PROJECT_DATABASE.md` for schema
+- Reference `.opencode/base/docs/PROJECT_DATABASE.md` for schema
 - Follow database naming conventions
 - Implement proper column types and constraints
 - Add cascade options for relationships
@@ -456,7 +456,7 @@ If refactoring causes issues:
 **Rollback Steps**:
 1. Restore `backend-developer.md.backup` (created before refactoring)
 2. Update agent-registry.json if modified
-3. Clear conversation cache: `.pi/memory/conversations/`
+3. Clear conversation cache: `.project/memory/conversations/`
 4. Test with known-working scenario
 
 **Backup Location**:

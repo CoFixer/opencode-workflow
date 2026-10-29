@@ -41,12 +41,12 @@ touch frontend/test/tests/[page].spec.ts
 ```typescript
 // frontend/test/tests/[page].spec.ts
 import { test, expect } from '@playwright/test';
-import { authenticateAsCoach, testUsers } from '../fixtures/auth.fixture';
+import { authenticateAsAdmin, testUsers } from '../fixtures/auth.fixture';
 
 test.describe('[PageName] Page', () => {
   test.beforeEach(async ({ page }) => {
-    await authenticateAsCoach(page);
-    await page.goto('/coach/[route]');
+    await authenticateAsAdmin(page);
+    await page.goto('/admin/[route]');
   });
 
   test('should display page correctly', async ({ page }) => {
@@ -75,13 +75,13 @@ frontend/
     │   ├── auth/
     │   │   ├── login.spec.ts
     │   │   └── signup.spec.ts
-    │   ├── coach/
-    │   └── patient/
+    │   ├── admin/
+    │   └── member/
     ├── pages/                     # Page Object Models
     │   ├── base.page.ts
     │   ├── auth/
-    │   ├── coach/
-    │   └── patient/
+    │   ├── admin/
+    │   └── member/
     ├── fixtures/                  # Test fixtures
     │   ├── auth.fixture.ts
     │   └── user.fixture.ts
@@ -128,12 +128,12 @@ export default defineConfig({
 ```typescript
 test('should login successfully', async ({ page }) => {
   await page.goto('/');
-  await page.getByPlaceholder('Username').fill(testUsers.coach.username);
-  await page.getByPlaceholder('Password').fill(testUsers.coach.password);
+  await page.getByPlaceholder('Username').fill(testUsers.admin.username);
+  await page.getByPlaceholder('Password').fill(testUsers.admin.password);
   await page.getByRole('button', { name: 'Login' }).click();
 
-  await page.waitForURL('/coach');
-  await expect(page).toHaveURL('/coach');
+  await page.waitForURL('/admin');
+  await expect(page).toHaveURL('/admin');
 });
 
 test('should show error for invalid credentials', async ({ page }) => {
@@ -150,18 +150,18 @@ test('should show error for invalid credentials', async ({ page }) => {
 
 ```typescript
 test('should submit form successfully', async ({ page }) => {
-  await page.goto('/patient/exercise/new');
+  await page.goto('/member/exercise/new');
 
   await page.getByLabel('Exercise Name').fill('Morning Run');
   await page.getByLabel('Duration').fill('30');
   await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(page.getByText('Exercise created successfully')).toBeVisible();
-  await page.waitForURL(/\/patient\/exercise\/\d+/);
+  await page.waitForURL(/\/member\/exercise\/\d+/);
 });
 
 test('should show validation errors', async ({ page }) => {
-  await page.goto('/patient/exercise/new');
+  await page.goto('/member/exercise/new');
   await page.getByRole('button', { name: 'Save' }).click();
 
   await expect(page.getByText('Name is required')).toBeVisible();
@@ -172,28 +172,28 @@ test('should show validation errors', async ({ page }) => {
 
 ```typescript
 test('should display list of items', async ({ page }) => {
-  await page.goto('/coach/patients');
+  await page.goto('/admin/members');
 
   // Wait for either content or empty state
   await Promise.race([
-    page.locator('[data-testid="patient-list"]').waitFor(),
-    page.getByText('No patients found').waitFor(),
+    page.locator('[data-testid="member-list"]').waitFor(),
+    page.getByText('No members found').waitFor(),
   ]);
 
   // Test shows data or empty state
-  const hasData = await page.locator('[data-testid="patient-item"]').count() > 0;
+  const hasData = await page.locator('[data-testid="member-item"]').count() > 0;
   if (hasData) {
-    await expect(page.locator('[data-testid="patient-item"]').first()).toBeVisible();
+    await expect(page.locator('[data-testid="member-item"]').first()).toBeVisible();
   } else {
-    await expect(page.getByText('No patients found')).toBeVisible();
+    await expect(page.getByText('No members found')).toBeVisible();
   }
 });
 
 test('should navigate to detail page', async ({ page }) => {
-  await page.goto('/coach/patients');
-  await page.locator('[data-testid="patient-item"]').first().click();
+  await page.goto('/admin/members');
+  await page.locator('[data-testid="member-item"]').first().click();
 
-  await expect(page).toHaveURL(/\/coach\/patient\/\d+/);
+  await expect(page).toHaveURL(/\/admin\/member\/\d+/);
   await expect(page.getByRole('heading')).toBeVisible();
 });
 ```
@@ -235,34 +235,34 @@ export abstract class BasePage {
 ### Example Page Object
 
 ```typescript
-// frontend/test/pages/coach/patients.page.ts
+// frontend/test/pages/admin/members.page.ts
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from '../base.page';
 
-export class CoachPatientsPage extends BasePage {
-  readonly url = '/coach/patients';
+export class AdminMembersPage extends BasePage {
+  readonly url = '/admin/members';
 
   // Locators
-  readonly patientList: Locator;
+  readonly memberList: Locator;
   readonly emptyState: Locator;
   readonly addButton: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.patientList = page.locator('[data-testid="patient-list"]');
-    this.emptyState = page.getByText('No patients found');
-    this.addButton = page.getByRole('button', { name: 'Add Patient' });
+    this.memberList = page.locator('[data-testid="member-list"]');
+    this.emptyState = page.getByText('No members found');
+    this.addButton = page.getByRole('button', { name: 'Add Member' });
   }
 
-  async waitForPatients(): Promise<void> {
-    await this.waitForContentOrEmptyState(this.patientList, this.emptyState);
+  async waitForMembers(): Promise<void> {
+    await this.waitForContentOrEmptyState(this.memberList, this.emptyState);
   }
 
-  async clickPatient(index: number): Promise<void> {
-    await this.patientList.locator('[data-testid="patient-item"]').nth(index).click();
+  async clickMember(index: number): Promise<void> {
+    await this.memberList.locator('[data-testid="member-item"]').nth(index).click();
   }
 
-  async addNewPatient(): Promise<void> {
+  async addNewMember(): Promise<void> {
     await this.addButton.click();
   }
 }
@@ -271,16 +271,16 @@ export class CoachPatientsPage extends BasePage {
 ### Using Page Objects
 
 ```typescript
-import { CoachPatientsPage } from '../pages/coach/patients.page';
+import { AdminMembersPage } from '../pages/admin/members.page';
 
-test('should navigate to patient detail', async ({ page }) => {
-  const patientsPage = new CoachPatientsPage(page);
+test('should navigate to member detail', async ({ page }) => {
+  const membersPage = new AdminMembersPage(page);
 
-  await patientsPage.navigate();
-  await patientsPage.waitForPatients();
-  await patientsPage.clickPatient(0);
+  await membersPage.navigate();
+  await membersPage.waitForMembers();
+  await membersPage.clickMember(0);
 
-  await expect(page).toHaveURL(/\/coach\/patient\/\d+/);
+  await expect(page).toHaveURL(/\/admin\/member\/\d+/);
 });
 ```
 
@@ -301,34 +301,34 @@ export const testUsers = {
     password: '12341234',
     role: 'ADMIN',
   },
-  coach: {
-    username: 'coach',
-    email: 'coach@example.com',
+  admin: {
+    username: 'admin',
+    email: 'admin@example.com',
     password: '12341234',
-    role: 'COACH',
+    role: 'ADMIN',
   },
-  patient: {
-    username: 'patient',
-    email: 'patient@example.com',
+  member: {
+    username: 'member',
+    email: 'member@example.com',
     password: '12341234',
-    role: 'PATIENT',
+    role: 'MEMBER',
   },
 };
 
-export async function authenticateAsCoach(page: Page): Promise<void> {
+export async function authenticateAsAdmin(page: Page): Promise<void> {
   await page.goto('/');
-  await page.getByPlaceholder('Username').fill(testUsers.coach.username);
-  await page.getByPlaceholder('Password').fill(testUsers.coach.password);
+  await page.getByPlaceholder('Username').fill(testUsers.admin.username);
+  await page.getByPlaceholder('Password').fill(testUsers.admin.password);
   await page.getByRole('button', { name: 'Login' }).click();
-  await page.waitForURL('/coach');
+  await page.waitForURL('/admin');
 }
 
-export async function authenticateAsPatient(page: Page): Promise<void> {
+export async function authenticateAsMember(page: Page): Promise<void> {
   await page.goto('/');
-  await page.getByPlaceholder('Username').fill(testUsers.patient.username);
-  await page.getByPlaceholder('Password').fill(testUsers.patient.password);
+  await page.getByPlaceholder('Username').fill(testUsers.member.username);
+  await page.getByPlaceholder('Password').fill(testUsers.member.password);
   await page.getByRole('button', { name: 'Login' }).click();
-  await page.waitForURL('/patient');
+  await page.waitForURL('/member');
 }
 ```
 
@@ -337,29 +337,29 @@ export async function authenticateAsPatient(page: Page): Promise<void> {
 ```typescript
 // Extend base test with custom fixtures
 import { test as base } from '@playwright/test';
-import { CoachPatientsPage } from './pages/coach/patients.page';
+import { AdminMembersPage } from './pages/admin/members.page';
 
 type MyFixtures = {
-  patientsPage: CoachPatientsPage;
-  authenticatedCoach: void;
+  membersPage: AdminMembersPage;
+  authenticatedAdmin: void;
 };
 
 export const test = base.extend<MyFixtures>({
-  authenticatedCoach: async ({ page }, use) => {
-    await authenticateAsCoach(page);
+  authenticatedAdmin: async ({ page }, use) => {
+    await authenticateAsAdmin(page);
     await use();
   },
 
-  patientsPage: async ({ page }, use) => {
-    const patientsPage = new CoachPatientsPage(page);
-    await use(patientsPage);
+  membersPage: async ({ page }, use) => {
+    const membersPage = new AdminMembersPage(page);
+    await use(membersPage);
   },
 });
 
 // Usage
-test('should load patients', async ({ authenticatedCoach, patientsPage }) => {
-  await patientsPage.navigate();
-  await patientsPage.waitForPatients();
+test('should load members', async ({ authenticatedAdmin, membersPage }) => {
+  await membersPage.navigate();
+  await membersPage.waitForMembers();
 });
 ```
 
@@ -371,16 +371,16 @@ test('should load patients', async ({ authenticatedCoach, patientsPage }) => {
 
 ```typescript
 // ✅ GOOD - Tests real backend
-test('should create patient', async ({ page }) => {
-  await page.goto('/coach/patients/new');
+test('should create member', async ({ page }) => {
+  await page.goto('/admin/members/new');
   await page.getByLabel('Name').fill('John Doe');
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('Patient created')).toBeVisible();
+  await expect(page.getByText('Member created')).toBeVisible();
 });
 
 // ❌ BAD - Don't mock APIs in E2E tests
-test('should create patient', async ({ page }) => {
-  await page.route('**/api/patients', (route) => {
+test('should create member', async ({ page }) => {
+  await page.route('**/api/members', (route) => {
     route.fulfill({ json: { id: 1, name: 'John Doe' } });
   });
   // This defeats the purpose of E2E testing

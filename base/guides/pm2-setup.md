@@ -18,7 +18,7 @@ PM2 is a process manager for Node.js that enables managing multiple development 
 | Backend (NestJS) | 3000 | Fixed |
 | Frontend (React Router) | 5173 | Fixed |
 | admin-dashboard | 5174 | First dashboard alphabetically |
-| coach-dashboard | 5175 | Second dashboard |
+| admin-dashboard | 5175 | Second dashboard |
 | owner-dashboard | 5176 | Third dashboard |
 | ... | 5177+ | Additional dashboards auto-increment |
 
@@ -58,7 +58,7 @@ npm run dev:stop     # Stop all servers
 pm2 restart backend     # Restart only backend
 pm2 logs frontend       # View only frontend logs
 pm2 stop admin          # Stop only admin dashboard
-pm2 restart coach       # Restart coach dashboard
+pm2 restart admin       # Restart admin dashboard
 
 # Log management
 pm2 logs                # All logs, real-time
@@ -80,7 +80,7 @@ your-project/
 ├── backend/                      → port 3000
 ├── frontend/                     → port 5173
 ├── frontend-admin-dashboard/     → port 5174
-├── frontend-coach-dashboard/     → port 5175
+├── frontend-admin-dashboard/     → port 5175
 ├── frontend-owner-dashboard/     → port 5176
 ```
 

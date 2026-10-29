@@ -1,6 +1,6 @@
 # Mobile Authentication
 
-How authentication works in the StorePilot mobile app.
+How authentication works in the mobile app.
 
 ## Flow
 

@@ -1,6 +1,6 @@
 # Mobile Best Practices
 
-Best practices for StorePilot mobile development.
+Best practices for mobile development in this project.
 
 ## Performance
 

@@ -47,7 +47,7 @@ Extract:
 - `@ApiOperation({ summary })` - Endpoint description
 - `@ApiResponse({ status, description })` - Response codes
 - `@Public()` - Public endpoints (no auth required)
-- `@Roles('role')`, `@AdminOnly()`, `@CoachOnly()`, `@PatientOnly()` - Access control
+- `@Roles('role')`, `@AdminOnly()`, `@AdminOnly()`, `@MemberOnly()` - Access control
 
 ### 2. Custom @ApiSwagger Decorator
 
@@ -123,7 +123,7 @@ All responses are wrapped in `ResponsePayloadDto`:
 ```markdown
 # Project API Reference
 
-> Auto-generated API documentation for ActivityCoaching Backend
+> Auto-generated API documentation for Project Backend
 
 ## Base URL
 
@@ -185,7 +185,7 @@ Authenticate user and receive JWT tokens.
 ```markdown
 ### {METHOD} {Path}
 
-{Access: Public | Requires Auth | Admin Only | Coach Only | Patient Only}
+{Access: Public | Requires Auth | Admin Only | Admin Only | Member Only}
 
 {Summary/Description}
 

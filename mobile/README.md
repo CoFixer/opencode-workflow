@@ -1,11 +1,11 @@
 ---
 name: mobile-workspace
-description: React Native mobile workspace for StorePilot.
+description: React Native mobile workspace.
 ---
 
 # .opencode/mobile
 
-React Native-specific agents, guides, and examples for the StorePilot mobile app.
+React Native-specific agents, guides, and examples for the project's mobile app.
 
 ## Directory Structure
 

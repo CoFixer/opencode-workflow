@@ -69,8 +69,8 @@ From requirements, extract nouns that represent storable data:
 Example from PRD:
 
 - "Users can submit **daily surveys**" → DailySurvey entity
-- "Coaches schedule **Zoom meetings**" → ZoomMeeting entity
-- "Patients complete **exercises**" → Exercise, ExerciseLog entities
+- "Admines schedule **Zoom meetings**" → ZoomMeeting entity
+- "Members complete **exercises**" → Exercise, ExerciseLog entities
 ```
 
 ---
@@ -292,7 +292,7 @@ Look for fields with fixed set of values:
 From PRD:
 
 - "Status: Scheduled / Completed / Cancelled" → MeetingStatusEnum
-- "Role: PATIENT / COACH" → UserRoleEnum
+- "Role: MEMBER / ADMIN" → UserRoleEnum
 - "Muscle pain: None / Mild / Moderate / Severe" → MusclePainEnum
 ```
 
@@ -398,7 +398,7 @@ export class EntityName extends BaseEntity {
 export class CreateUsersTable implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         // 1. Create enums first
-        await queryRunner.query(`CREATE TYPE "user_role_enum" AS ENUM ('PATIENT', 'COACH')`);
+        await queryRunner.query(`CREATE TYPE "user_role_enum" AS ENUM ('MEMBER', 'ADMIN')`);
 
         // 2. Create tables
         await queryRunner.createTable(new Table({ ... }), true);
@@ -454,13 +454,13 @@ Before finalizing, verify common queries:
 
 ```typescript
 // Test query patterns from requirements
-// Example: "Get patient's exercises for today"
+// Example: "Get member's exercises for today"
 const exercises = await exerciseRepository
     .createQueryBuilder('exercise')
     .leftJoinAndSelect('exercise.logs', 'log', 'log.date = :date', {
         date: today,
     })
-    .where('exercise.patientId = :patientId', { patientId })
+    .where('exercise.memberId = :memberId', { memberId })
     .getMany();
 ```
 

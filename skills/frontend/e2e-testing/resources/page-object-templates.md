@@ -108,21 +108,21 @@ export class LoginPage extends BasePage {
 
 ## List Page Object Template
 
-For pages with lists/tables (patients, exercises, chat):
+For pages with lists/tables (members, exercises, chat):
 
 ```typescript
-// frontend/test/pages/coach/patients.page.ts
+// frontend/test/pages/admin/members.page.ts
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from '../base.page';
 
-export class PatientsPage extends BasePage {
-  readonly url = '/coach/patients';
+export class MembersPage extends BasePage {
+  readonly url = '/admin/members';
 
   // =====================
   // LOCATORS - Header
   // =====================
   readonly title = this.page.getByRole('heading', { name: '담당 환자' });
-  readonly patientCount = this.page.locator('p').filter({ hasText: /총.*명/ });
+  readonly memberCount = this.page.locator('p').filter({ hasText: /총.*명/ });
 
   // =====================
   // LOCATORS - Search/Filter
@@ -134,7 +134,7 @@ export class PatientsPage extends BasePage {
   // =====================
   // LOCATORS - List Items
   // =====================
-  readonly patientCards = this.page.locator('[data-testid="patient-card"]');
+  readonly memberCards = this.page.locator('[data-testid="member-card"]');
   readonly emptyState = this.page.getByText('검색 결과가 없습니다');
   readonly loadingSpinner = this.page.locator('[data-loading="true"]');
 
@@ -145,7 +145,7 @@ export class PatientsPage extends BasePage {
   // =====================
   // ACTIONS - Search/Filter
   // =====================
-  async searchPatient(name: string): Promise<void> {
+  async searchMember(name: string): Promise<void> {
     await this.searchInput.fill(name);
     await this.page.waitForLoadState('networkidle');
   }
@@ -163,30 +163,30 @@ export class PatientsPage extends BasePage {
   // =====================
   // ACTIONS - List Items
   // =====================
-  async clickPatient(name: string): Promise<void> {
-    await this.patientCards.filter({ hasText: name }).click();
+  async clickMember(name: string): Promise<void> {
+    await this.memberCards.filter({ hasText: name }).click();
   }
 
-  async clickPatientByIndex(index: number): Promise<void> {
-    await this.patientCards.nth(index).click();
+  async clickMemberByIndex(index: number): Promise<void> {
+    await this.memberCards.nth(index).click();
   }
 
-  async getPatientCard(name: string): Promise<Locator> {
-    return this.patientCards.filter({ hasText: name });
+  async getMemberCard(name: string): Promise<Locator> {
+    return this.memberCards.filter({ hasText: name });
   }
 
   // =====================
   // GETTERS
   // =====================
-  async getPatientCount(): Promise<number> {
-    return this.patientCards.count();
+  async getMemberCount(): Promise<number> {
+    return this.memberCards.count();
   }
 
-  async getPatientNames(): Promise<string[]> {
-    const cards = await this.patientCards.all();
+  async getMemberNames(): Promise<string[]> {
+    const cards = await this.memberCards.all();
     const names: string[] = [];
     for (const card of cards) {
-      const name = await card.locator('.patient-name, h3').textContent();
+      const name = await card.locator('.member-name, h3').textContent();
       if (name) names.push(name.trim());
     }
     return names;
@@ -195,20 +195,20 @@ export class PatientsPage extends BasePage {
   // =====================
   // ASSERTIONS
   // =====================
-  async expectPatientVisible(name: string): Promise<void> {
-    await expect(this.patientCards.filter({ hasText: name })).toBeVisible();
+  async expectMemberVisible(name: string): Promise<void> {
+    await expect(this.memberCards.filter({ hasText: name })).toBeVisible();
   }
 
-  async expectPatientNotVisible(name: string): Promise<void> {
-    await expect(this.patientCards.filter({ hasText: name })).not.toBeVisible();
+  async expectMemberNotVisible(name: string): Promise<void> {
+    await expect(this.memberCards.filter({ hasText: name })).not.toBeVisible();
   }
 
   async expectEmptyState(): Promise<void> {
     await expect(this.emptyState).toBeVisible();
   }
 
-  async expectPatientCount(count: number): Promise<void> {
-    await expect(this.patientCards).toHaveCount(count);
+  async expectMemberCount(count: number): Promise<void> {
+    await expect(this.memberCards).toHaveCount(count);
   }
 
   async expectLoading(): Promise<void> {
@@ -228,7 +228,7 @@ export class PatientsPage extends BasePage {
 For detail/single-item pages:
 
 ```typescript
-// frontend/test/pages/patient/exercise-detail.page.ts
+// frontend/test/pages/member/exercise-detail.page.ts
 import { Page, expect } from '@playwright/test';
 import { BasePage } from '../base.page';
 
@@ -236,7 +236,7 @@ export class ExerciseDetailPage extends BasePage {
   readonly exerciseId: string;
 
   get url(): string {
-    return `/patient/exercise/${this.exerciseId}`;
+    return `/member/exercise/${this.exerciseId}`;
   }
 
   // =====================
@@ -292,7 +292,7 @@ export class ExerciseDetailPage extends BasePage {
 
   async goBack(): Promise<void> {
     await this.backButton.click();
-    await this.page.waitForURL('/patient/exercise');
+    await this.page.waitForURL('/member/exercise');
   }
 
   // =====================
@@ -327,12 +327,12 @@ export class ExerciseDetailPage extends BasePage {
 For multi-step flows (signup with OTP, wizards):
 
 ```typescript
-// frontend/test/pages/auth/patient-signup.page.ts
+// frontend/test/pages/auth/member-signup.page.ts
 import { Page, expect } from '@playwright/test';
 import { BasePage } from '../base.page';
 
-export class PatientSignupPage extends BasePage {
-  readonly url = '/signup/patient';
+export class MemberSignupPage extends BasePage {
+  readonly url = '/signup/member';
 
   // =====================
   // STEP INDICATORS
